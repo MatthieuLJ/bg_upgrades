@@ -1,0 +1,13 @@
+<h1>Enter the dimensions for your box</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'pattern' %}" method="post">
+{% csrf_token %}
+
+Height (mm):<input type="text" name="height" id="height_id"><br>
+Width (mm):<input type="text" name="width" id="width_id"><br>
+Depth (mm):<input type="text" name="depth" id="depth_id"><br>
+
+<input type="submit" value="send">
+</form>

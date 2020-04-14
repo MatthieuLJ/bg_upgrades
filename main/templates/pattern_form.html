@@ -6,7 +6,7 @@
 
     <script type="text/javascript">
 function check_number(field, error_label) {
-    if(field.value != "" && isNaN(field.value)) {
+    if(field.value != "" && (isNaN(field.value) || (field.value < 0))) {
         error_label.style.display="inline";
     } else {
         error_label.style.display="none";
@@ -22,16 +22,46 @@ function check_number(field, error_label) {
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
-<form action="{% url 'pattern' %}" method="post">
-{% csrf_token %}
+<div class="container">
+    <form action="{% url 'pattern' %}" method="post">
+        {% csrf_token %}
 
-Height (mm):<input type="text" name="height" id="height_id" oninput="check_number(this, height_error_id)">
-<span id="height_error_id" class="input_error">This needs to be a number</span><br>
-Width (mm):<input type="text" name="width" id="width_id">
-<span id="width_error_id" class="input_error">This needs to be a number</span><br>
-Depth (mm):<input type="text" name="depth" id="depth_id">
-<span id="depth_error_id" class="input_error">This needs to be a number</span><br>
-
-<input type="submit" value="send">
-</form>
+        <div class="row">
+            <div class="col-sm">
+                Height (mm):
+            </div>
+            <div class="col-sm">
+                <input type="text" name="height" id="height_id" oninput="check_number(this, height_error_id)">
+            </div>
+            <div id="height_error_id" class="input_error col-sm">
+                This needs to be a positive number
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                Width (mm):
+            </div>
+            <div class="col-sm">
+                <input type="text" name="width" id="width_id">
+            </div>
+            <div id="width_error_id" class="input_error col-sm">
+                This needs to be a positive number
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                Depth (mm):
+            </div>
+            <div class="col-sm">
+                <input type="text" name="depth" id="depth_id">
+            </div>
+            <div id="depth_error_id" class="input_error col-sm">
+                This needs to be a positive number
+            </div>
+        </div>
+        <div class="row">
+            <input type="submit" value="send">
+        </div>
+    </form>
+</div>
 </body>

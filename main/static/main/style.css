@@ -1,7 +1,8 @@
 
 .input_error {
-    display: none;
+    visibility: hidden;
     color: red;
+    font-size: small;
 }
 
 h1 {

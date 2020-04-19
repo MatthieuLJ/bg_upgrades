@@ -1,10 +1,11 @@
 # for all functions taking tuckbox, this is a dictionary with
 # height, width, depth
 
-import cairo
 import math
+from wand.color import Color
+from wand.drawing import Drawing
+from wand.image import Image
 
-from PIL import Image
 
 POINT_PER_MM = 72/25.4
 
@@ -21,44 +22,41 @@ def pattern_width(tuckbox):
     return ( 3*tuckbox['depth'] ) + ( 2*tuckbox['width'])
 
 def draw_box(paper, tuckbox):
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
-            math.ceil(paper['width'] * POINT_PER_MM),
-            math.ceil(paper['height'] * POINT_PER_MM))
-    ctx = cairo.Context(surface)
+    image = Image(width = math.ceil(paper['width'] * POINT_PER_MM),
+            height = math.ceil(paper['height'] * POINT_PER_MM))
+
+    draw = Drawing()
+    draw.fill_color = Color('white')
+    draw.stroke_color = Color('black')
+    draw.stroke_width = 1
     
-    ctx.scale(POINT_PER_MM, POINT_PER_MM)
+    draw.scale(POINT_PER_MM, POINT_PER_MM)
 
     # Find the coordinate of the left top corner to start drawing from there
     margin_height = (paper['height'] - pattern_height(tuckbox)) / 2
     margin_width = (paper['width'] - pattern_width(tuckbox)) / 2
 
-    ctx.translate(margin_width,
+    draw.translate(margin_width,
             margin_height + lip_size(tuckbox) + tuckbox['depth'])
 
+    draw.rectangle(left = 0, top = 0, 
+            width = tuckbox['depth'] , height = tuckbox['height'])
+    draw(image)
 
-    ctx.set_line_width(1 / POINT_PER_MM)
+    draw.rectangle(left = tuckbox['depth'], top = 0,
+            width = tuckbox['width'], height = tuckbox['height'])
+    draw(image)
 
-    ctx.set_source_rgb(1,1,1)
-    ctx.paint()
-    ctx.set_source_rgb(0,0,0)
+    draw.rectangle(left = tuckbox['depth'] + tuckbox['width'], top = 0,
+            width = tuckbox['depth'], height = tuckbox['height'])
+    draw(image)
 
-    ctx.rectangle(0, 0, tuckbox['depth'] , tuckbox['height'])
-    ctx.stroke()
-    ctx.rectangle(tuckbox['depth'], 0,
-            tuckbox['depth'] + tuckbox['width'], tuckbox['height'])
-    ctx.stroke()
-
-    surface.write_to_png("example.png")
-
-    return surface
-
-def save_surface_to_pdf(surface, paper):
-    pass
+    image.save(filename="example.png")
 
 
 if __name__ == "__main__":
     paper = { 'width': 200, 'height': 200 }
-    tuckbox = { 'height': 50, 'width': 30, 'depth': 20 }
-    surface = draw_box(paper, tuckbox)
+    tuckbox = { 'height': 50, 'width': 40, 'depth': 20 }
+    draw_box(paper, tuckbox)
 
 

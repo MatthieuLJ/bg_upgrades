@@ -1,5 +1,5 @@
 """
-WSGI config for tuckbox_pattern project.
+WSGI config for bg_upgrades project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tuckbox_pattern.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bg_upgrades.settings')
 
 application = get_wsgi_application()

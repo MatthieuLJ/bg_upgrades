@@ -5,7 +5,7 @@ import sys
 
 
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tuckbox_pattern.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bg_upgrades.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

@@ -38,7 +38,7 @@ def draw_box(paper, tuckbox):
 
 
     draw.fill_color = Color('white')
-    draw.fill_opacity = 1
+    draw.fill_opacity = 0
     draw.stroke_color = Color('black')
     
     draw.scale(POINT_PER_MM, POINT_PER_MM)
@@ -55,27 +55,22 @@ def draw_box(paper, tuckbox):
     # left side
     draw.rectangle(left = 0, top = 0, 
             width = tuckbox['depth'] , height = tuckbox['height'])
-    draw(image)
 
     # back
     draw.rectangle(left = tuckbox['depth'], top = 0,
             width = tuckbox['width'], height = tuckbox['height'])
-    draw(image)
 
     # right side
     draw.rectangle(left = tuckbox['depth'] + tuckbox['width'], top = 0,
             width = tuckbox['depth'], height = tuckbox['height'])
-    draw(image)
 
     # front
     draw.rectangle(left = 2 * tuckbox['depth'] + tuckbox['width'], top = 0,
             width = tuckbox['width'], height = tuckbox['height'])
-    draw(image)
 
     # top
     draw.rectangle(left = tuckbox['depth'], top = - tuckbox['depth'],
             width = tuckbox['width'], height = tuckbox['depth'])
-    draw(image)
 
     # 1/2 left of lip
     points = [(tuckbox['depth'], -tuckbox['depth']),
@@ -85,7 +80,6 @@ def draw_box(paper, tuckbox):
             (tuckbox['depth'] + .5 * tuckbox['width'],
                 -tuckbox['depth'] - lip_size(tuckbox))]
     draw.bezier(points)
-    draw(image)
 
     # 1/2 right of lip
     points = [(tuckbox['depth'] + tuckbox['width'], -tuckbox['depth']),
@@ -96,6 +90,22 @@ def draw_box(paper, tuckbox):
             (tuckbox['depth'] + .5 * tuckbox['width'],
                 -tuckbox['depth'] - lip_size(tuckbox))]
     draw.bezier(points)
+
+    # left top tab
+    tab_length = min(.9 * tuckbox['depth'], .4 * tuckbox['width'])
+    points = [(0,0), (.1 * tuckbox['depth'], -tab_length),
+            (.9 * tuckbox['depth'], -tab_length),
+            (tuckbox['depth'], 0)]
+    draw.polyline(points)
+
+    # right top tab
+    points = [(tuckbox['depth'] + tuckbox['width'],0),
+            (tuckbox['depth'] + tuckbox['width'] + .1 * tuckbox['depth'],
+                -tab_length),
+            (tuckbox['depth'] + tuckbox['width'] + .9 * tuckbox['depth'],
+                -tab_length),
+            (2*tuckbox['depth'] + tuckbox['width'], 0)]
+    draw.polyline(points)
     draw(image)
 
     image.save(filename="example.pdf")

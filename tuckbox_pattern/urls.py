@@ -17,6 +17,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('tuck/', include('main.urls')),
+    path('tuck/', include('tuckbox.urls')),
     path('admin/', admin.site.urls),
 ]

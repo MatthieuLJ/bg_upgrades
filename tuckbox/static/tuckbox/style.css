@@ -1,8 +1,13 @@
 
 .input_error {
     visibility: hidden;
+    vertical-align: middle;
     color: red;
     font-size: small;
+}
+
+.label {
+    text-align: right;
 }
 
 h1 {

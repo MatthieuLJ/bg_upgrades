@@ -27,33 +27,33 @@ function check_number(field, error_label) {
         {% csrf_token %}
 
         <div class="row">
-            <div class="col-md">
+            <div class="label col-md">
                 Height (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="height" id="height_id" oninput="check_number(this, height_error_id)">
+                <input type="text" name="height" id="id_height" oninput="check_number(this, height_error_id)">
             </div>
             <div id="height_error_id" class="input_error col-sm">
                 This needs to be a valid number
             </div>
         </div>
         <div class="row">
-            <div class="col-md">
+            <div class="label col-md">
                 Width (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="width" id="width_id">
+                <input type="text" name="width" id="id_width">
             </div>
             <div id="width_error_id" class="input_error col-sm">
                 This needs to be a valid number
             </div>
         </div>
         <div class="row">
-            <div class="col-md">
+            <div class="label col-md">
                 Depth (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="depth" id="depth_id">
+                <input type="text" name="depth" id="id_depth">
             </div>
             <div id="depth_error_id" class="input_error col-sm">
                 This needs to be a valid number

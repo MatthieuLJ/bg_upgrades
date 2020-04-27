@@ -108,12 +108,16 @@ def draw_box(paper, tuckbox):
     draw.polyline(points)
     draw(image)
 
-    image.save(filename="example.pdf")
+    return image
 
+def create_box_file(filename, paper, tuckbox):
+    image = draw_box(paper, tuckbox)
+
+    image.save(filename=filename)
 
 if __name__ == "__main__":
     paper = { 'width': 200, 'height': 200 }
     tuckbox = { 'height': 50, 'width': 40, 'depth': 20 }
-    draw_box(paper, tuckbox)
+    create_box_file("example.pdf", paper, tuckbox)
 
 

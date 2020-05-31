@@ -1,17 +1,29 @@
 <head>
+    <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <!-- Include our own CSS -->
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'tuckbox/style.css' %}">
 
+    <!-- Include jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <script type="text/javascript">
-function check_number(field, error_label) {
+function check_number(field, error_label_id) {
     if(field.value != "" && (isNaN(field.value) || (field.value < 0))) {
-        error_label.style.visibility="visible";
+        $(error_label_id).css('visibility','visible');
     } else {
-        error_label.style.visibility="hidden";
+        $(error_label_id).css('visibility','hidden');
     }
 }
+
+$(function() {
+    // For all the elements with the "tuck_input_num" class
+    // hook the check number function with the error label also
+    $(".tuck_input_num").on('input', function() {check_number(this, "#" + this.id + "_error")});
+
+});
     </script>
 </head>
 
@@ -31,9 +43,9 @@ function check_number(field, error_label) {
                 Height (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="height" id="id_height" oninput="check_number(this, height_error_id)">
+                <input type="text" name="height" id="id_height" class="tuck_input_num">
             </div>
-            <div id="height_error_id" class="input_error col-sm">
+            <div id="id_height_error" class="input_error col-sm">
                 This needs to be a valid number
             </div>
         </div>
@@ -42,9 +54,9 @@ function check_number(field, error_label) {
                 Width (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="width" id="id_width" oninput="check_number(this, width_error_id)">
+                <input type="text" name="width" id="id_width" class="tuck_input_num">
             </div>
-            <div id="width_error_id" class="input_error col-sm">
+            <div id="id_width_error" class="input_error col-sm">
                 This needs to be a valid number
             </div>
         </div>
@@ -53,9 +65,9 @@ function check_number(field, error_label) {
                 Depth (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="depth" id="id_depth" oninput="check_number(this, depth_error_id)">
+                <input type="text" name="depth" id="id_depth" class="tuck_input_num">
             </div>
-            <div id="depth_error_id" class="input_error col-sm">
+            <div id="id_depth_error" class="input_error col-sm">
                 This needs to be a valid number
             </div>
         </div>

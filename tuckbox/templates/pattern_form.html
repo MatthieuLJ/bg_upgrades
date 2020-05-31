@@ -42,7 +42,7 @@ function check_number(field, error_label) {
                 Width (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="width" id="id_width">
+                <input type="text" name="width" id="id_width" oninput="check_number(this, width_error_id)">
             </div>
             <div id="width_error_id" class="input_error col-sm">
                 This needs to be a valid number
@@ -53,7 +53,7 @@ function check_number(field, error_label) {
                 Depth (mm):
             </div>
             <div class="col-md">
-                <input type="text" name="depth" id="id_depth">
+                <input type="text" name="depth" id="id_depth" oninput="check_number(this, depth_error_id)">
             </div>
             <div id="depth_error_id" class="input_error col-sm">
                 This needs to be a valid number

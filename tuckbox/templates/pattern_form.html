@@ -18,11 +18,15 @@ function check_number(field, error_label_id) {
     }
 }
 
+// Entry function when the page is loaded
 $(function() {
     // For all the elements with the "tuck_input_num" class
     // hook the check number function with the error label also
-    $(".tuck_input_num").on('input', function() {check_number(this, "#" + this.id + "_error")});
+    $(".tuck_input_num").change(function() {check_number(this, "#" + this.id + "_error")});
 
+    $("#id_preview").click(function() {
+        alert("clicked me!");
+    });
 });
     </script>
 </head>
@@ -70,6 +74,11 @@ $(function() {
             <div id="id_depth_error" class="input_error col-sm">
                 This needs to be a valid number
             </div>
+        </div>
+        <div class="row">
+            <button type="button" id="id_preview" value="preview">
+        </div>
+        <div id="image_preview" class="row">
         </div>
         <div class="row">
             <input type="submit" value="send">

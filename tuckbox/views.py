@@ -1,8 +1,9 @@
+import base64
 import json
 import tempfile
 from . import box
 from django.shortcuts import render, redirect
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django import forms
 
 class PatternForm(forms.Form):
@@ -22,21 +23,17 @@ def preview(request):
     tmp = tempfile.NamedTemporaryFile(suffix=".png")
     print(tmp.name)
 
-
     data = json.loads(request.body)
-    # hardcode for now
     paper = data['paper']
     tuckbox = data['tuckbox']
-    # paper = { 'width': 100, 'height': 100}
-    # tuckbox = { 'width': float(form.cleaned_data['width']),
-            # 'height': float(form.cleaned_data['height']),
-            # 'depth': float(form.cleaned_data['depth'])}
     print("paper: ", paper)
     print("tuckbox: ", tuckbox)
 
     box.create_box_file(tmp.name, paper, tuckbox)
 
-    return FileResponse(tmp)
+    encoded_string = base64.b64encode(tmp.read())
+
+    return HttpResponse(encoded_string, content_type="image/png")
 
 def pattern(request):
     if request.method != 'POST':

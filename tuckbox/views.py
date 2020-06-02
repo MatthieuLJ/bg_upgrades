@@ -17,6 +17,26 @@ def index(request):
     form = PatternForm()
     return render(request, "pattern_form.html", { 'form': form })
 
+def preview(request):
+    tmp = tempfile.NamedTemporaryFile(suffix=".png")
+    print(tmp.name)
+
+
+    print(request.POST.get('paper'))
+    # hardcode for now
+    paper = request.POST.get('paper', None)
+    tuckbox = request.POST.get('tuckbox', None)
+    # paper = { 'width': 100, 'height': 100}
+    # tuckbox = { 'width': float(form.cleaned_data['width']),
+            # 'height': float(form.cleaned_data['height']),
+            # 'depth': float(form.cleaned_data['depth'])}
+    print("paper: ", paper)
+    print("tuckbox: ", tuckbox)
+
+    box.create_box_file(tmp.name, paper, tuckbox)
+
+    return FileResponse(tmp)
+
 def pattern(request):
     if request.method != 'POST':
         return redirect('index')

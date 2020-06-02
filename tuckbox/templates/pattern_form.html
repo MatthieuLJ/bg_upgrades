@@ -38,20 +38,17 @@ $(function() {
                 "width" : 100,
                 "height": 100 },
                 "tuckbox" : {
-                    "width" : $('#id_width').val(),
-                    "height" : $('#id_height').val(),
-                    "depth" : $('#id_depth').val() }
+                    "width" : parseInt($('#id_width').val()),
+                    "height" : parseInt($('#id_height').val()),
+                    "depth" : parseInt($('#id_depth').val()) }
         };
         console.log(data);
-        $.post('preview', data, show_preview);
+        $.post('preview', JSON.stringify(data), show_preview);
     });
 
     function show_preview(data, status) {
         console.log("updating preview, status="+status)
-        var img = $('<img>');
-        var data_received = "";
-        img.attr('src', 'data:image/png;base64,' + data);
-        $('#image_preview').html(img)
+        $('#image_preview').html('<img src="data:image/png;base64,' + data + '" />');
 
     }
 });

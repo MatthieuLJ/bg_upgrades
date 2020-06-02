@@ -1,3 +1,4 @@
+import json
 import tempfile
 from . import box
 from django.shortcuts import render, redirect
@@ -22,10 +23,10 @@ def preview(request):
     print(tmp.name)
 
 
-    print(request.POST.get('paper'))
+    data = json.loads(request.body)
     # hardcode for now
-    paper = request.POST.get('paper', None)
-    tuckbox = request.POST.get('tuckbox', None)
+    paper = data['paper']
+    tuckbox = data['tuckbox']
     # paper = { 'width': 100, 'height': 100}
     # tuckbox = { 'width': float(form.cleaned_data['width']),
             # 'height': float(form.cleaned_data['height']),

@@ -48,7 +48,7 @@ $(function() {
 
     function show_preview(data, status) {
         console.log("updating preview, status="+status)
-        $('#image_preview').html('<img src="data:image/png;base64,' + data + '" />');
+        $('#image_preview').html('<img src="data:image/png;base64,' + data + '" class="img-thumbnail img-responsive" />');
 
     }
 });
@@ -63,7 +63,7 @@ $(function() {
 
 
 <div class="container">
-    <form action="{% url 'pattern' %}" method="post">
+    <form action="{% url 'pattern' %}" method="post" target="_blank">
         {% csrf_token %}
 
         <div class="row">
@@ -100,12 +100,16 @@ $(function() {
             </div>
         </div>
         <div class="row">
-            <button type="button" id="id_preview" value="preview">
-        </div>
-        <div id="image_preview" class="row">
+            <div class="col-md">
+                <button type="button" id="id_preview" value="preview">Show preview</button>
+            </div>
+            <div id="image_preview" class="col-md-2">
+            </div>
         </div>
         <div class="row">
-            <input type="submit" value="send">
+            <div class="col-md-3">
+                <input type="submit" value="send">
+            </div>
         </div>
     </form>
 </div>

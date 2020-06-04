@@ -1,16 +1,21 @@
 <head>
-    <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-
-    <!-- Include our own CSS -->
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'tuckbox/style.css' %}">
-
     <!-- Include jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- cookie plugin -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <!-- Include Bootstrap toggle -->
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+    <!-- Include our own CSS -->
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'tuckbox/style.css' %}">
+
 
     <script type="text/javascript">
 
@@ -138,6 +143,12 @@ $(function() {
         <label class="control-label col-sm-4"> Depth (mm): </label>
         <div class="col-sm-6">
             <input type="text" name="depth" id="id_depth" class="tuck_input_num form-control">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-4"> Openings: </label>
+        <div class="col-sm-4">
+            <input type="checkbox" data-toggle="toggle" data-on="Both ends" data-off="One end">
         </div>
     </div>
     <div class="form-group row">

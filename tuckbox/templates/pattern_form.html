@@ -1,6 +1,6 @@
 <head>
     <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
     <!-- Include our own CSS -->
     {% load static %}
@@ -95,76 +95,62 @@ $(function() {
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
-<div class="container">
-    <form action="{% url 'pattern' %}" method="post" target="_blank">
-        {% csrf_token %}
+<form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal">
+    {% csrf_token %}
 
-        <div class="row">
-            <div class="label col-md">
-                Paper size:
-            </div>
-            <div class="col-md">
-                <select id="paper-size" name="paper size">
-                    <option value="A4">A4</option>
-                    <option value="A3">A3</option>
-                    <option value="Letter">Letter</option>
-                    <option value="Legal">Legal</option>
-                    <option value="Custom">Custom</option>
-                </select>
-            </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-4"> Paper size: </label>
+        <div class="col-sm-6">
+            <select id="paper-size" class="form-control" name="paper size">
+                <option value="A4">A4</option>
+                <option value="A3">A3</option>
+                <option value="Letter">Letter</option>
+                <option value="Legal">Legal</option>
+                <option value="Custom">Custom</option>
+            </select>
         </div>
-        <div class="row paper_custom">
-            <div class="label col-md">
-                Paper Height (mm):
-            </div>
-            <div class="col-md">
-                <input type="text" name="paper_height" id="id_paper_height" class="tuck_input_num">
-            </div>
+    </div>
+    <div class="form-group row paper_custom">
+        <label class="control-label col-sm-4"> Paper Height (mm): </label>
+        <div class="col-sm-6">
+            <input type="text" name="paper_height" id="id_paper_height" class="tuck_input_num form-control">
         </div>
-        <div class="row paper_custom">
-            <div class="label col-md">
-                Paper Width (mm):
-            </div>
-            <div class="col-md">
-                <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num">
-            </div>
+    </div>
+    <div class="form-group row paper_custom">
+        <label class="control-label col-sm-4"> Paper Width (mm): </label>
+        <div class="col-sm-6">
+            <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num form-control">
         </div>
-        <div class="row">
-            <div class="label col-md">
-                Height (mm):
-            </div>
-            <div class="col-md">
-                <input type="text" name="height" id="id_height" class="tuck_input_num">
-            </div>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-4"> Height (mm): </label>
+        <div class="col-sm-6">
+            <input type="text" name="height" id="id_height" class="tuck_input_num form-control">
         </div>
-        <div class="row">
-            <div class="label col-md">
-                Width (mm):
-            </div>
-            <div class="col-md">
-                <input type="text" name="width" id="id_width" class="tuck_input_num">
-            </div>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-4"> Width (mm): </label>
+        <div class="col-sm-6">
+            <input type="text" name="width" id="id_width" class="tuck_input_num form-control">
         </div>
-        <div class="row">
-            <div class="label col-md">
-                Depth (mm):
-            </div>
-            <div class="col-md">
-                <input type="text" name="depth" id="id_depth" class="tuck_input_num">
-            </div>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-4"> Depth (mm): </label>
+        <div class="col-sm-6">
+            <input type="text" name="depth" id="id_depth" class="tuck_input_num form-control">
         </div>
-        <div class="row">
-            <div class="col-md">
-                <button type="button" id="id_preview" value="preview">Show preview</button>
-            </div>
-            <div id="image_preview" class="col-md">
-            </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-4 col-sm-offset-4">
+            <button type="button" id="id_preview" class="form-control" value="preview">Show preview</button>
         </div>
-        <div class="row">
-            <div class="col-md-2">
-                <input type="submit" value="send">
-            </div>
+        <div id="image_preview" class="col-sm-6">
         </div>
-    </form>
-</div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-4 col-sm-offset-4">
+            <input type="submit" value="send" class="form-control">
+        </div>
+    </div>
+</form>
 </body>

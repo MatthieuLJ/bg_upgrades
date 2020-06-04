@@ -14,11 +14,33 @@
 
     <script type="text/javascript">
 
-function check_number(field, error_label_id) {
+// Some constants for paper sizes:
+var paper_a4 = {
+    "width" : 210,
+    "height" : 297
+};
+
+var paper_a3 = {
+    "width" : 297,
+    "height" : 420
+};
+
+var paper_letter = {
+    "width" : 216,
+    "height" : 279
+};
+
+var paper_legal = {
+    "width" : 216,
+    "height" : 356
+};
+
+
+function check_number(field) {
     if(field.value != "" && (isNaN(field.value) || (field.value < 0))) {
-        $(error_label_id).css('visibility','visible');
+        $(field).css('color','red');
     } else {
-        $(error_label_id).css('visibility','hidden');
+        $(field).css('color','black');
     }
 }
 
@@ -26,7 +48,18 @@ function check_number(field, error_label_id) {
 $(function() {
     // For all the elements with the "tuck_input_num" class
     // hook the check number function with the error label also
-    $(".tuck_input_num").change(function() {check_number(this, "#" + this.id + "_error")});
+    $(".tuck_input_num").change(function() {check_number(this)});
+
+    // Hide the entries for custom paper sizes and set them to appear
+    // on that specific selection
+    $(".paper_custom").css('display', 'none');
+    $("#paper-size").change(function() {
+        if (this.value == "Custom") {
+            $(".paper_custom").css('display', '');
+        } else {
+            $(".paper_custom").css('display', 'none');
+        }
+    });
 
     $.ajaxSetup({
         headers: { "X-CSRFToken": Cookies.get("csrftoken") }
@@ -68,13 +101,40 @@ $(function() {
 
         <div class="row">
             <div class="label col-md">
+                Paper size:
+            </div>
+            <div class="col-md">
+                <select id="paper-size" name="paper size">
+                    <option value="A4">A4</option>
+                    <option value="A3">A3</option>
+                    <option value="Letter">Letter</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Custom">Custom</option>
+                </select>
+            </div>
+        </div>
+        <div class="row paper_custom">
+            <div class="label col-md">
+                Paper Height (mm):
+            </div>
+            <div class="col-md">
+                <input type="text" name="paper_height" id="id_paper_height" class="tuck_input_num">
+            </div>
+        </div>
+        <div class="row paper_custom">
+            <div class="label col-md">
+                Paper Width (mm):
+            </div>
+            <div class="col-md">
+                <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num">
+            </div>
+        </div>
+        <div class="row">
+            <div class="label col-md">
                 Height (mm):
             </div>
             <div class="col-md">
                 <input type="text" name="height" id="id_height" class="tuck_input_num">
-            </div>
-            <div id="id_height_error" class="input_error col-sm">
-                This needs to be a valid number
             </div>
         </div>
         <div class="row">
@@ -84,9 +144,6 @@ $(function() {
             <div class="col-md">
                 <input type="text" name="width" id="id_width" class="tuck_input_num">
             </div>
-            <div id="id_width_error" class="input_error col-sm">
-                This needs to be a valid number
-            </div>
         </div>
         <div class="row">
             <div class="label col-md">
@@ -95,19 +152,16 @@ $(function() {
             <div class="col-md">
                 <input type="text" name="depth" id="id_depth" class="tuck_input_num">
             </div>
-            <div id="id_depth_error" class="input_error col-sm">
-                This needs to be a valid number
-            </div>
         </div>
         <div class="row">
             <div class="col-md">
                 <button type="button" id="id_preview" value="preview">Show preview</button>
             </div>
-            <div id="image_preview" class="col-md-2">
+            <div id="image_preview" class="col-md">
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <input type="submit" value="send">
             </div>
         </div>

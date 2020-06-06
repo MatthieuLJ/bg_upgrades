@@ -72,15 +72,33 @@ $(function() {
 
     $("#id_preview").click(function() {
         var data = {
-            "paper" : {
-                "width" : 100,
-                "height": 100 },
-                "tuckbox" : {
-                    "width" : parseInt($('#id_width').val()),
-                    "height" : parseInt($('#id_height').val()),
-                    "depth" : parseInt($('#id_depth').val()) }
+            "tuckbox" : {
+                "width" : parseInt($('#id_width').val()),
+                "height" : parseInt($('#id_height').val()),
+                "depth" : parseInt($('#id_depth').val()) }
         };
-        console.log(data);
+        switch ($("#paper-size").val()) {
+            case "Letter":
+                data["paper"] = paper_letter;
+                break;
+            case "Legal":
+                data["paper"] = paper_legal;
+                break;
+            case "A4":
+                data["paper"] = paper_a4;
+                break;
+            case "A3":
+                data["paper"] = paper_a3;
+                break;
+            case "Custom":
+                data["paper"] = {
+                    "width": $(".paper_width").val(),
+                    "height": $(".paper_height").val() };
+                break;
+            default:
+                // should be an error here of some kind
+                break;
+        }
         $.post('preview', JSON.stringify(data), show_preview);
     });
 

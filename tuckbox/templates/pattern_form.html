@@ -113,7 +113,7 @@ $(function() {
 
 <body>
 
-<h1>Enter the dimensions for your box</h1>
+<h1>Build a tuckbox</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
@@ -170,15 +170,15 @@ $(function() {
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-sm-4 col-sm-offset-4">
+        <div class="col-sm-4 col-sm-offset-2">
             <button type="button" id="id_preview" class="form-control" value="preview">Show preview</button>
         </div>
-        <div id="image_preview" class="col-sm-6">
+        <div id="image_preview" class="col-sm-4">
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-sm-4 col-sm-offset-4">
-            <input type="submit" value="send" class="form-control">
+        <div class="col-sm-4 col-sm-offset-2">
+            <input type="submit" value="Generate PDF" class="form-control">
         </div>
     </div>
 </form>

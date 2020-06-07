@@ -1,0 +1,9 @@
+Next steps:
+* When the fields are updated and all valid, generate the preview automatically (remove the preview button)
+* Change the preview to be a 3D model instead (three.js)
+* Add fields in the form to upload pictures for the sides
+* Use those files to generate the PDF
+* Change the 3D model to use those images
+* Add buttons to rotate the pictures on the sides
+* Check for the size of the model compared to the paper
+* Generate box template that go over two pages (give a warning when that happens)

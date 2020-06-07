@@ -12,42 +12,47 @@
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
+    <!-- Three JS -->
+    <script src="https://threejs.org/build/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://threejs.org/examples/js/libs/dat.gui.min.js"></script>
+
     <!-- Include our own CSS -->
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'tuckbox/style.css' %}">
+    <script src="{% static 'tuckbox/3d-box.js' %}"></script>
 
     <script type="text/javascript">
 
 // Some constants for paper sizes:
-var paper_a4 = {
+const paper_a4 = {
     "width" : 210,
     "height" : 297
 };
 
-var paper_a3 = {
+const paper_a3 = {
     "width" : 297,
     "height" : 420
 };
 
-var paper_letter = {
+const paper_letter = {
     "width" : 216,
     "height" : 279
 };
 
-var paper_legal = {
+const paper_legal = {
     "width" : 216,
     "height" : 356
 };
 
 
 function check_for_preview() {
-    fields_to_check = [ $("#id_height"), $("#id_width"), $("#id_depth") ];
+    let fields_to_check = [ $("#id_height"), $("#id_width"), $("#id_depth") ];
     if ($("#paper-size").val() == "Custom") {
         field_to_check.concat([ $("#id_paper_height"), $("#id_paper_width") ]);
     }
-    var valid = true;
+    let valid = true;
     fields_to_check.forEach(function (field) {
-        console.log("checking "+field.val());
         if (field.val() == "" || isNaN(field.val()) || field.val()<0) {
             valid = false;
         }
@@ -67,7 +72,7 @@ function check_number(field) {
 }
 
 function generate_preview() {
-    var data = {
+    let data = {
         "tuckbox" : {
             "width" : parseInt($('#id_width').val()),
             "height" : parseInt($('#id_height').val()),
@@ -95,13 +100,15 @@ function generate_preview() {
             // should be an error here of some kind
             break;
     }
-    $.post('preview', JSON.stringify(data), show_preview);
+    draw_3d_box($("#image_preview"), data);
+    //$.post('preview', JSON.stringify(data), show_preview);
 }
+/*
 function show_preview(data, status) {
     console.log("updating preview, status="+status)
         $('#image_preview').html('<img src="data:image/png;base64,' + data + '" class="img-thumbnail img-responsive" />');
-
 }
+*/
 
 // Entry function when the page is loaded
 $(function() {
@@ -186,11 +193,11 @@ $(function() {
         </div>
     </div>
     <div class="form-group row">
-        <div id="image_preview" class="col-sm-4 col-sm-offset-2">
+        <div id="image_preview" class="col-sm-4 col-sm-offset-4">
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-sm-4 col-sm-offset-2">
+        <div class="col-sm-4 col-sm-offset-4">
             <input type="submit" value="Generate PDF" class="form-control">
         </div>
     </div>

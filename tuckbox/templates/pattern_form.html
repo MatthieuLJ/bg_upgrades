@@ -16,7 +16,6 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'tuckbox/style.css' %}">
 
-
     <script type="text/javascript">
 
 // Some constants for paper sizes:
@@ -41,12 +40,67 @@ var paper_legal = {
 };
 
 
+function check_for_preview() {
+    fields_to_check = [ $("#id_height"), $("#id_width"), $("#id_depth") ];
+    if ($("#paper-size").val() == "Custom") {
+        field_to_check.concat([ $("#id_paper_height"), $("#id_paper_width") ]);
+    }
+    var valid = true;
+    fields_to_check.forEach(function (field) {
+        console.log("checking "+field.val());
+        if (field.val() == "" || isNaN(field.val()) || field.val()<0) {
+            valid = false;
+        }
+    });
+    if (valid) {
+        generate_preview();
+    }
+}
+
 function check_number(field) {
     if(field.value != "" && (isNaN(field.value) || (field.value < 0))) {
         $(field).css('color','red');
     } else {
         $(field).css('color','black');
+        check_for_preview();
     }
+}
+
+function generate_preview() {
+    var data = {
+        "tuckbox" : {
+            "width" : parseInt($('#id_width').val()),
+            "height" : parseInt($('#id_height').val()),
+            "depth" : parseInt($('#id_depth').val()) }
+    };
+    switch ($("#paper-size").val()) {
+        case "Letter":
+            data["paper"] = paper_letter;
+            break;
+        case "Legal":
+            data["paper"] = paper_legal;
+            break;
+        case "A4":
+            data["paper"] = paper_a4;
+            break;
+        case "A3":
+            data["paper"] = paper_a3;
+            break;
+        case "Custom":
+            data["paper"] = {
+                "width": $(".paper_width").val(),
+                "height": $(".paper_height").val() };
+            break;
+        default:
+            // should be an error here of some kind
+            break;
+    }
+    $.post('preview', JSON.stringify(data), show_preview);
+}
+function show_preview(data, status) {
+    console.log("updating preview, status="+status)
+        $('#image_preview').html('<img src="data:image/png;base64,' + data + '" class="img-thumbnail img-responsive" />');
+
 }
 
 // Entry function when the page is loaded
@@ -69,44 +123,6 @@ $(function() {
     $.ajaxSetup({
         headers: { "X-CSRFToken": Cookies.get("csrftoken") }
     });
-
-    $("#id_preview").click(function() {
-        var data = {
-            "tuckbox" : {
-                "width" : parseInt($('#id_width').val()),
-                "height" : parseInt($('#id_height').val()),
-                "depth" : parseInt($('#id_depth').val()) }
-        };
-        switch ($("#paper-size").val()) {
-            case "Letter":
-                data["paper"] = paper_letter;
-                break;
-            case "Legal":
-                data["paper"] = paper_legal;
-                break;
-            case "A4":
-                data["paper"] = paper_a4;
-                break;
-            case "A3":
-                data["paper"] = paper_a3;
-                break;
-            case "Custom":
-                data["paper"] = {
-                    "width": $(".paper_width").val(),
-                    "height": $(".paper_height").val() };
-                break;
-            default:
-                // should be an error here of some kind
-                break;
-        }
-        $.post('preview', JSON.stringify(data), show_preview);
-    });
-
-    function show_preview(data, status) {
-        console.log("updating preview, status="+status)
-        $('#image_preview').html('<img src="data:image/png;base64,' + data + '" class="img-thumbnail img-responsive" />');
-
-    }
 });
     </script>
 </head>
@@ -170,10 +186,7 @@ $(function() {
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-sm-4 col-sm-offset-2">
-            <button type="button" id="id_preview" class="form-control" value="preview">Show preview</button>
-        </div>
-        <div id="image_preview" class="col-sm-4">
+        <div id="image_preview" class="col-sm-4 col-sm-offset-2">
         </div>
     </div>
     <div class="form-group row">

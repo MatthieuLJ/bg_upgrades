@@ -3,4 +3,4 @@
 *.pyc
 
 # environment folder
-env/
+venv/

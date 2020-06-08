@@ -1,5 +1,5 @@
 """
-ASGI config for tuckbox_pattern project.
+ASGI config for bg_upgrades project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tuckbox_pattern.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bg_upgrades.settings')
 
 application = get_asgi_application()

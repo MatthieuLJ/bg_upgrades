@@ -1,6 +1,7 @@
 import base64
 import json
 import tempfile
+import os
 from . import box
 from django.shortcuts import render, redirect
 from django.http import FileResponse, HttpResponse
@@ -44,15 +45,22 @@ def pattern(request):
         print("Something went wrong in the form")
         return redirect('index')
 
-    tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
-    print(tmp.name)
+    result_pdf = tempfile.NamedTemporaryFile(delete = True, suffix=".pdf")
+    print(result_pdf.name)
 
     # hardcode for now
     paper = { 'width': 100, 'height': 100}
     tuckbox = { 'width': float(form.cleaned_data['width']),
             'height': float(form.cleaned_data['height']),
             'depth': float(form.cleaned_data['depth'])}
+    faces = {}
+    for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
+        if face in request.FILES:
+            temp_file = tempfile.NamedTemporaryFile(delete = True, suffix=os.path.splitext(request.FILES[face].name)[1])
+            for chunk in request.FILES[face].chunks():
+                temp_file.write(chunk)
+            faces[face] = temp_file
 
-    box.create_box_file(tmp.name, paper, tuckbox)
+    box.create_box_file(result_pdf.name, paper, tuckbox, faces)
 
-    return FileResponse(tmp)
+    return FileResponse(result_pdf)

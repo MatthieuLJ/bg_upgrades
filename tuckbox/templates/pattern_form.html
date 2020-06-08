@@ -141,7 +141,7 @@ $(function() {
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
-<form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal">
+<form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="form-group row">
@@ -194,6 +194,12 @@ $(function() {
     </div>
     <div class="form-group row">
         <div id="image_preview" class="col-sm-4 col-sm-offset-4">
+        </div>
+    </div>
+    <div class="form-group row image-files">
+        <label class="control-label col-sm-4"> Front image: </label>
+        <div class="col-sm-4">
+            <input type="file" name="front" id="id_front" class="form-control">
         </div>
     </div>
     <div class="form-group row">

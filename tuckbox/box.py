@@ -22,7 +22,7 @@ def pattern_height(tuckbox):
 def pattern_width(tuckbox):
     return ( 3*tuckbox['depth'] ) + ( 2*tuckbox['width'])
 
-def draw_box(paper, tuckbox):
+def draw_box(paper, tuckbox, faces):
     image = Image(width = math.ceil(paper['width'] * POINT_PER_MM),
             height = math.ceil(paper['height'] * POINT_PER_MM))
 
@@ -35,7 +35,6 @@ def draw_box(paper, tuckbox):
     draw.fill_color = Color('blue')
     draw.fill_opacity = 1
     draw.color(10,10, 'floodfill')
-
 
     draw.fill_color = Color('white')
     draw.fill_opacity = 0
@@ -110,8 +109,8 @@ def draw_box(paper, tuckbox):
 
     return image
 
-def create_box_file(filename, paper, tuckbox):
-    image = draw_box(paper, tuckbox)
+def create_box_file(filename, paper, tuckbox, faces):
+    image = draw_box(paper, tuckbox, faces)
 
     image.save(filename=filename)
 

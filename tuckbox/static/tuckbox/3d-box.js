@@ -3,7 +3,7 @@ function draw_3d_box(container, data) {
 
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(45, 1, 0.1, 300);
-    camera.position.set(0, 0, 10);
+    camera.position.set(6, 6, 8);
 
     let renderer = new THREE.WebGLRenderer({
         antialias: true
@@ -12,15 +12,17 @@ function draw_3d_box(container, data) {
     container.empty();
     container.append(renderer.domElement);
 
-    var axesHelper = new THREE.AxesHelper(5);
-    scene.add(axesHelper);
+    //var axesHelper = new THREE.AxesHelper(5);
+    //scene.add(axesHelper);
 
-    //var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-    var ambient_light = new THREE.AmbientLight(0x606060); // soft white light
+    scene.background = new THREE.Color(0x808080)
+
+    var ambient_light = new THREE.AmbientLight(0xC0C0C0); // soft white light
     scene.add(ambient_light);
 
-    var light = new THREE.PointLight(0xFFFFFF);
+    var light = new THREE.PointLight(0xA0A0A0);
     light.position.set(5, 5, 0);
     scene.add(light);
 
@@ -90,9 +92,6 @@ function draw_3d_box(container, data) {
     function animate() {
 
         requestAnimationFrame(animate);
-
-        group.rotation.x += 0.01;
-        group.rotation.y += 0.005;
 
         renderer.render(scene, camera);
 

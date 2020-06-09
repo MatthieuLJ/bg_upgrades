@@ -29,12 +29,12 @@ function draw_3d_box(container, data) {
 
     scene.background = new THREE.Color(0x808080)
 
-    var ambient_light = new THREE.AmbientLight(0xC0C0C0); // soft white light
+    var ambient_light = new THREE.AmbientLight(0x909090); // soft white light
     scene.add(ambient_light);
 
-    var light = new THREE.PointLight(0xA0A0A0);
-    light.position.set(5, 5, 0);
-    scene.add(light);
+    var spotlight = new THREE.PointLight(0xA0A0A0);
+    spotlight.position.set(5, 5, 0);
+    scene.add(spotlight);
 
     var group = new THREE.Group();
     group.scale.set(1, 1, 1);
@@ -104,7 +104,7 @@ function draw_3d_box(container, data) {
     function animate() {
 
         requestAnimationFrame(animate);
-
+        spotlight.position.copy( camera.getWorldPosition() );
         renderer.render(scene, camera);
 
     }

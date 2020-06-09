@@ -12,10 +12,6 @@ class PatternForm(forms.Form):
     width = forms.CharField()
     depth = forms.CharField()
 
-    def clean(self):
-        cleaned_data = super().clean()
-        # Here eventually check everything is good and fits...
-
 def index(request):
     form = PatternForm()
     return render(request, "pattern_form.html", { 'form': form })

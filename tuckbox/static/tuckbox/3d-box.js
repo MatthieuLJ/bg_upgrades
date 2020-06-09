@@ -1,7 +1,7 @@
 let materials = [
     new THREE.MeshLambertMaterial({color: 0x000000, side: THREE.BackSide}),
-    new THREE.MeshLambertMaterial({color: 0x00FF00, side: THREE.FrontSide}), // front
-    new THREE.MeshLambertMaterial({color: 0xff0000, side: THREE.FrontSide}), // back
+    new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // front
+    new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // back
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // left
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // right
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // top
@@ -100,7 +100,7 @@ function draw_3d_box(container, data) {
     window.THREE = THREE;
 
     // updating materials later works...
-    materials[1].color = new THREE.Color(0x00FFFF);
+    //materials[1].color = new THREE.Color(0x00FFFF);
 
     animate();
 
@@ -111,6 +111,21 @@ function draw_3d_box(container, data) {
         renderer.render(scene, camera);
 
     }
+}
+
+// face is an index: 1=front, 2=back, 3=left, 4=right, 5=top, 6=bottom
+function load_face_image(file, face) {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let loader = new THREE.TextureLoader();
+        loader.load(e.target.result,
+            onLoad = function(tx) {
+                materials[face].map = tx;
+                materials[face].needsUpdate = true;
+            });
+    }
+    reader.readAsDataURL(file);
+    
 }
 
 //draw_3d_box($("body"), {"width":2, "height":3, "depth":1});

@@ -6,7 +6,8 @@
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
     <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
     <!-- Include Bootstrap toggle -->
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
@@ -23,225 +24,235 @@
 
     <script type="text/javascript">
 
-// Some constants for paper sizes:
-const paper_a4 = {
-    "width" : 210,
-    "height" : 297
-};
+        // Some constants for paper sizes:
+        const paper_a4 = {
+            "width": 210,
+            "height": 297
+        };
 
-const paper_a3 = {
-    "width" : 297,
-    "height" : 420
-};
+        const paper_a3 = {
+            "width": 297,
+            "height": 420
+        };
 
-const paper_letter = {
-    "width" : 216,
-    "height" : 279
-};
+        const paper_letter = {
+            "width": 216,
+            "height": 279
+        };
 
-const paper_legal = {
-    "width" : 216,
-    "height" : 356
-};
+        const paper_legal = {
+            "width": 216,
+            "height": 356
+        };
 
 
-function check_for_preview() {
-    let fields_to_check = [ $("#id_height"), $("#id_width"), $("#id_depth") ];
-    if ($("#paper-size").val() == "Custom") {
-        field_to_check.concat([ $("#id_paper_height"), $("#id_paper_width") ]);
-    }
-    let valid = true;
-    fields_to_check.forEach(function (field) {
-        if (field.val() == "" || isNaN(field.val()) || field.val()<0) {
-            valid = false;
+        function check_for_preview() {
+            let fields_to_check = [$("#id_height"), $("#id_width"), $("#id_depth")];
+            if ($("#paper-size").val() == "Custom") {
+                field_to_check.concat([$("#id_paper_height"), $("#id_paper_width")]);
+            }
+            let valid = true;
+            fields_to_check.forEach(function (field) {
+                if (field.val() == "" || isNaN(field.val()) || field.val() < 0) {
+                    valid = false;
+                }
+            });
+            if (valid) {
+                generate_preview();
+            } else {
+                $("#image_preview").empty();
+            }
         }
-    });
-    if (valid) {
-        generate_preview();
-    } else {
-        $("#image_preview").empty();
-    }
-}
 
-function check_number(field) {
-    if(field.value != "" && (isNaN(field.value) || (field.value < 0))) {
-        $(field).css('color','red');
-    } else {
-        $(field).css('color','black');
-        check_for_preview();
-    }
-}
+        function check_number(field) {
+            if (field.value != "" && (isNaN(field.value) || (field.value < 0))) {
+                $(field).css('color', 'red');
+            } else {
+                $(field).css('color', 'black');
+                check_for_preview();
+            }
+        }
 
-function generate_preview() {
-    let data = {
-        "tuckbox" : {
-            "width" : parseInt($('#id_width').val()),
-            "height" : parseInt($('#id_height').val()),
-            "depth" : parseInt($('#id_depth').val()) }
-    };
-    switch ($("#paper-size").val()) {
-        case "Letter":
-            data["paper"] = paper_letter;
-            break;
-        case "Legal":
-            data["paper"] = paper_legal;
-            break;
-        case "A4":
-            data["paper"] = paper_a4;
-            break;
-        case "A3":
-            data["paper"] = paper_a3;
-            break;
-        case "Custom":
-            data["paper"] = {
-                "width": $(".paper_width").val(),
-                "height": $(".paper_height").val() };
-            break;
-        default:
-            // should be an error here of some kind
-            break;
-    }
-    front_file = $("#id_front")[0].files[0];
-    
-    if (front_file && front_file.type.split("/")[0] == "image") {
-        console.log("got it");
-    }
-    draw_3d_box($("#image_preview"), data);
-    //$.post('preview', JSON.stringify(data), show_preview);
-}
-/*
-function show_preview(data, status) {
-    console.log("updating preview, status="+status)
-        $('#image_preview').html('<img src="data:image/png;base64,' + data + '" class="img-thumbnail img-responsive" />');
-}
-*/
+        function generate_preview() {
+            let data = {
+                "tuckbox": {
+                    "width": parseInt($('#id_width').val()),
+                    "height": parseInt($('#id_height').val()),
+                    "depth": parseInt($('#id_depth').val())
+                }
+            };
+            switch ($("#paper-size").val()) {
+                case "Letter":
+                    data["paper"] = paper_letter;
+                    break;
+                case "Legal":
+                    data["paper"] = paper_legal;
+                    break;
+                case "A4":
+                    data["paper"] = paper_a4;
+                    break;
+                case "A3":
+                    data["paper"] = paper_a3;
+                    break;
+                case "Custom":
+                    data["paper"] = {
+                        "width": $(".paper_width").val(),
+                        "height": $(".paper_height").val()
+                    };
+                    break;
+                default:
+                    // should be an error here of some kind
+                    break;
+            }
 
-// Entry function when the page is loaded
-$(function() {
-    // For all the elements with the "tuck_input_num" class
-    // hook the check number function with the error label also
-    $(".tuck_input_num").change(function() {check_number(this)});
+            draw_3d_box($("#image_preview"), data);
+            //$.post('preview', JSON.stringify(data), show_preview);
+        }
+        /*
+        function show_preview(data, status) {
+            console.log("updating preview, status="+status)
+                $('#image_preview').html('<img src="data:image/png;base64,' + data + '" class="img-thumbnail img-responsive" />');
+        }
+        */
 
-    // Hide the entries for custom paper sizes and set them to appear
-    // on that specific selection
-    $(".paper_custom").css('display', 'none');
-    $("#paper-size").change(function() {
-        if (this.value == "Custom") {
-            $(".paper_custom").css('display', '');
-        } else {
+        // Entry function when the page is loaded
+        $(function () {
+            // For all the elements with the "tuck_input_num" class
+            // hook the check number function with the error label also
+            $(".tuck_input_num").change(function () { check_number(this) });
+
+            // Hide the entries for custom paper sizes and set them to appear
+            // on that specific selection
             $(".paper_custom").css('display', 'none');
-        }
-    });
+            $("#paper-size").change(function () {
+                if (this.value == "Custom") {
+                    $(".paper_custom").css('display', '');
+                } else {
+                    $(".paper_custom").css('display', 'none');
+                }
+            });
 
-    $.ajaxSetup({
-        headers: { "X-CSRFToken": Cookies.get("csrftoken") }
-    });
-});
+            $.ajaxSetup({
+                headers: { "X-CSRFToken": Cookies.get("csrftoken") }
+            });
+
+            ["front", "back", "left", "right", "top", "bottom"].forEach(function(face, index) {
+                $("#id_" + face).change(function () {
+                    file = $("#id_" + face)[0].files[0];
+
+                    if (file && file.type.split("/")[0] == "image") {
+                        load_face_image(file, index+1);
+                    }
+                })
+            }
+            );
+        });
     </script>
 </head>
 
 <body>
 
-<h1>Build a tuckbox</h1>
+    <h1>Build a tuckbox</h1>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
-<form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal" enctype="multipart/form-data">
-    {% csrf_token %}
+    <form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal"
+        enctype="multipart/form-data">
+        {% csrf_token %}
 
-    <div class="form-group row">
-        <label class="control-label col-sm-4"> Paper size: </label>
-        <div class="col-sm-6">
-            <select id="paper-size" class="form-control" name="paper size">
-                <option value="A4">A4</option>
-                <option value="A3">A3</option>
-                <option value="Letter">Letter</option>
-                <option value="Legal">Legal</option>
-                <option value="Custom">Custom</option>
-            </select>
+        <div class="form-group row">
+            <label class="control-label col-sm-4"> Paper size: </label>
+            <div class="col-sm-6">
+                <select id="paper-size" class="form-control" name="paper size">
+                    <option value="A4">A4</option>
+                    <option value="A3">A3</option>
+                    <option value="Letter">Letter</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Custom">Custom</option>
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="form-group row paper_custom">
-        <label class="control-label col-sm-4"> Paper Height (mm): </label>
-        <div class="col-sm-6">
-            <input type="text" name="paper_height" id="id_paper_height" class="tuck_input_num form-control">
+        <div class="form-group row paper_custom">
+            <label class="control-label col-sm-4"> Paper Height (mm): </label>
+            <div class="col-sm-6">
+                <input type="text" name="paper_height" id="id_paper_height" class="tuck_input_num form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row paper_custom">
-        <label class="control-label col-sm-4"> Paper Width (mm): </label>
-        <div class="col-sm-6">
-            <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num form-control">
+        <div class="form-group row paper_custom">
+            <label class="control-label col-sm-4"> Paper Width (mm): </label>
+            <div class="col-sm-6">
+                <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="control-label col-sm-4"> Height (mm): </label>
-        <div class="col-sm-6">
-            <input type="text" name="height" id="id_height" class="tuck_input_num form-control">
+        <div class="form-group row">
+            <label class="control-label col-sm-4"> Height (mm): </label>
+            <div class="col-sm-6">
+                <input type="text" name="height" id="id_height" class="tuck_input_num form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="control-label col-sm-4"> Width (mm): </label>
-        <div class="col-sm-6">
-            <input type="text" name="width" id="id_width" class="tuck_input_num form-control">
+        <div class="form-group row">
+            <label class="control-label col-sm-4"> Width (mm): </label>
+            <div class="col-sm-6">
+                <input type="text" name="width" id="id_width" class="tuck_input_num form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="control-label col-sm-4"> Depth (mm): </label>
-        <div class="col-sm-6">
-            <input type="text" name="depth" id="id_depth" class="tuck_input_num form-control">
+        <div class="form-group row">
+            <label class="control-label col-sm-4"> Depth (mm): </label>
+            <div class="col-sm-6">
+                <input type="text" name="depth" id="id_depth" class="tuck_input_num form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="control-label col-sm-4"> Openings: </label>
-        <div class="col-sm-4">
-            <input type="checkbox" data-toggle="toggle" data-on="Both ends" data-off="One end">
+        <div class="form-group row">
+            <label class="control-label col-sm-4"> Openings: </label>
+            <div class="col-sm-4">
+                <input type="checkbox" data-toggle="toggle" data-on="Both ends" data-off="One end">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <div id="image_preview" class="col-sm-4 col-sm-offset-4">
+        <div class="form-group row">
+            <div id="image_preview" class="col-sm-4 col-sm-offset-4">
+            </div>
         </div>
-    </div>
-    <div class="form-group row image-files">
-        <label class="control-label col-sm-4"> Front image: </label>
-        <div class="col-sm-4">
-            <input type="file" name="front" id="id_front" class="form-control">
+        <div class="form-group row image-files">
+            <label class="control-label col-sm-4"> Front image: </label>
+            <div class="col-sm-4">
+                <input type="file" name="front" id="id_front" class="form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row image-files">
-        <label class="control-label col-sm-4"> Back image: </label>
-        <div class="col-sm-4">
-            <input type="file" name="back" id="id_back" class="form-control">
+        <div class="form-group row image-files">
+            <label class="control-label col-sm-4"> Back image: </label>
+            <div class="col-sm-4">
+                <input type="file" name="back" id="id_back" class="form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row image-files">
-        <label class="control-label col-sm-4"> Left image: </label>
-        <div class="col-sm-4">
-            <input type="file" name="left" id="id_left" class="form-control">
+        <div class="form-group row image-files">
+            <label class="control-label col-sm-4"> Left image: </label>
+            <div class="col-sm-4">
+                <input type="file" name="left" id="id_left" class="form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row image-files">
-        <label class="control-label col-sm-4"> Right image: </label>
-        <div class="col-sm-4">
-            <input type="file" name="right" id="id_right" class="form-control">
+        <div class="form-group row image-files">
+            <label class="control-label col-sm-4"> Right image: </label>
+            <div class="col-sm-4">
+                <input type="file" name="right" id="id_right" class="form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row image-files">
-        <label class="control-label col-sm-4"> Top image: </label>
-        <div class="col-sm-4">
-            <input type="file" name="top" id="id_top" class="form-control">
+        <div class="form-group row image-files">
+            <label class="control-label col-sm-4"> Top image: </label>
+            <div class="col-sm-4">
+                <input type="file" name="top" id="id_top" class="form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row image-files">
-        <label class="control-label col-sm-4"> Bottom image: </label>
-        <div class="col-sm-4">
-            <input type="file" name="bottom" id="id_bottom" class="form-control">
+        <div class="form-group row image-files">
+            <label class="control-label col-sm-4"> Bottom image: </label>
+            <div class="col-sm-4">
+                <input type="file" name="bottom" id="id_bottom" class="form-control">
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-sm-4 col-sm-offset-4">
-            <input type="submit" value="Generate PDF" class="form-control">
+        <div class="form-group row">
+            <div class="col-sm-4 col-sm-offset-4">
+                <input type="submit" value="Generate PDF" class="form-control">
+            </div>
         </div>
-    </div>
-</form>
+    </form>
 </body>

@@ -23,7 +23,7 @@ def pattern_width(tuckbox):
     return (3*tuckbox['depth']) + (2*tuckbox['width'])
 
 
-def draw_box(paper, tuckbox, faces):
+def draw_box(paper, tuckbox, faces, options):
 
     draw = Drawing()
 
@@ -183,9 +183,18 @@ def draw_box(paper, tuckbox, faces):
         "bottom": (math.floor((margin_width + tuckbox['depth']) * POINT_PER_MM),
                    math.floor((margin_height + lip_size(tuckbox) + tuckbox['depth'] + tuckbox['height']) * POINT_PER_MM)),
     }
+    face_angles = {
+        "front": options['front_angle'] if 'front_angle' in options else 0,
+        "back": options['back_angle'] if 'back_angle' in options else 0,
+        "left": options['left_angle'] if 'left_angle' in options else 0,
+        "right": options['right_angle'] if 'right_angle' in options else 0,
+        "top": options['top_angle'] if 'top_angle' in options else 0,
+        "bottom": options['bottom_angle'] if 'bottom_angle' in options else 0,
+    }
     for side in ["front", "back", "left", "right", "top", "bottom"]:
         if side in faces:
             with Image(file=faces[side]) as i:
+                i.rotate(face_angles[side] * 90)
                 i.resize(*face_sizes[side])
                 image.composite(i, *face_positions[side])
 
@@ -196,8 +205,8 @@ def draw_box(paper, tuckbox, faces):
     return image
 
 
-def create_box_file(filename, paper, tuckbox, faces):
-    image = draw_box(paper, tuckbox, faces)
+def create_box_file(filename, paper, tuckbox, faces, options):
+    image = draw_box(paper, tuckbox, faces, options)
 
     image.save(filename=filename)
 
@@ -208,4 +217,5 @@ if __name__ == "__main__":
                  'right': right, 'top': top, 'bottom': bottom}
         paper = {'width': 200, 'height': 200}
         tuckbox = {'height': 50, 'width': 40, 'depth': 20}
-        create_box_file("example.pdf", paper, tuckbox, faces)
+        options = {'left_angle':3, 'right_angle':1, 'bottom_angle':2}
+        create_box_file("example.pdf", paper, tuckbox, faces, options)

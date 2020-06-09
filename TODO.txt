@@ -1,10 +1,8 @@
 Next steps:
--> Add fields in the form to upload pictures for the sides
--> Use those files to generate the PDF (and actually generate the whole thing)
--> Complete the PDF generation (all faces, 2 ended, layout of the paper, two pages)
 * Scale 3D model so that it's always visible
 * Add orbit controls to rotate the 3D model
 * Change the 3D model to use those images
 * Add buttons to rotate the face pictures by 90° increment
-* Check for the size of the model compared to the paper
+* Check for the size of the model compared to the paper (modify the layout if needed)
 * Generate box template that go over two pages (give a warning when that happens)
+* Give the option for boxes with two openings

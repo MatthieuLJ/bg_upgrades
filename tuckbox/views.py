@@ -56,10 +56,7 @@ def pattern(request):
     faces = {}
     for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
         if face in request.FILES:
-            temp_file = tempfile.NamedTemporaryFile(delete = True, suffix=os.path.splitext(request.FILES[face].name)[1])
-            for chunk in request.FILES[face].chunks():
-                temp_file.write(chunk)
-            faces[face] = temp_file
+            faces[face] = request.FILES[face]
 
     box.create_box_file(result_pdf.name, paper, tuckbox, faces)
 

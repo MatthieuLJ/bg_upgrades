@@ -4,3 +4,6 @@
 
 # environment folder
 venv/
+
+# Folder for static files
+staticfiles/

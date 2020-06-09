@@ -1,5 +1,6 @@
 Next steps:
-* Add buttons to rotate the face pictures by 90° increment
+* Rotate the images based on the angle on the generated PDF
+* Roate the images based on the angle in the 3D model
 * Check for the size of the model compared to the paper (modify the layout if needed)
 * Generate box template that go over two pages (give a warning when that happens)
 * Give the option for boxes with two openings

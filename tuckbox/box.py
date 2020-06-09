@@ -24,33 +24,26 @@ def pattern_width(tuckbox):
 
 
 def draw_box(paper, tuckbox, faces):
-    image = Image(width=math.ceil(paper['width'] * POINT_PER_MM),
-                  height=math.ceil(paper['height'] * POINT_PER_MM))
-
-    image.resolution = RESOLUTION
-    image.unit = 'pixelsperinch'
 
     draw = Drawing()
-
-    # test - fill the page in blue
-    #draw.fill_color = Color('blue')
-    #draw.fill_opacity = 1
-    #draw.color(10, 10, 'floodfill')
-
-    draw.fill_color = Color('white')
-    draw.fill_opacity = 0
-    draw.stroke_color = Color('black')
 
     draw.scale(POINT_PER_MM, POINT_PER_MM)
 
     draw.stroke_width = 1 / POINT_PER_MM
 
     # Find the coordinate of the left top corner to start drawing from there
-    margin_height = (paper['height'] - pattern_height(tuckbox)) / 2
-    margin_width = (paper['width'] - pattern_width(tuckbox)) / 2
+    margin_height = 1+(paper['height'] - pattern_height(tuckbox)) / 2
+    margin_width = 1+(paper['width'] - pattern_width(tuckbox)) / 2
 
     draw.translate(margin_width,
                    margin_height + lip_size(tuckbox) + tuckbox['depth'])
+
+    finger_draw = Drawing(draw)
+    dashed_draw = Drawing(draw)
+
+    draw.fill_color = Color('white')
+    draw.fill_opacity = 0
+    draw.stroke_color = Color('black')
 
     #        ---------
     #       /         \
@@ -73,26 +66,6 @@ def draw_box(paper, tuckbox, faces):
     #      +-----------+
     #
     # 0 is the origin
-    #        ---------
-    #       /         \
-    #      +---     ---+
-    #  +---+ A       G +---+
-    #  | A |           |F  |
-    #  0                   +----+ +----+
-    #  |                      F +-+ E  |
-    #  |                               |
-    #  |                               |
-    #  |                               |
-    #  | A                             |
-    #  |                             E |
-    #  |                               |
-    #  |                               |
-    #  |                               |
-    #  +                               +
-    #  | A |          A|  D| E         |
-    #  +---+  A        +---+-----------+
-    #      +-----------+
-    #
 
     tab_length = min(.9 * tuckbox['depth'], .4 * tuckbox['width'])
     dash_array = [min(tuckbox['depth'], tuckbox['width'],
@@ -152,27 +125,73 @@ def draw_box(paper, tuckbox, faces):
                   -tuckbox['depth'] - lip_size(tuckbox))])
 
     # finger hold
-    draw.arc((tuckbox['depth']*2 + tuckbox['width']*1.4, -tuckbox['width']*.1),
-             (tuckbox['depth']*2 + tuckbox['width']*1.6, tuckbox['width']*.1),
-             (0, 180))
+    finger_draw.fill_color = Color('white')
+    finger_draw.fill_opacity = 1
+    finger_draw.arc((tuckbox['depth']*2 + tuckbox['width']*1.4, -tuckbox['width']*.1),
+                    (tuckbox['depth']*2 + tuckbox['width']
+                     * 1.6, tuckbox['width']*.1),
+                    (0, 180))
 
     # dashed lines
-    draw.stroke_color = Color('rgb(200,200,200)')
-    draw.stroke_width = .2 / POINT_PER_MM
-    draw.stroke_dash_array = dash_array
-    draw.line((0, 0), (tuckbox['depth']*2 + tuckbox['width'], 0))
-    draw.line((tuckbox['depth'] + tuckbox['width']*.2, -tuckbox['depth']),
+    dashed_draw.stroke_color = Color('rgb(200,200,200)')
+    dashed_draw.stroke_width = .2 / POINT_PER_MM
+    dashed_draw.stroke_dash_array = dash_array
+    dashed_draw.line((0, 0), (tuckbox['depth']*2 + tuckbox['width'], 0))
+    dashed_draw.line((tuckbox['depth'] + tuckbox['width']*.2, -tuckbox['depth']),
               (tuckbox['depth'] + tuckbox['width']*.8, -tuckbox['depth']))
-    draw.line((0, tuckbox['height']),
+    dashed_draw.line((0, tuckbox['height']),
               (tuckbox['depth']*2 + tuckbox['width']*2, tuckbox['height']))
-    draw.line((tuckbox['depth'], 0),
+    dashed_draw.line((tuckbox['depth'], 0),
               (tuckbox['depth'], tuckbox['height']))
-    draw.line((tuckbox['depth'] + tuckbox['width'], 0),
+    dashed_draw.line((tuckbox['depth'] + tuckbox['width'], 0),
               (tuckbox['depth'] + tuckbox['width'], tuckbox['height']))
-    draw.line((tuckbox['depth']*2 + tuckbox['width'], 0),
+    dashed_draw.line((tuckbox['depth']*2 + tuckbox['width'], 0),
               (tuckbox['depth']*2 + tuckbox['width'], tuckbox['height']))
 
-    draw(image)
+    # Create the image
+    image = Image(width=math.ceil(paper['width'] * POINT_PER_MM),
+                  height=math.ceil(paper['height'] * POINT_PER_MM))
+    image.resolution = RESOLUTION
+    image.unit = 'pixelsperinch'
+
+    # Put the pictures in first
+    face_sizes = {
+        "front": (math.ceil(tuckbox['width'] * POINT_PER_MM),
+                  math.ceil(tuckbox['height'] * POINT_PER_MM)),
+        "back": (math.ceil(tuckbox['width'] * POINT_PER_MM),
+                 math.ceil(tuckbox['height'] * POINT_PER_MM)),
+        "left": (math.ceil(tuckbox['depth'] * POINT_PER_MM),
+                 math.ceil(tuckbox['height'] * POINT_PER_MM)),
+        "right": (math.ceil(tuckbox['depth'] * POINT_PER_MM),
+                  math.ceil(tuckbox['height'] * POINT_PER_MM)),
+        "top": (math.ceil(tuckbox['width'] * POINT_PER_MM),
+                math.ceil(tuckbox['depth'] * POINT_PER_MM)),
+        "bottom": (math.ceil(tuckbox['width'] * POINT_PER_MM),
+                   math.ceil(tuckbox['depth'] * POINT_PER_MM)),
+    }
+    face_positions = {
+        "front": (math.floor((margin_width + tuckbox['depth']) * POINT_PER_MM),
+                  math.floor((margin_height + lip_size(tuckbox) + tuckbox['depth']) * POINT_PER_MM)),
+        "back": (math.floor((margin_width + tuckbox['depth']*2 + tuckbox['width']) * POINT_PER_MM),
+                 math.floor((margin_height + lip_size(tuckbox) + tuckbox['depth']) * POINT_PER_MM)),
+        "left": (math.floor(margin_width * POINT_PER_MM),
+                 math.floor((margin_height + lip_size(tuckbox) + tuckbox['depth']) * POINT_PER_MM)),
+        "right": (math.floor((margin_width + tuckbox['depth'] + tuckbox['width']) * POINT_PER_MM),
+                  math.floor((margin_height + lip_size(tuckbox) + tuckbox['depth']) * POINT_PER_MM)),
+        "top": (math.floor((margin_width + tuckbox['depth']) * POINT_PER_MM),
+                math.floor((margin_height + lip_size(tuckbox)) * POINT_PER_MM)),
+        "bottom": (math.floor((margin_width + tuckbox['depth']) * POINT_PER_MM),
+                   math.floor((margin_height + lip_size(tuckbox) + tuckbox['depth'] + tuckbox['height']) * POINT_PER_MM)),
+    }
+    for side in ["front", "back", "left", "right", "top", "bottom"]:
+        if side in faces:
+            with Image(file=faces[side]) as i:
+                i.resize(*face_sizes[side])
+                image.composite(i, *face_positions[side])
+
+    draw.draw(image)
+    finger_draw.draw(image)
+    dashed_draw.draw(image)
 
     return image
 
@@ -184,6 +203,9 @@ def create_box_file(filename, paper, tuckbox, faces):
 
 
 if __name__ == "__main__":
-    paper = {'width': 200, 'height': 200}
-    tuckbox = {'height': 50, 'width': 40, 'depth': 20}
-    create_box_file("example.pdf", paper, tuckbox, {})
+    with open("front.jpg", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
+        faces = {'front': front, 'back': back, 'left': left,
+                 'right': right, 'top': top, 'bottom': bottom}
+        paper = {'width': 200, 'height': 200}
+        tuckbox = {'height': 50, 'width': 40, 'depth': 20}
+        create_box_file("example.pdf", paper, tuckbox, faces)

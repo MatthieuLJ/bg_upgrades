@@ -30,7 +30,7 @@ def preview(request):
     print("paper: ", paper)
     print("tuckbox: ", tuckbox)
 
-    box.create_box_file(tmp.name, paper, tuckbox)
+    box.create_box_file(tmp.name, paper, tuckbox, {})
 
     encoded_string = base64.b64encode(tmp.read())
 

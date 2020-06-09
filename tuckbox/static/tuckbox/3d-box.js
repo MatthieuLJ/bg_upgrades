@@ -99,9 +99,6 @@ function draw_3d_box(container, data) {
     window.scene = scene;
     window.THREE = THREE;
 
-    // updating materials later works...
-    //materials[1].color = new THREE.Color(0x00FFFF);
-
     animate();
 
     function animate() {
@@ -127,5 +124,3 @@ function load_face_image(file, face) {
     reader.readAsDataURL(file);
     
 }
-
-//draw_3d_box($("body"), {"width":2, "height":3, "depth":1});

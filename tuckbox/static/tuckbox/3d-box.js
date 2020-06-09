@@ -1,3 +1,13 @@
+let materials = [
+    new THREE.MeshLambertMaterial({color: 0x000000, side: THREE.BackSide}),
+    new THREE.MeshLambertMaterial({color: 0x00FF00, side: THREE.FrontSide}), // front
+    new THREE.MeshLambertMaterial({color: 0xff0000, side: THREE.FrontSide}), // back
+    new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // left
+    new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // right
+    new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // top
+    new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // bottom
+]
+
 function draw_3d_box(container, data) {
     let tuckbox = data.tuckbox;
 
@@ -30,13 +40,6 @@ function draw_3d_box(container, data) {
     group.scale.set(1, 1, 1);
     scene.add(group)
 
-    materials = [
-        new THREE.MeshLambertMaterial({color: 0x000000, side: THREE.BackSide}),
-        new THREE.MeshLambertMaterial({color: 0xFF0000, side: THREE.FrontSide}),
-        new THREE.MeshLambertMaterial({color: 0x00FF00, side: THREE.FrontSide}),
-        new THREE.MeshLambertMaterial({color: 0x0000FF, side: THREE.FrontSide})
-    ]
-
     // front
     let front_planeGeom = new THREE.PlaneGeometry(tuckbox.width, tuckbox.height);
     front_planeGeom.translate(0, 0, tuckbox.depth / 2);
@@ -50,34 +53,43 @@ function draw_3d_box(container, data) {
     back_planeGeom.rotateY(Math.PI);
     back_planeGeom.translate(0, 0, -tuckbox.depth / 2);
     let back_plane = new THREE.Mesh(back_planeGeom, materials[0]);
-    let back_plane2 = new THREE.Mesh(back_planeGeom, materials[1]);
+    let back_plane2 = new THREE.Mesh(back_planeGeom, materials[2]);
     group.add(back_plane);
     group.add(back_plane2);
-
-    // right
-    let right_planeGeom = new THREE.PlaneGeometry(tuckbox.depth, tuckbox.height);
-    right_planeGeom.rotateY(Math.PI * 0.5);
-    right_planeGeom.translate(tuckbox.width / 2, 0, 0);
-    let right_plane = new THREE.Mesh(right_planeGeom, materials[0]);
-    let right_plane2 = new THREE.Mesh(right_planeGeom, materials[2]);
-    group.add(right_plane);
-    group.add(right_plane2);
 
     // left
     let left_planeGeom = new THREE.PlaneGeometry(tuckbox.depth, tuckbox.height);
     left_planeGeom.rotateY(-Math.PI * 0.5);
     left_planeGeom.translate(-tuckbox.width / 2, 0, 0);
     let left_plane = new THREE.Mesh(left_planeGeom, materials[0]);
-    let left_plane2 = new THREE.Mesh(left_planeGeom, materials[2]);
+    let left_plane2 = new THREE.Mesh(left_planeGeom, materials[3]);
     group.add(left_plane);
     group.add(left_plane2);
+
+    // right
+    let right_planeGeom = new THREE.PlaneGeometry(tuckbox.depth, tuckbox.height);
+    right_planeGeom.rotateY(Math.PI * 0.5);
+    right_planeGeom.translate(tuckbox.width / 2, 0, 0);
+    let right_plane = new THREE.Mesh(right_planeGeom, materials[0]);
+    let right_plane2 = new THREE.Mesh(right_planeGeom, materials[4]);
+    group.add(right_plane);
+    group.add(right_plane2);
+
+    // top
+    let top_planeGeom = new THREE.PlaneGeometry(tuckbox.width, tuckbox.depth);
+    top_planeGeom.rotateX(-Math.PI * 0.25);
+    top_planeGeom.translate(0, tuckbox.height / 2 + tuckbox.depth * Math.sin(Math.PI * 0.25) / 2, (1 - Math.cos(Math.PI * 0.25)) * tuckbox.depth / 2);
+    let top_plane = new THREE.Mesh(top_planeGeom, materials[0]);
+    let top_plane2 = new THREE.Mesh(top_planeGeom, materials[5]);
+    group.add(top_plane);
+    group.add(top_plane2);
 
     // bottom
     let bottom_planeGeom = new THREE.PlaneGeometry(tuckbox.width, tuckbox.depth);
     bottom_planeGeom.rotateX(Math.PI * 0.5);
     bottom_planeGeom.translate(0, -tuckbox.height / 2, 0);
     let bottom_plane = new THREE.Mesh(bottom_planeGeom, materials[0]);
-    let bottom_plane2 = new THREE.Mesh(bottom_planeGeom, materials[3]);
+    let bottom_plane2 = new THREE.Mesh(bottom_planeGeom, materials[6]);
     group.add(bottom_plane);
     group.add(bottom_plane2);
 
@@ -86,6 +98,9 @@ function draw_3d_box(container, data) {
 
     window.scene = scene;
     window.THREE = THREE;
+
+    // updating materials later works...
+    materials[1].color = new THREE.Color(0x00FFFF);
 
     animate();
 

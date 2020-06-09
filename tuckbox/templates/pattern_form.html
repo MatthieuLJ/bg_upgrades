@@ -58,6 +58,8 @@ function check_for_preview() {
     });
     if (valid) {
         generate_preview();
+    } else {
+        $("#image_preview").empty();
     }
 }
 
@@ -98,6 +100,11 @@ function generate_preview() {
         default:
             // should be an error here of some kind
             break;
+    }
+    front_file = $("#id_front")[0].files[0];
+    
+    if (front_file && front_file.type.split("/")[0] == "image") {
+        console.log("got it");
     }
     draw_3d_box($("#image_preview"), data);
     //$.post('preview', JSON.stringify(data), show_preview);

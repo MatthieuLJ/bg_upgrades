@@ -79,13 +79,8 @@ function draw_3d_box(container, data) {
     group.add(bottom_plane);
     group.add(bottom_plane2);
 
-
-    /*
-     * var gui = new dat.GUI();
-     * gui.add(group.scale, "x", 0.1, 5);
-     * gui.add(group.scale, "y", 0.1, 5);
-     * gui.add(group.scale, "z", 0.1, 5);
-     * */
+    let scaling = 3 / Math.max(tuckbox.depth, tuckbox.width, tuckbox.height)
+    group.scale.set(scaling, scaling, scaling)
 
     window.scene = scene;
     window.THREE = THREE;

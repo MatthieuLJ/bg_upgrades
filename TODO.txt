@@ -1,7 +1,6 @@
 Next steps:
-* Scale 3D model so that it's always visible
 * Add orbit controls to rotate the 3D model
-* Change the 3D model to use those images
+* Change the 3D model to use the face images
 * Add buttons to rotate the face pictures by 90° increment
 * Check for the size of the model compared to the paper (modify the layout if needed)
 * Generate box template that go over two pages (give a warning when that happens)

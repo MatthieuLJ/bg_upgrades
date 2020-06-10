@@ -1,9 +1,8 @@
 Next steps:
-* Rotate the images based on the angle on the generated PDF
-* Rotate the images based on the angle in the 3D model
 * Check for the size of the model compared to the paper (modify the layout if needed)
 * Add the option for liquid (smart) rescale on the pdf
+* Add a tip for the liquid rescale option to explain the consequences
+* Deploy on Heroku
 * Generate box template that go over two pages (give a warning when that happens)
 * Give the option for boxes with two openings
-* Deploy on Heroku
 * Adapt to be able to build bitboxes

@@ -1,5 +1,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<head>    
+
+<head>
     <!-- Include jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -24,7 +25,7 @@
     <script src="{% static 'tuckbox/3d-box.js' %}"></script>
 
     <script type="text/javascript">
-    'use strict';
+        'use strict';
 
         // Some constants for paper sizes:
         const paper_a4 = {
@@ -75,37 +76,12 @@
         }
 
         function generate_preview() {
-            let data = {
-                "tuckbox": {
-                    "width": parseInt($('#id_width').val()),
-                    "height": parseInt($('#id_height').val()),
-                    "depth": parseInt($('#id_depth').val())
-                }
-            };
-            switch ($("#paper-size").val()) {
-                case "Letter":
-                    data["paper"] = paper_letter;
-                    break;
-                case "Legal":
-                    data["paper"] = paper_legal;
-                    break;
-                case "A4":
-                    data["paper"] = paper_a4;
-                    break;
-                case "A3":
-                    data["paper"] = paper_a3;
-                    break;
-                case "Custom":
-                    data["paper"] = {
-                        "width": $(".paper_width").val(),
-                        "height": $(".paper_height").val()
-                    };
-                    break;
-                default:
-                    // should be an error here of some kind
-                    break;
-            }
-
+            let data={};
+            data.tuckbox = {};
+            ["width", "height", "depth"].forEach(dim => {
+                data.tuckbox[dim] = parseInt($("#id_"+dim).val())
+            });
+            
             draw_3d_box($("#image_preview"), data);
         }
 
@@ -130,17 +106,18 @@
                 headers: { "X-CSRFToken": Cookies.get("csrftoken") }
             });
 
-            ["front", "back", "left", "right", "top", "bottom"].forEach(function(face, index) {
+            ["front", "back", "left", "right", "top", "bottom"].forEach(function (face, index) {
                 $("#id_" + face).change(function () {
                     let file = $("#id_" + face)[0].files[0];
 
                     if (file && file.type.split("/")[0] == "image") {
-                        load_face_image(file, index+1);
+                        load_face_image(file, index + 1);
                     }
                 });
-                $("#id_rotate_"+face).click(function() {
-                    $("#id_"+face+"_angle").val((index, currentValue) => { return (parseInt(currentValue) + 1)%4;});
-                    console.log("angle at "+$("#id_"+face+"_angle").val());
+                $("#id_rotate_" + face).click(function () {
+                    $("#id_" + face + "_angle").val((index, currentValue) => { return (parseInt(currentValue) + 1) % 4; });
+                    rotate_face_image($("#id_" + face + "_angle").val(), index+1)
+                    $("#id_" + face).trigger("change");
                 });
             }
             );
@@ -217,8 +194,9 @@
                 <input type="file" name="front" id="id_front" class="form-control">
             </div>
             <div class="col-sm-1">
-                <button type="button" name="rotate_front" id="id_rotate_front" class="form-control btn img-rounded">&#10227;</button>
-                <input  type="hidden" name="front_angle" id="id_front_angle" value="0"/>
+                <button type="button" name="rotate_front" id="id_rotate_front"
+                    class="form-control btn img-rounded">&#10227;</button>
+                <input type="hidden" name="front_angle" id="id_front_angle" value="0" />
             </div>
         </div>
         <div class="form-group row image-files">
@@ -227,8 +205,9 @@
                 <input type="file" name="back" id="id_back" class="form-control">
             </div>
             <div class="col-sm-1">
-                <button type="button" name="rotate_back" id="id_rotate_back" class="form-control btn img-rounded">&#10227;</button>
-                <input  type="hidden" name="back_angle" id="id_back_angle" value="0"/>
+                <button type="button" name="rotate_back" id="id_rotate_back"
+                    class="form-control btn img-rounded">&#10227;</button>
+                <input type="hidden" name="back_angle" id="id_back_angle" value="0" />
             </div>
         </div>
         <div class="form-group row image-files">
@@ -237,8 +216,9 @@
                 <input type="file" name="left" id="id_left" class="form-control">
             </div>
             <div class="col-sm-1">
-                <button type="button" name="rotate_left" id="id_rotate_left" class="form-control btn img-rounded">&#10227;</button>
-                <input  type="hidden" name="left_angle" id="id_left_angle" value="0"/>
+                <button type="button" name="rotate_left" id="id_rotate_left"
+                    class="form-control btn img-rounded">&#10227;</button>
+                <input type="hidden" name="left_angle" id="id_left_angle" value="0" />
             </div>
         </div>
         <div class="form-group row image-files">
@@ -247,8 +227,9 @@
                 <input type="file" name="right" id="id_right" class="form-control">
             </div>
             <div class="col-sm-1">
-                <button type="button" name="rotate_right" id="id_rotate_right" class="form-control btn img-rounded">&#10227;</button>
-                <input  type="hidden" name="right_angle" id="id_right_angle" value="0"/>
+                <button type="button" name="rotate_right" id="id_rotate_right"
+                    class="form-control btn img-rounded">&#10227;</button>
+                <input type="hidden" name="right_angle" id="id_right_angle" value="0" />
             </div>
         </div>
         <div class="form-group row image-files">
@@ -257,8 +238,9 @@
                 <input type="file" name="top" id="id_top" class="form-control">
             </div>
             <div class="col-sm-1">
-                <button type="button" name="rotate_top" id="id_rotate_top" class="form-control btn img-rounded">&#10227;</button>
-                <input  type="hidden" name="top_angle" id="id_top_angle" value="0"/>
+                <button type="button" name="rotate_top" id="id_rotate_top"
+                    class="form-control btn img-rounded">&#10227;</button>
+                <input type="hidden" name="top_angle" id="id_top_angle" value="0" />
             </div>
         </div>
         <div class="form-group row image-files">
@@ -267,8 +249,9 @@
                 <input type="file" name="bottom" id="id_bottom" class="form-control">
             </div>
             <div class="col-sm-1">
-                <button type="button" name="rotate_bottom" id="id_rotate_bottom" class="form-control btn img-rounded">&#10227;</button>
-                <input  type="hidden" name="bottom_angle" id="id_bottom_angle" value="0"/>
+                <button type="button" name="rotate_bottom" id="id_rotate_bottom"
+                    class="form-control btn img-rounded">&#10227;</button>
+                <input type="hidden" name="bottom_angle" id="id_bottom_angle" value="0" />
             </div>
         </div>
         <div class="form-group row">

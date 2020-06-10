@@ -8,6 +8,8 @@ let materials = [
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // bottom
 ]
 
+let face_rotations = Array(6).fill(0);
+
 function draw_3d_box(container, data) {
     let tuckbox = data.tuckbox;
 
@@ -81,6 +83,11 @@ function draw_3d_box(container, data) {
 }
 
 // face is an index: 1=front, 2=back, 3=left, 4=right, 5=top, 6=bottom
+function rotate_face_image(rotation, face) {
+    face_rotations[face]=rotation;
+}
+
+// face is an index: 1=front, 2=back, 3=left, 4=right, 5=top, 6=bottom
 function load_face_image(file, face) {
     let reader = new FileReader();
     reader.onload = function(e) {
@@ -88,6 +95,9 @@ function load_face_image(file, face) {
         loader.load(e.target.result,
             onLoad = function(tx) {
                 materials[face].map = tx;
+                materials[face].map.center.x = 0.5;
+                materials[face].map.center.y = 0.5;
+                materials[face].map.rotation = - face_rotations[face] * Math.PI / 2;
                 materials[face].needsUpdate = true;
             });
     }

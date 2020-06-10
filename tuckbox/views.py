@@ -34,7 +34,8 @@ def preview(request):
     tuckbox = data['tuckbox']
 
     # Would need to fill the faces and the options to use this again
-    box.create_box_file(tmp.name, paper, tuckbox, {}, {})
+    my_box = box.TuckBoxDrawing(tuckbox, paper, {}, {})
+    my_box.create_box_file(tmp.name)
 
     encoded_string = base64.b64encode(tmp.read())
 
@@ -46,8 +47,10 @@ def check_fit(request):
     paper = data['paper']
     tuckbox = data['tuckbox']
 
-    will_it_fit = ((min(box.pattern_height(tuckbox), box.pattern_width(tuckbox)) < min(paper['height'], paper['width'])) and
-                   (max(box.pattern_height(tuckbox), box.pattern_width(tuckbox)) < max(paper['height'], paper['width'])))
+    my_box = box.TuckBoxDrawing(tuckbox, paper, {}, {})
+
+    will_it_fit = ((min(my_box.pattern_height(), my_box.pattern_width()) < min(paper['height'], paper['width'])) and
+                   (max(my_box.pattern_height(), my_box.pattern_width()) < max(paper['height'], paper['width'])))
 
     return HttpResponse(status=200 if will_it_fit else 406)
 
@@ -82,6 +85,7 @@ def pattern(request):
                'bottom_angle': int(form.cleaned_data['bottom_angle']),
                }
 
-    box.create_box_file(result_pdf.name, paper, tuckbox, faces, options)
+    my_box = box.TuckBoxDrawing(tuckbox, paper, faces, options)
+    my_box.create_box_file(result_pdf.name)
 
     return FileResponse(result_pdf)

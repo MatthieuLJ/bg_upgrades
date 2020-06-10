@@ -8,7 +8,7 @@ let materials = [
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // bottom
 ]
 
-let face_rotations = Array(6).fill(0);
+let face_rotations = Array(7).fill(0);
 
 function draw_3d_box(container, data) {
     let tuckbox = data.tuckbox;

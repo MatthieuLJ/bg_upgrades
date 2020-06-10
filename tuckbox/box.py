@@ -214,19 +214,17 @@ class TuckBoxDrawing:
             "bottom": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth'] + self.tuckbox['height']) * POINT_PER_MM)),
         }
-        face_angles = {
-            "front": self.options['front_angle'] if 'front_angle' in self.options else 0,
-            "back": self.options['back_angle'] if 'back_angle' in self.options else 0,
-            "left": self.options['left_angle'] if 'left_angle' in self.options else 0,
-            "right": self.options['right_angle'] if 'right_angle' in self.options else 0,
-            "top": self.options['top_angle'] if 'top_angle' in self.options else 0,
-            "bottom": self.options['bottom_angle'] if 'bottom_angle' in self.options else 0,
-        }
+        face_angles = {}
+        face_smart_rescale = {}
+        for face in ["front", "back", "left", "right", "top", "bottom"]:
+            face_angles[face] = self.options[face+"_angle"] if face+"_angle" in self.options else 0
+            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face+"_smart_rescale" in self.options else False
+
         for side in ["front", "back", "left", "right", "top", "bottom"]:
             if side in self.faces:
                 with Image(file=self.faces[side]) as i:
                     i.rotate(face_angles[side] * 90)
-                    i.resize(*face_sizes[side])
+                    self.resize_image(i, face_smart_rescale[side], *face_sizes[side])
                     image.composite(i, *face_positions[side])
 
         draw.draw(image)
@@ -234,6 +232,40 @@ class TuckBoxDrawing:
         dashed_draw.draw(image)
 
         return image
+
+    def resize_image(self, img, smart_rescale, width, height):
+        # Algorithm http://www.imagemagick.org/Usage/resize/
+        #  if the picture is the wrong aspect ratio and smart_rescale is enabled:
+        #    -> liquid resize to the right aspect ratio
+        #         - up on one side if both are smaller
+        #         - down on one side if both are larger
+        #         - up on one side to the right size and down on the other
+        #  -> regular scaling
+        if smart_rescale and img.height / img.width != height / width:
+            # will use some seam carving to get to the right aspect ratio
+            if img.height < height and img.width < width:
+                if img.height / img.width < height / width:
+                    # need to upscale the height to the right aspect ratio
+                    img.liquid_rescale(img.width, int(height * img.width / width))
+                else:
+                    img.liquid_rescale(int(img.height * width / height), img.height)
+            elif img.height > height and img.width > width:
+                if img.height / img.width > height / width:
+                    # need to downscale the height to the right aspect ratio
+                    img.liquid_rescale(img.width, int(height * img.width / width))
+                else:
+                    img.liquid_rescale(int(img.height * width / height), img.height)
+            else:
+                # one dimension is smaller, the other one larger, upscale the right one
+                if img.height < height:
+                    img.liquid_rescale(img.width, height)
+                else:
+                    img.liquid_rescale(width, img.height)
+                # downscale the other one
+                img.liquid_rescale(width, height)
+
+        # finally resize to the right
+        img.resize(width, height)
 
     def create_box_file(self, filename):
         image = self.draw_box()
@@ -243,11 +275,18 @@ class TuckBoxDrawing:
 
 
 if __name__ == "__main__":
-    with open("front.jpg", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
+    paper = {'width': 200, 'height': 200}
+    tuckbox = {'height': 50, 'width': 40, 'depth': 20}
+    options = {'left_angle': 3, 'right_angle': 1, 'bottom_angle': 2}
+    with open("house.png", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
         faces = {'front': front, 'back': back, 'left': left,
                  'right': right, 'top': top, 'bottom': bottom}
-        paper = {'width': 200, 'height': 200}
-        tuckbox = {'height': 50, 'width': 40, 'depth': 20}
-        options = {'left_angle': 3, 'right_angle': 1, 'bottom_angle': 2}
         box = TuckBoxDrawing(tuckbox, paper, faces, options)
         box.create_box_file("example.pdf")
+    with open("house.png", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
+        faces = {'front': front, 'back': back, 'left': left,
+                 'right': right, 'top': top, 'bottom': bottom}
+        options.update({'front_smart_rescale': True, 'bottom_smart_rescale': True,
+                        'left_smart_rescale': True, 'right_smart_rescale': True})
+        box2 = TuckBoxDrawing(tuckbox, paper, faces, options)
+        box2.create_box_file("example2.pdf")

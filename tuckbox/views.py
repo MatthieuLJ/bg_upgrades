@@ -49,10 +49,7 @@ def check_fit(request):
 
     my_box = box.TuckBoxDrawing(tuckbox, paper, {}, {})
 
-    will_it_fit = ((min(my_box.pattern_height(), my_box.pattern_width()) < min(paper['height'], paper['width'])) and
-                   (max(my_box.pattern_height(), my_box.pattern_width()) < max(paper['height'], paper['width'])))
-
-    return HttpResponse(status=200 if will_it_fit else 406)
+    return HttpResponse(status=200 if my_box.will_it_fit() else 406)
 
 
 def pattern(request):

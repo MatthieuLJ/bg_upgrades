@@ -48,6 +48,51 @@
             "height": 356
         };
 
+        function check_pattern_fit() {
+            let data = {
+                "tuckbox": {
+                    "width": parseInt($('#id_width').val()),
+                    "height": parseInt($('#id_height').val()),
+                    "depth": parseInt($('#id_depth').val())
+                }
+            };
+            switch ($("#paper-size").val()) {
+                case "Letter":
+                    data["paper"] = paper_letter;
+                    break;
+                case "Legal":
+                    data["paper"] = paper_legal;
+                    break;
+                case "A4":
+                    data["paper"] = paper_a4;
+                    break;
+                case "A3":
+                    data["paper"] = paper_a3;
+                    break;
+                case "Custom":
+                    data["paper"] = {
+                        "width": $(".paper_width").val(),
+                        "height": $(".paper_height").val()
+                    };
+                    break;
+                default:
+                    // should be an error here of some kind
+                    break;
+            }
+
+            $.post('check_fit', JSON.stringify(data), check_fit_response).fail(check_fit_response);
+        }
+
+        function check_fit_response(data, status) {
+            if (status != "success") {
+                $("#id_wont_fit").css('display', '');
+                $("#id_submit").prop('disabled', true);
+            } else {
+                $("#id_wont_fit").css('display', 'none');
+                $("#id_submit").prop('disabled', false);
+            }
+        }
+
         function check_for_preview() {
             let fields_to_check = [$("#id_height"), $("#id_width"), $("#id_depth")];
             if ($("#paper-size").val() == "Custom") {
@@ -59,10 +104,17 @@
                     valid = false;
                 }
             });
+
             if (valid) {
+                // show a 3D model
                 generate_preview();
+
+                // check if the pattern will fit on paper
+                check_pattern_fit();
             } else {
                 $("#image_preview").empty();
+                $("#id_wont_fit").css('display', 'none');
+                $("id_submit").prop('disabled', true);
             }
         }
 
@@ -71,17 +123,18 @@
                 $(field).css('color', 'red');
             } else {
                 $(field).css('color', 'black');
+                // check if all other dimension fields have valid data
                 check_for_preview();
             }
         }
 
         function generate_preview() {
-            let data={};
+            let data = {};
             data.tuckbox = {};
             ["width", "height", "depth"].forEach(dim => {
-                data.tuckbox[dim] = parseInt($("#id_"+dim).val())
+                data.tuckbox[dim] = parseInt($("#id_" + dim).val())
             });
-            
+
             draw_3d_box($("#image_preview"), data);
         }
 
@@ -94,6 +147,8 @@
             // Hide the entries for custom paper sizes and set them to appear
             // on that specific selection
             $(".paper_custom").css('display', 'none');
+            $("#id_wont_fit").css('display', 'none');
+
             $("#paper-size").change(function () {
                 if (this.value == "Custom") {
                     $(".paper_custom").css('display', '');
@@ -116,7 +171,7 @@
                 });
                 $("#id_rotate_" + face).click(function () {
                     $("#id_" + face + "_angle").val((index, currentValue) => { return (parseInt(currentValue) + 1) % 4; });
-                    rotate_face_image($("#id_" + face + "_angle").val(), index+1)
+                    rotate_face_image($("#id_" + face + "_angle").val(), index + 1)
                     $("#id_" + face).trigger("change");
                 });
             }
@@ -254,9 +309,14 @@
                 <input type="hidden" name="bottom_angle" id="id_bottom_angle" value="0" />
             </div>
         </div>
+        <div id="id_wont_fit" class="form-group row">
+            <div class="col-sm-4 col-sm-offset-4">
+                The pattern is too large
+            </div>
+        </div>
         <div class="form-group row">
             <div class="col-sm-4 col-sm-offset-4">
-                <input type="submit" value="Generate PDF" class="form-control">
+                <input type="submit" id="id_submit" value="Generate PDF" class="form-control">
             </div>
         </div>
     </form>

@@ -1,5 +1,5 @@
 Next steps:
-* Check for the size of the model compared to the paper (modify the layout if needed)
+-> Check for the size of the model compared to the paper (modify the layout if needed)
 * Add the option for liquid (smart) rescale on the pdf
 * Add a tip for the liquid rescale option to explain the consequences
 * Deploy on Heroku

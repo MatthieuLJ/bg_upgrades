@@ -32,8 +32,6 @@ def preview(request):
     data = json.loads(request.body)
     paper = data['paper']
     tuckbox = data['tuckbox']
-    print("paper: ", paper)
-    print("tuckbox: ", tuckbox)
 
     # Would need to fill the faces and the options to use this again
     box.create_box_file(tmp.name, paper, tuckbox, {}, {})
@@ -41,6 +39,17 @@ def preview(request):
     encoded_string = base64.b64encode(tmp.read())
 
     return HttpResponse(encoded_string, content_type="image/png")
+
+
+def check_fit(request):
+    data = json.loads(request.body)
+    paper = data['paper']
+    tuckbox = data['tuckbox']
+
+    will_it_fit = ((min(box.pattern_height(tuckbox), box.pattern_width(tuckbox)) < min(paper['height'], paper['width'])) and
+                   (max(box.pattern_height(tuckbox), box.pattern_width(tuckbox)) < max(paper['height'], paper['width'])))
+
+    return HttpResponse(status=200 if will_it_fit else 406)
 
 
 def pattern(request):

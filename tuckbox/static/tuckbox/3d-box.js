@@ -56,6 +56,7 @@ function draw_3d_box(container, data) {
         group.add(front_plane);
         group.add(back_plane);
     }
+
     create_plane(tuckbox.width, tuckbox.height, 0, 0, 0, 0, tuckbox.depth/2, 1);
     create_plane(tuckbox.width, tuckbox.height, 0, Math.PI, 0, 0,-tuckbox.depth / 2, 2);
     create_plane(tuckbox.depth, tuckbox.height, 0, -Math.PI / 2, -tuckbox.width / 2, 0, 0, 3);

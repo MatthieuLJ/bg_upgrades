@@ -12,6 +12,8 @@ class PatternForm(forms.Form):
     height = forms.CharField()
     width = forms.CharField()
     depth = forms.CharField()
+    paper_height = forms.CharField()
+    paper_width = forms.CharField()
     front_angle = forms.CharField()
     back_angle = forms.CharField()
     left_angle = forms.CharField()
@@ -58,14 +60,15 @@ def pattern(request):
 
     form = PatternForm(request.POST)
     if not form.is_valid():
-        print("Something went wrong in the form")
+        print("Something went wrong in the form"+str(form.errors))
         return redirect('index')
 
     result_pdf = tempfile.NamedTemporaryFile(delete=True, suffix=".pdf")
     print(result_pdf.name)
 
     # hardcode for now
-    paper = {'width': 100, 'height': 100}
+    paper = {'width': float(form.cleaned_data['paper_width']),
+             'height': float(form.cleaned_data['paper_height'])}
     tuckbox = {'width': float(form.cleaned_data['width']),
                'height': float(form.cleaned_data['height']),
                'depth': float(form.cleaned_data['depth'])}

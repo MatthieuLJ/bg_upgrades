@@ -17,8 +17,8 @@ class TuckBoxDrawing:
 
     def lip_size(self):
         # the lip is the minimum of
-        # 80% of the depth
-        # 80% of the width
+        # the depth
+        # 30% of the width
         return min(self.tuckbox['depth'], .3 * self.tuckbox['width'])
 
     def pattern_height(self):
@@ -31,7 +31,16 @@ class TuckBoxDrawing:
         return ((min(self.pattern_height(), self.pattern_width()) < min(self.paper['height'], self.paper['width'])) and
                 (max(self.pattern_height(), self.pattern_width()) < max(self.paper['height'], self.paper['width'])))
 
+    def check_paper_layout(self):
+        if not self.will_it_fit():
+            return False
+        elif self.pattern_height() > self.paper['height'] or self.pattern_width() > self.paper['width']:
+            self.paper['width'], self.paper['height'] = self.paper['height'], self.paper['width']
+        return True
+
     def draw_box(self):
+        if not self.check_paper_layout():
+            return None
 
         draw = Drawing()
 
@@ -154,6 +163,7 @@ class TuckBoxDrawing:
 
         # dashed lines
         dashed_draw.stroke_color = Color('rgb(200,200,200)')
+        dashed_draw.fill_opacity = 0
         dashed_draw.stroke_width = .2 / POINT_PER_MM
         dashed_draw.stroke_dash_array = dash_array
         dashed_draw.line(
@@ -228,7 +238,8 @@ class TuckBoxDrawing:
     def create_box_file(self, filename):
         image = self.draw_box()
 
-        image.save(filename=filename)
+        if image is not None:
+            image.save(filename=filename)
 
 
 if __name__ == "__main__":

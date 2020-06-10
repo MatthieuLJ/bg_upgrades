@@ -56,7 +56,7 @@
                     "depth": parseInt($('#id_depth').val())
                 }
             };
-            switch ($("#paper-size").val()) {
+            switch ($("#id_paper_size").val()) {
                 case "Letter":
                     data["paper"] = paper_letter;
                     break;
@@ -95,7 +95,7 @@
 
         function check_for_preview() {
             let fields_to_check = [$("#id_height"), $("#id_width"), $("#id_depth")];
-            if ($("#paper-size").val() == "Custom") {
+            if ($("#id_paper_size").val() == "Custom") {
                 field_to_check.concat([$("#id_paper_height"), $("#id_paper_width")]);
             }
             let valid = true;
@@ -146,16 +146,33 @@
 
             // Hide the entries for custom paper sizes and set them to appear
             // on that specific selection
-            $(".paper_custom").css('display', 'none');
             $("#id_wont_fit").css('display', 'none');
 
-            $("#paper-size").change(function () {
+            $("#id_paper_size").change(function () {
                 if (this.value == "Custom") {
                     $(".paper_custom").css('display', '');
                 } else {
                     $(".paper_custom").css('display', 'none');
+                    switch (this.value) {
+                        case "Letter":
+                            $("#id_paper_height").val(paper_letter.height);
+                            $("#id_paper_width").val(paper_letter.width);
+                            break;
+                        case "Legal":
+                            $("#id_paper_height").val(paper_legal.height);
+                            $("#id_paper_width").val(paper_legal.width);
+                            break;
+                        case "A4":
+                            $("#id_paper_height").val(paper_a4.height);
+                            $("#id_paper_width").val(paper_a4.width);
+                            break;
+                        case "A3":
+                            $("#id_paper_height").val(paper_a3.height);
+                            $("#id_paper_width").val(paper_a3.width);
+                            break;
+                    }
                 }
-            });
+            }).trigger("change");
 
             $.ajaxSetup({
                 headers: { "X-CSRFToken": Cookies.get("csrftoken") }
@@ -194,7 +211,7 @@
         <div class="form-group row top-row">
             <label class="control-label col-sm-4"> Paper size: </label>
             <div class="col-sm-6">
-                <select id="paper-size" class="form-control" name="paper size">
+                <select id="id_paper_size" class="form-control" name="paper_size">
                     <option value="A4">A4</option>
                     <option value="A3">A3</option>
                     <option value="Letter">Letter</option>

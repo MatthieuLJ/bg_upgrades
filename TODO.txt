@@ -1,9 +1,10 @@
 Next steps:
--> Check for the size of the model compared to the paper (modify the layout if needed)
 * Add the option for liquid (smart) rescale on the pdf
 * Add a tip for the liquid rescale option to explain the consequences
 * Deploy on Heroku
 * Have some of the front picture on the box lip
+* Add markers on the edge for where to fold the pattern
+* Offer the option to not draw the fold lines
 * Generate box template that go over two pages (give a warning when that happens)
 * Give the option for boxes with two openings
 * Adapt to be able to build bitboxes

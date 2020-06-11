@@ -114,7 +114,7 @@
             } else {
                 $("#image_preview").empty();
                 $("#id_wont_fit").css('display', 'none');
-                $("id_submit").prop('disabled', true);
+                $("#id_submit").prop('disabled', true);
             }
         }
 
@@ -173,6 +173,7 @@
                             break;
                     }
                 }
+                check_for_preview();
             }).trigger("change");
 
             $.ajaxSetup({

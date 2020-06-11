@@ -20,11 +20,17 @@ class PatternForm(forms.Form):
     right_angle = forms.CharField()
     top_angle = forms.CharField()
     bottom_angle = forms.CharField()
+    front_smart_rescale = forms.CheckboxInput()
+    back_smart_rescale = forms.CheckboxInput()
+    left_smart_rescale = forms.CheckboxInput()
+    right_smart_rescale = forms.CheckboxInput()
+    bottom_smart_rescale = forms.CheckboxInput()
+    top_smart_rescale = forms.CheckboxInput()
 
 
 def index(request):
     form = PatternForm()
-    return render(request, "pattern_form.html", {'form': form})
+    return render(request, "pattern_form.html.j2", {'form': form})
 
 
 def preview(request):
@@ -73,17 +79,13 @@ def pattern(request):
                'height': float(form.cleaned_data['height']),
                'depth': float(form.cleaned_data['depth'])}
     faces = {}
+    options = {}
+
     for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
         if face in request.FILES:
             faces[face] = request.FILES[face]
-
-    options = {'front_angle': int(form.cleaned_data['front_angle']),
-               'back_angle': int(form.cleaned_data['back_angle']),
-               'left_angle': int(form.cleaned_data['left_angle']),
-               'right_angle': int(form.cleaned_data['right_angle']),
-               'top_angle': int(form.cleaned_data['top_angle']),
-               'bottom_angle': int(form.cleaned_data['bottom_angle']),
-               }
+        options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
+        options[face+"_smart_rescale"] = face+"_smart_rescale" in form.data
 
     my_box = box.TuckBoxDrawing(tuckbox, paper, faces, options)
     my_box.create_box_file(result_pdf.name)

@@ -123,6 +123,7 @@
                 $(field).css('color', 'red');
             } else {
                 $(field).css('color', 'black');
+                
                 // check if all other dimension fields have valid data
                 check_for_preview();
             }
@@ -201,9 +202,6 @@
 
     <h1>Build a tuckbox</h1>
 
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-
     <form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal"
         enctype="multipart/form-data">
         {% csrf_token %}
@@ -232,24 +230,18 @@
                 <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num form-control">
             </div>
         </div>
-        <div class="form-group row">
-            <label class="control-label col-sm-4"> Height (mm): </label>
-            <div class="col-sm-6">
-                <input type="text" name="height" id="id_height" class="tuck_input_num form-control">
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="control-label col-sm-4"> Width (mm): </label>
-            <div class="col-sm-6">
-                <input type="text" name="width" id="id_width" class="tuck_input_num form-control">
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="control-label col-sm-4"> Depth (mm): </label>
-            <div class="col-sm-6">
-                <input type="text" name="depth" id="id_depth" class="tuck_input_num form-control">
-            </div>
-        </div>
+
+        {% with dimensions='height width depth' %}
+            {% for dim in dimensions.split %}
+                <div class="form-group row">
+                  <label class="control-label col-sm-4"> {{ dim|title }} (mm): </label>
+                  <div class="col-sm-6">
+                      <input type="text" name="{{ dim }}" id="id_{{ dim }}" class="tuck_input_num form-control">
+                    </div>
+               </div>
+            {% endfor %}
+        {% endwith %}
+
         <div class="form-group row">
             <label class="control-label col-sm-4"> Openings: </label>
             <div class="col-sm-4">
@@ -260,72 +252,27 @@
             <div id="image_preview" class="col-sm-4 col-sm-offset-4">
             </div>
         </div>
-        <div class="form-group row image-files">
-            <label class="control-label col-sm-4"> Front image: </label>
-            <div class="col-sm-4">
-                <input type="file" name="front" id="id_front" class="form-control">
-            </div>
-            <div class="col-sm-1">
-                <button type="button" name="rotate_front" id="id_rotate_front"
-                    class="form-control btn img-rounded">&#10227;</button>
-                <input type="hidden" name="front_angle" id="id_front_angle" value="0" />
-            </div>
-        </div>
-        <div class="form-group row image-files">
-            <label class="control-label col-sm-4"> Back image: </label>
-            <div class="col-sm-4">
-                <input type="file" name="back" id="id_back" class="form-control">
-            </div>
-            <div class="col-sm-1">
-                <button type="button" name="rotate_back" id="id_rotate_back"
-                    class="form-control btn img-rounded">&#10227;</button>
-                <input type="hidden" name="back_angle" id="id_back_angle" value="0" />
-            </div>
-        </div>
-        <div class="form-group row image-files">
-            <label class="control-label col-sm-4"> Left image: </label>
-            <div class="col-sm-4">
-                <input type="file" name="left" id="id_left" class="form-control">
-            </div>
-            <div class="col-sm-1">
-                <button type="button" name="rotate_left" id="id_rotate_left"
-                    class="form-control btn img-rounded">&#10227;</button>
-                <input type="hidden" name="left_angle" id="id_left_angle" value="0" />
-            </div>
-        </div>
-        <div class="form-group row image-files">
-            <label class="control-label col-sm-4"> Right image: </label>
-            <div class="col-sm-4">
-                <input type="file" name="right" id="id_right" class="form-control">
-            </div>
-            <div class="col-sm-1">
-                <button type="button" name="rotate_right" id="id_rotate_right"
-                    class="form-control btn img-rounded">&#10227;</button>
-                <input type="hidden" name="right_angle" id="id_right_angle" value="0" />
-            </div>
-        </div>
-        <div class="form-group row image-files">
-            <label class="control-label col-sm-4"> Top image: </label>
-            <div class="col-sm-4">
-                <input type="file" name="top" id="id_top" class="form-control">
-            </div>
-            <div class="col-sm-1">
-                <button type="button" name="rotate_top" id="id_rotate_top"
-                    class="form-control btn img-rounded">&#10227;</button>
-                <input type="hidden" name="top_angle" id="id_top_angle" value="0" />
-            </div>
-        </div>
-        <div class="form-group row image-files">
-            <label class="control-label col-sm-4"> Bottom image: </label>
-            <div class="col-sm-4">
-                <input type="file" name="bottom" id="id_bottom" class="form-control">
-            </div>
-            <div class="col-sm-1">
-                <button type="button" name="rotate_bottom" id="id_rotate_bottom"
-                    class="form-control btn img-rounded">&#10227;</button>
-                <input type="hidden" name="bottom_angle" id="id_bottom_angle" value="0" />
-            </div>
-        </div>
+
+        {% with faces='front back left right top bottom' %}
+            {% for face in faces.split %}
+                <div class="form-group row image-files">
+                    <label class="control-label col-sm-4"> {{ face|title }} image: </label>
+                    <div class="col-sm-4">
+                        <input type="file" name="{{ face }}" id="id_{{ face }}" class="form-control">
+                    </div>
+                    <div class="col-sm-1">
+                        <button type="button" name="rotate_{{ face }}" id="id_rotate_{{ face }}"
+                            class="form-control btn img-rounded">&#10227;</button>
+                        <input type="hidden" name="{{ face }}_angle" id="id_{{ face }}_angle" value="0" />
+                    </div>
+                    <div class="col-sm-1">
+                        <input id="id_{{ face }}_smart_rescale" name="{{ face }}_smart_rescale" type="checkbox"
+                            data-toggle="toggle" data-on="Smart resizing" data-off="Regular resizing">
+                    </div>
+                </div>
+            {% endfor %}
+        {% endwith %}
+
         <div id="id_wont_fit" class="form-group row">
             <div class="col-sm-4 col-sm-offset-4">
                 The pattern is too large

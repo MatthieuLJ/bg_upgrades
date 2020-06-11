@@ -1,5 +1,4 @@
 Next steps:
-* Add the option for liquid (smart) rescale on the pdf
 * Add a tip for the liquid rescale option to explain the consequences
 * Deploy on Heroku
 * Have some of the front picture on the box lip

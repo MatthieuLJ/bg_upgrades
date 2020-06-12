@@ -1,6 +1,6 @@
 Next steps:
-* Add a tip for the liquid rescale option to explain the consequences
 * Deploy on Heroku
+* Look if it needs a progress bar when uploading large files
 * Have some of the front picture on the box lip
 * Add markers on the edge for where to fold the pattern
 * Offer the option to not draw the fold lines

@@ -7,10 +7,10 @@
     <!-- cookie plugin -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
-    <!-- Include Bootstrap CSS -->
+    <!-- Include Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    
 
     <!-- Include Bootstrap toggle -->
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
@@ -55,31 +55,12 @@
                     "width": parseInt($('#id_width').val()),
                     "height": parseInt($('#id_height').val()),
                     "depth": parseInt($('#id_depth').val())
+                },
+                "paper": {
+                    "width": parseInt($("#id_paper_width").val()),
+                    "height": parseInt($("#id_paper_height").val())
                 }
             };
-            switch ($("#id_paper_size").val()) {
-                case "Letter":
-                    data["paper"] = paper_letter;
-                    break;
-                case "Legal":
-                    data["paper"] = paper_legal;
-                    break;
-                case "A4":
-                    data["paper"] = paper_a4;
-                    break;
-                case "A3":
-                    data["paper"] = paper_a3;
-                    break;
-                case "Custom":
-                    data["paper"] = {
-                        "width": $(".paper_width").val(),
-                        "height": $(".paper_height").val()
-                    };
-                    break;
-                default:
-                    // should be an error here of some kind
-                    break;
-            }
 
             $.post('check_fit', JSON.stringify(data), check_fit_response).fail(check_fit_response);
         }
@@ -97,7 +78,7 @@
         function check_for_preview() {
             let fields_to_check = [$("#id_height"), $("#id_width"), $("#id_depth")];
             if ($("#id_paper_size").val() == "Custom") {
-                field_to_check.concat([$("#id_paper_height"), $("#id_paper_width")]);
+                fields_to_check.concat([$("#id_paper_height"), $("#id_paper_width")]);
             }
             let valid = true;
             fields_to_check.forEach(function (field) {
@@ -150,6 +131,10 @@
             // on that specific selection
             $("#id_wont_fit").css('display', 'none');
 
+            // Initialize all tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+
+
             $("#id_paper_size").change(function () {
                 if (this.value == "Custom") {
                     $(".paper_custom").css('display', '');
@@ -201,7 +186,6 @@
 </head>
 
 <body>
-
     <h1>Build a tuckbox</h1>
 
     <form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal"
@@ -209,7 +193,7 @@
         {% csrf_token %}
 
         <div class="form-group row top-row">
-            <label class="form-control-label col-sm-4"> Paper size: </label>
+            <label class="form-control-label col-sm-4 align-self-center"> Paper size: </label>
             <div class="col-sm-6">
                 <select id="id_paper_size" class="form-control" name="paper_size">
                     <option value="A4">A4</option>
@@ -221,13 +205,13 @@
             </div>
         </div>
         <div class="form-group row paper_custom">
-            <label class="form-control-label col-sm-4"> Paper Height (mm): </label>
+            <label class="form-control-label col-sm-4 align-self-center"> Paper Height (mm): </label>
             <div class="col-sm-6">
                 <input type="text" name="paper_height" id="id_paper_height" class="tuck_input_num form-control">
             </div>
         </div>
         <div class="form-group row paper_custom">
-            <label class="form-control-label col-sm-4"> Paper Width (mm): </label>
+            <label class="form-control-label col-sm-4 align-self-center"> Paper Width (mm): </label>
             <div class="col-sm-6">
                 <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num form-control">
             </div>
@@ -236,7 +220,7 @@
         {% with dimensions='height width depth' %}
             {% for dim in dimensions.split %}
                 <div class="form-group row">
-                  <label class="form-control-label col-sm-4" for="id_{{ dim }}"> {{ dim|title }} (mm): </label>
+                  <label class="form-control-label col-sm-4 align-self-center" for="id_{{ dim }}"> Tuckbox {{ dim|title }} (mm): </label>
                   <div class="col-sm-6">
                       <input type="text" name="{{ dim }}" id="id_{{ dim }}" class="tuck_input_num form-control">
                     </div>
@@ -245,7 +229,7 @@
         {% endwith %}
 
         <div class="form-group row">
-            <label class="control-label col-sm-4"> Openings: </label>
+            <label class="control-label col-sm-4 align-self-center"> Openings: </label>
             <div class="col-sm-4">
                 <input type="checkbox" data-toggle="toggle" data-on="Both ends" data-off="One end">
             </div>
@@ -258,8 +242,8 @@
         {% with faces='front back left right top bottom' %}
             {% for face in faces.split %}
                 <div class="form-group row image-files">
-                    <label class="col-sm-4"> {{ face|title }} image: </label>
-                    <div class="custom-file col-sm-4">
+                    <label class="col-sm-4 align-self-center"> {{ face|title }} image: </label>
+                    <div class="custom-file col-sm-3">
                         <input type="file" name="{{ face }}" id="id_{{ face }}" class="custom-file-input">
                         <label class="custom-file-label" for="id_{{ face }}"></label>
                     </div>
@@ -270,7 +254,14 @@
                     </div>
                     <div class="col-sm-2">
                         <input id="id_{{ face }}_smart_rescale" name="{{ face }}_smart_rescale" type="checkbox"
-                            data-toggle="toggle" data-on="Smart resizing" data-off="Regular resizing">
+                            data-toggle="toggle" data-on="Smart resizing" data-off="Regular resizing"  style="display: inline-block;">
+                        <div class="align-self-center"  style="display: inline-block;">
+                            <svg class="bi bi-info-circle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-toggle="tooltip" data-placement="top" title="Smart resizing will generally produce better looking images, but may not keep proportions or alignement with the different faces">
+                                <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                <circle cx="8" cy="4.5" r="1"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             {% endfor %}

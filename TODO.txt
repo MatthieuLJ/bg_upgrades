@@ -1,5 +1,4 @@
 Next steps:
-* Deploy on Heroku
 * Look if it needs a progress bar when uploading large files
 * Have some of the front picture on the box lip
 * Add markers on the edge for where to fold the pattern

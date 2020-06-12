@@ -25,7 +25,7 @@ SECRET_KEY = 'to2a5#&-dgyxi3x7))!oy+!vo7n)h7b_p=con0glby^vhqce=('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["bg-upgrades.herokuapp.com", "127.0.0.1"]
 
 
 # Application definition
@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'bg_upgrades.urls'
@@ -123,5 +124,5 @@ STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    #os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'tuckbox/static'),
 )

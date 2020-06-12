@@ -8,12 +8,13 @@
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
     <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
-        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    
 
     <!-- Include Bootstrap toggle -->
-    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
 
     <!-- Three JS -->
     <script src="https://threejs.org/build/three.min.js"></script>
@@ -208,7 +209,7 @@
         {% csrf_token %}
 
         <div class="form-group row top-row">
-            <label class="control-label col-sm-4"> Paper size: </label>
+            <label class="form-control-label col-sm-4"> Paper size: </label>
             <div class="col-sm-6">
                 <select id="id_paper_size" class="form-control" name="paper_size">
                     <option value="A4">A4</option>
@@ -220,13 +221,13 @@
             </div>
         </div>
         <div class="form-group row paper_custom">
-            <label class="control-label col-sm-4"> Paper Height (mm): </label>
+            <label class="form-control-label col-sm-4"> Paper Height (mm): </label>
             <div class="col-sm-6">
                 <input type="text" name="paper_height" id="id_paper_height" class="tuck_input_num form-control">
             </div>
         </div>
         <div class="form-group row paper_custom">
-            <label class="control-label col-sm-4"> Paper Width (mm): </label>
+            <label class="form-control-label col-sm-4"> Paper Width (mm): </label>
             <div class="col-sm-6">
                 <input type="text" name="paper_width" id="id_paper_width" class="tuck_input_num form-control">
             </div>
@@ -235,7 +236,7 @@
         {% with dimensions='height width depth' %}
             {% for dim in dimensions.split %}
                 <div class="form-group row">
-                  <label class="control-label col-sm-4"> {{ dim|title }} (mm): </label>
+                  <label class="form-control-label col-sm-4" for="id_{{ dim }}"> {{ dim|title }} (mm): </label>
                   <div class="col-sm-6">
                       <input type="text" name="{{ dim }}" id="id_{{ dim }}" class="tuck_input_num form-control">
                     </div>
@@ -250,23 +251,24 @@
             </div>
         </div>
         <div class="form-group row">
-            <div id="image_preview" class="col-sm-4 col-sm-offset-4">
+            <div id="image_preview" class="col-sm-4 offset-sm-4">
             </div>
         </div>
 
         {% with faces='front back left right top bottom' %}
             {% for face in faces.split %}
                 <div class="form-group row image-files">
-                    <label class="control-label col-sm-4"> {{ face|title }} image: </label>
-                    <div class="col-sm-4">
-                        <input type="file" name="{{ face }}" id="id_{{ face }}" class="form-control">
+                    <label class="col-sm-4"> {{ face|title }} image: </label>
+                    <div class="custom-file col-sm-4">
+                        <input type="file" name="{{ face }}" id="id_{{ face }}" class="custom-file-input">
+                        <label class="custom-file-label" for="id_{{ face }}"></label>
                     </div>
                     <div class="col-sm-1">
                         <button type="button" name="rotate_{{ face }}" id="id_rotate_{{ face }}"
                             class="form-control btn img-rounded">&#10227;</button>
                         <input type="hidden" name="{{ face }}_angle" id="id_{{ face }}_angle" value="0" />
                     </div>
-                    <div class="col-sm-1">
+                    <div class="col-sm-2">
                         <input id="id_{{ face }}_smart_rescale" name="{{ face }}_smart_rescale" type="checkbox"
                             data-toggle="toggle" data-on="Smart resizing" data-off="Regular resizing">
                     </div>
@@ -275,12 +277,12 @@
         {% endwith %}
 
         <div id="id_wont_fit" class="form-group row">
-            <div class="col-sm-4 col-sm-offset-4">
+            <div class="col-sm-4 offset-sm-4">
                 The pattern is too large
             </div>
         </div>
         <div class="form-group row">
-            <div class="col-sm-4 col-sm-offset-4">
+            <div class="col-sm-4 offset-sm-4">
                 <input type="submit" id="id_submit" value="Generate PDF" class="form-control">
             </div>
         </div>

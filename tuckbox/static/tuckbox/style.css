@@ -6,8 +6,13 @@
     font-size: small;
 }
 
-.label {
+label {
     text-align: right;
+    font-weight: bold;
+}
+
+.toggle {
+    white-space: nowrap;
 }
 
 h1 {

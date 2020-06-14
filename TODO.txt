@@ -1,5 +1,4 @@
 Next steps:
-* When coming back to the form and it gets automatically populated, it may show the pattern is too large - investigate
 * Offer the option to not draw the fold lines
 * Adjust the form's layout so that the (i) always stays next to the button and to be able to reset the file input fields
 * The pattern on the lip should be full visibility at least for the size of the notch

@@ -61,6 +61,11 @@
                     "height": parseInt($("#id_paper_height").val())
                 }
             };
+            //console.log("checking for fit:"+JSON.stringify(data));
+
+            $.ajaxSetup({
+                headers: { "X-CSRFToken": Cookies.get("csrftoken") }
+            });
 
             $.post('check_fit', JSON.stringify(data), check_fit_response).fail(check_fit_response);
         }
@@ -160,10 +165,6 @@
                 }
                 check_for_preview();
             }).trigger("change");
-
-            $.ajaxSetup({
-                headers: { "X-CSRFToken": Cookies.get("csrftoken") }
-            });
 
             ["front", "back", "left", "right", "top", "bottom"].forEach(function (face, index) {
                 $("#id_" + face).change(function () {

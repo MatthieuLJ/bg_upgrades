@@ -272,9 +272,10 @@ class TuckBoxDrawing:
                               margin_width +
                               self.tuckbox['depth']*2 + self.tuckbox['width'],
                               margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']*2]
+            vertical_folds_length = min(0.6 * margin_height, 20)
             for x in vertical_folds:
-                folding_guides_draw.line((x, 0), (x, 0.6 * margin_height))
-                folding_guides_draw.line((x, self.paper['height']), (x, self.paper['height'] - 0.6 * margin_height))
+                folding_guides_draw.line((x, 0.6 * margin_height - vertical_folds_length), (x, 0.6 * margin_height))
+                folding_guides_draw.line((x, self.paper['height'] - 0.6 * margin_height + vertical_folds_length), (x, self.paper['height'] - 0.6 * margin_height))
 
             horizontal_folds = [margin_height + self.lip_size(),
                                 margin_height + self.lip_size() +
@@ -282,9 +283,10 @@ class TuckBoxDrawing:
                                 margin_height + self.lip_size() +
                                 self.tuckbox['depth'] + self.tuckbox['height'],
                                 margin_height + self.lip_size() + self.tuckbox['depth']*2 + self.tuckbox['height']]
+            horizontal_folds_length = min(0.6*margin_width, 20)
             for y in horizontal_folds:
-                folding_guides_draw.line((0, y), (0.6*margin_width, y))
-                folding_guides_draw.line((self.paper['width'], y), (self.paper['width'] - 0.6*margin_width, y))
+                folding_guides_draw.line((0.6*margin_width - horizontal_folds_length, y), (0.6*margin_width, y))
+                folding_guides_draw.line((self.paper['width'] - 0.6*margin_width + horizontal_folds_length, y), (self.paper['width'] - 0.6*margin_width, y))
 
             folding_guides_draw.draw(image)
 

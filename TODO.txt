@@ -1,10 +1,11 @@
 Next steps:
--> Add markers on the edge for where to fold the pattern
 * Offer the option to not draw the fold lines
+* Adjust the form's layout so that the (i) always stays next to the button and to be able to reset the file input fields
 * The pattern on the lip should be full visibility at least for the size of the notch
-* Look at gathering some metrics
+* Look at gathering some metrics (options, image created, computation time, data upload time)
+? Draw at higher precision than mm?
 ? Add a watermark on the generated PDF (with tool version number)
-* Look if it needs a progress bar when uploading large files
+? Look if it needs a progress bar when uploading large files
 ? Drag and drop the pictures into the different fields
 * Give the option for boxes with two openings
 * Generate box template that go over two pages (give a warning when that happens)

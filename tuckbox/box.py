@@ -27,7 +27,7 @@ class TuckBoxDrawing:
         return self.tuckbox['height'] + (2 * self.tuckbox['depth']) + self.lip_size()
 
     def pattern_width(self):
-        return (3*self.tuckbox['depth']) + (2*self.tuckbox['width'])
+        return (2.8*self.tuckbox['depth']) + (2*self.tuckbox['width'])
 
     def will_it_fit(self):
         return ((min(self.pattern_height(), self.pattern_width()) < min(self.paper['height'], self.paper['width'])) and
@@ -48,11 +48,12 @@ class TuckBoxDrawing:
 
         draw.scale(POINT_PER_MM, POINT_PER_MM)
 
-        draw.stroke_width = 1 / POINT_PER_MM
+        draw.stroke_color = Color('black')
+        draw.stroke_width = 3 / POINT_PER_MM
 
-        # Find the coordinate of the left top corner to start drawing from there
-        margin_height = 1+(self.paper['height'] - self.pattern_height()) / 2
-        margin_width = 1+(self.paper['width'] - self.pattern_width()) / 2
+        # How much white space on the sides
+        margin_height = (self.paper['height'] - self.pattern_height()) / 2
+        margin_width = (self.paper['width'] - self.pattern_width()) / 2
 
         draw.translate(margin_width,
                        margin_height + self.lip_size() + self.tuckbox['depth'])
@@ -60,9 +61,7 @@ class TuckBoxDrawing:
         finger_draw = Drawing(draw)
         dashed_draw = Drawing(draw)
 
-        draw.fill_color = Color('white')
         draw.fill_opacity = 0
-        draw.stroke_color = Color('black')
 
         #        ---------
         #       /         \
@@ -91,7 +90,7 @@ class TuckBoxDrawing:
         tab_length = min(.9 *
                          self.tuckbox['depth'], .4 * self.tuckbox['width'])
         dash_array = [min(self.tuckbox['depth'], self.tuckbox['width'],
-                          self.tuckbox['height'])/6.5] * 2
+                          self.tuckbox['height'])/13] * 2
 
         # Draw the solid lines
         draw.polyline([(self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
@@ -148,7 +147,7 @@ class TuckBoxDrawing:
         # 1/2 left of lip
         draw.bezier([(self.tuckbox['depth'], -self.tuckbox['depth']),
                      (self.tuckbox['depth'], -
-                      self.tuckbox['depth'] - .75*self.lip_size()),
+                      self.tuckbox['depth'] - .75 * self.lip_size()),
                      (self.tuckbox['depth'] + .2 * self.tuckbox['width'],
                       -self.tuckbox['depth'] - self.lip_size()),
                      (self.tuckbox['depth'] + .5 * self.tuckbox['width'],
@@ -172,10 +171,11 @@ class TuckBoxDrawing:
                         (0, 180))
 
         # dashed lines
-        dashed_draw.stroke_color = Color('rgb(200,200,200)')
+        dashed_draw.stroke_color = Color('rgb(100,100,100)')
         dashed_draw.fill_opacity = 0
-        dashed_draw.stroke_width = .2 / POINT_PER_MM
+        dashed_draw.stroke_width = 2 / POINT_PER_MM
         dashed_draw.stroke_dash_array = dash_array
+        dashed_draw.stroke_dash_offset = 1
         dashed_draw.line(
             (0, 0), (self.tuckbox['depth']*2 + self.tuckbox['width'], 0))
         dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
@@ -188,6 +188,8 @@ class TuckBoxDrawing:
                          (self.tuckbox['depth'] + self.tuckbox['width'], self.tuckbox['height']))
         dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
                          (self.tuckbox['depth']*2 + self.tuckbox['width'], self.tuckbox['height']))
+        dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width']*2, 0),
+                         (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
 
         # Prepare the face pictures first
         face_sizes = {
@@ -233,7 +235,7 @@ class TuckBoxDrawing:
         # Create the image
         image = Image(width=math.ceil(self.paper['width'] * POINT_PER_MM),
                       height=math.ceil(self.paper['height'] * POINT_PER_MM),
-                      background = Color('white'))
+                      background=Color('white'))
         image.resolution = RESOLUTION
         image.unit = 'pixelsperinch'
 
@@ -256,6 +258,35 @@ class TuckBoxDrawing:
         draw.draw(image)
         finger_draw.draw(image)
         dashed_draw.draw(image)
+
+        if (self.options["folding_guides"] if "folding_guides" in self.options else False):
+            folding_guides_draw = Drawing()
+            folding_guides_draw.scale(POINT_PER_MM, POINT_PER_MM)
+
+            folding_guides_draw.stroke_color = Color('black')
+            folding_guides_draw.stroke_width = 3 / POINT_PER_MM
+
+            vertical_folds = [margin_width + self.tuckbox['depth'],
+                              margin_width +
+                              self.tuckbox['depth'] + self.tuckbox['width'],
+                              margin_width +
+                              self.tuckbox['depth']*2 + self.tuckbox['width'],
+                              margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']*2]
+            for x in vertical_folds:
+                folding_guides_draw.line((x, 0), (x, 0.6 * margin_height))
+                folding_guides_draw.line((x, self.paper['height']), (x, self.paper['height'] - 0.6 * margin_height))
+
+            horizontal_folds = [margin_height + self.lip_size(),
+                                margin_height + self.lip_size() +
+                                self.tuckbox['depth'],
+                                margin_height + self.lip_size() +
+                                self.tuckbox['depth'] + self.tuckbox['height'],
+                                margin_height + self.lip_size() + self.tuckbox['depth']*2 + self.tuckbox['height']]
+            for y in horizontal_folds:
+                folding_guides_draw.line((0, y), (0.6*margin_width, y))
+                folding_guides_draw.line((self.paper['width'], y), (self.paper['width'] - 0.6*margin_width, y))
+
+            folding_guides_draw.draw(image)
 
         return image
 
@@ -319,8 +350,6 @@ class TuckBoxDrawing:
 
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
-        lip_image.save(filename="lip.png")
-
         return lip_image
 
     def resize_image(self, img, smart_rescale, width, height):
@@ -371,7 +400,8 @@ class TuckBoxDrawing:
 if __name__ == "__main__":
     paper = {'width': 210, 'height': 297}
     tuckbox = {'height': 100, 'width': 80, 'depth': 40}
-    options = {'left_angle': 3, 'right_angle': 1, 'bottom_angle': 2}
+    options = {'left_angle': 3, 'right_angle': 1,
+               'bottom_angle': 2, 'folding_guides': True}
     with open("front.jpg", "rb") as front, open("house.png", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
         faces = {'front': front, 'back': back, 'left': left,
                  'right': right, 'top': top, 'bottom': bottom}

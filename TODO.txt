@@ -1,9 +1,11 @@
 Next steps:
-* Look if it needs a progress bar when uploading large files
-* Add markers on the edge for where to fold the pattern
+-> Add markers on the edge for where to fold the pattern
 * Offer the option to not draw the fold lines
+* The pattern on the lip should be full visibility at least for the size of the notch
 * Look at gathering some metrics
-* Drag and drop the pictures into the different fields
-* Generate box template that go over two pages (give a warning when that happens)
+? Add a watermark on the generated PDF (with tool version number)
+* Look if it needs a progress bar when uploading large files
+? Drag and drop the pictures into the different fields
 * Give the option for boxes with two openings
+* Generate box template that go over two pages (give a warning when that happens)
 * Adapt to be able to build bitboxes

@@ -67,17 +67,17 @@ class TuckBoxDrawing:
         #      +--- - - ---+
         #  +---+           +---+
         #  |   |           |   |
-        #  0- - - - - - - - - -+----+ +----+
-        #  |   |           |   |    +-+    |
-        #  |                               |
-        #  |   |           |   |           |
-        #  |                               |
-        #  |   |           |   |           |
-        #  |                               |
-        #  |   |           |   |           |
-        #  |                               |
-        #  |   |           |   |           |
-        #  +- - - - - - - - - - - - - - - -+
+        #  0- - - - - - - - - -+----T +----+--+
+        #  |   |           |   |    +-+    |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  +- - - - - - - - - - - - - - - -+--+
         #  |   |           |   |           |
         #  +---+           +---------------+
         #      +-----------+
@@ -118,6 +118,11 @@ class TuckBoxDrawing:
                         self.tuckbox['height'] + self.tuckbox['depth']*.8),
                        (self.tuckbox['depth']*2 + self.tuckbox['width']*2,
                         self.tuckbox['height'] + self.tuckbox['depth']*.8),
+                       (self.tuckbox['depth']*2 + self.tuckbox['width']*2,
+                        self.tuckbox['height']),
+                       (self.tuckbox['depth']*2.8 + self.tuckbox['width']*2,
+                        self.tuckbox['height']),
+                       (self.tuckbox['depth']*2.8 + self.tuckbox['width']*2, 0),
                        (self.tuckbox['depth']*2 + self.tuckbox['width']*2, 0),
                        (self.tuckbox['depth']*2 +
                         self.tuckbox['width']*1.6, 0),

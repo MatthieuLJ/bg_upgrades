@@ -1,4 +1,5 @@
 Next steps:
+* When coming back to the form and it gets automatically populated, it may show the pattern is too large - investigate
 * Offer the option to not draw the fold lines
 * Adjust the form's layout so that the (i) always stays next to the button and to be able to reset the file input fields
 * The pattern on the lip should be full visibility at least for the size of the notch
@@ -7,6 +8,6 @@ Next steps:
 ? Add a watermark on the generated PDF (with tool version number)
 ? Look if it needs a progress bar when uploading large files
 ? Drag and drop the pictures into the different fields
-* Give the option for boxes with two openings
+* Give the option for boxes with openings on both ends
 * Generate box template that go over two pages (give a warning when that happens)
 * Adapt to be able to build bitboxes

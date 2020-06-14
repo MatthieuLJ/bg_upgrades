@@ -1,9 +1,8 @@
 Next steps:
-* Deploy on Heroku
 * Look if it needs a progress bar when uploading large files
-* Have some of the front picture on the box lip
 * Add markers on the edge for where to fold the pattern
 * Offer the option to not draw the fold lines
+* Look at gathering some metrics
 * Drag and drop the pictures into the different fields
 * Generate box template that go over two pages (give a warning when that happens)
 * Give the option for boxes with two openings

@@ -1,7 +1,9 @@
 import math
+from wand.api import library
 from wand.color import Color
 from wand.drawing import Drawing
 from wand.image import Image
+import sys
 
 
 RESOLUTION = 600  # Dots Per Inch
@@ -64,25 +66,27 @@ class TuckBoxDrawing:
 
         #        ---------
         #       /         \
-        #      +--- - - ---+
+        #      +--S - - ---+
         #  +---+           +---+
         #  |   |           |   |
-        #  0- - - - - - - - - -+----+ +----+
-        #  |   |           |   |    +-+    |
-        #  |                               |
-        #  |   |           |   |           |
-        #  |                               |
-        #  |   |           |   |           |
-        #  |                               |
-        #  |   |           |   |           |
-        #  |                               |
-        #  |   |           |   |           |
-        #  +- - - - - - - - - - - - - - - -+
+        #  0- - - - - - - - - -+----T +----+--+
+        #  |   |           |   |    +-+    |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  |                                  |
+        #  |   |           |   |           |  |
+        #  +- - - - - - - - - - - - - - - -+--+
         #  |   |           |   |           |
         #  +---+           +---------------+
         #      +-----------+
         #
         # 0 is the origin
+        # S is the start of the first polyline (going counter-clockwise)
+        # T is the start of the second one
 
         tab_length = min(.9 *
                          self.tuckbox['depth'], .4 * self.tuckbox['width'])
@@ -118,6 +122,12 @@ class TuckBoxDrawing:
                         self.tuckbox['height'] + self.tuckbox['depth']*.8),
                        (self.tuckbox['depth']*2 + self.tuckbox['width']*2,
                         self.tuckbox['height'] + self.tuckbox['depth']*.8),
+                       (self.tuckbox['depth']*2 + self.tuckbox['width']*2,
+                        self.tuckbox['height']),
+                       (self.tuckbox['depth']*2.8 + self.tuckbox['width']*2,
+                        self.tuckbox['height']),
+                       (self.tuckbox['depth']*2.8 +
+                        self.tuckbox['width']*2, 0),
                        (self.tuckbox['depth']*2 + self.tuckbox['width']*2, 0),
                        (self.tuckbox['depth']*2 +
                         self.tuckbox['width']*1.6, 0),
@@ -179,13 +189,7 @@ class TuckBoxDrawing:
         dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
                          (self.tuckbox['depth']*2 + self.tuckbox['width'], self.tuckbox['height']))
 
-        # Create the image
-        image = Image(width=math.ceil(self.paper['width'] * POINT_PER_MM),
-                      height=math.ceil(self.paper['height'] * POINT_PER_MM))
-        image.resolution = RESOLUTION
-        image.unit = 'pixelsperinch'
-
-        # Put the pictures in first
+        # Prepare the face pictures first
         face_sizes = {
             "front": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
                       math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
@@ -199,6 +203,8 @@ class TuckBoxDrawing:
                     math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
             "bottom": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
                        math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
+            "lip": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                    math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
         }
         face_positions = {
             "front": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
@@ -213,25 +219,109 @@ class TuckBoxDrawing:
                     math.floor((margin_height + self.lip_size()) * POINT_PER_MM)),
             "bottom": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth'] + self.tuckbox['height']) * POINT_PER_MM)),
+            "lip": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                    math.floor((margin_height) * POINT_PER_MM)),
         }
         face_angles = {}
         face_smart_rescale = {}
         for face in ["front", "back", "left", "right", "top", "bottom"]:
-            face_angles[face] = self.options[face+"_angle"] if face+"_angle" in self.options else 0
-            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face+"_smart_rescale" in self.options else False
+            face_angles[face] = self.options[face +
+                                             "_angle"] if face+"_angle" in self.options else 0
+            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face + \
+                "_smart_rescale" in self.options else False
 
+        # Create the image
+        image = Image(width=math.ceil(self.paper['width'] * POINT_PER_MM),
+                      height=math.ceil(self.paper['height'] * POINT_PER_MM),
+                      background = Color('white'))
+        image.resolution = RESOLUTION
+        image.unit = 'pixelsperinch'
+
+        # Apply those face pictures
         for side in ["front", "back", "left", "right", "top", "bottom"]:
             if side in self.faces:
                 with Image(file=self.faces[side]) as i:
                     i.rotate(face_angles[side] * 90)
-                    self.resize_image(i, face_smart_rescale[side], *face_sizes[side])
+                    self.resize_image(
+                        i, face_smart_rescale[side], *face_sizes[side])
                     image.composite(i, *face_positions[side])
+                self.faces[side].seek(0)
 
+        # Draw the lip
+        if "back" in self.faces:
+            lip = self.draw_lip()
+            image.composite(lip, *face_positions['lip'])
+
+        # Draw all the lines over
         draw.draw(image)
         finger_draw.draw(image)
         dashed_draw.draw(image)
 
         return image
+
+    def draw_lip(self):
+        # First draw a full mask with the lip shape
+        lip_full_mask_image = Image(width=math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                                    height=math.ceil(self.lip_size() * POINT_PER_MM))
+        lip_full_draw = Drawing()
+
+        lip_full_draw.scale(POINT_PER_MM, POINT_PER_MM)
+
+        lip_full_draw.stroke_width = 2 / POINT_PER_MM
+
+        lip_full_draw.fill_color = Color('white')
+        lip_full_draw.color(0, 0, 'reset')
+        lip_full_draw.draw(lip_full_mask_image)
+
+        lip_full_draw.stroke_color = Color('black')
+
+        # 1/2 left of lip
+        lip_full_draw.bezier([(0, self.lip_size()),
+                              (0, self.lip_size() - .75*self.lip_size()),
+                              (.2 * self.tuckbox['width'],
+                               self.lip_size() - self.lip_size()),
+                              (.5 * self.tuckbox['width'], self.lip_size() - self.lip_size())])
+
+        # 1/2 right of lip
+        lip_full_draw.bezier([(self.tuckbox['width'], self.lip_size()),
+                              (self.tuckbox['width'],
+                               self.lip_size() - .75*self.lip_size()),
+                              (.8 * self.tuckbox['width'],
+                               self.lip_size() - self.lip_size()),
+                              (.5 * self.tuckbox['width'], self.lip_size() - self.lip_size())])
+
+        lip_full_draw.draw(lip_full_mask_image)
+
+        lip_full_draw.fill_color = Color('black')
+        lip_full_draw.border_color = Color('black')
+        lip_full_draw.color(.5 * self.tuckbox['width'],
+                            0.8*self.lip_size(), 'filltoborder')
+
+        lip_full_draw.draw(lip_full_mask_image)
+
+        # Prepare the front image
+        lip_image = Image(file=self.faces['back'])
+
+        if "front_angle" in self.options:
+            lip_image.rotate((self.options["back_angle"]+2)*90)
+        else:
+            lip_image.rotate(180)
+
+        self.resize_image(lip_image,
+                          "back_smart_rescale" in self.options and
+                          self.options["back_smart_rescale"],
+                          math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                          math.ceil(self.tuckbox['height'] * POINT_PER_MM))
+
+        lip_image.crop(top=lip_image.height - lip_full_mask_image.height)
+
+        lip_image = lip_image.fx("u+1-sin(pi*j/(2*h))")
+
+        lip_image.composite(operator='lighten', image=lip_full_mask_image)
+
+        lip_image.save(filename="lip.png")
+
+        return lip_image
 
     def resize_image(self, img, smart_rescale, width, height):
         # Algorithm http://www.imagemagick.org/Usage/resize/
@@ -246,15 +336,19 @@ class TuckBoxDrawing:
             if img.height < height and img.width < width:
                 if img.height / img.width < height / width:
                     # need to upscale the height to the right aspect ratio
-                    img.liquid_rescale(img.width, int(height * img.width / width))
+                    img.liquid_rescale(img.width, int(
+                        height * img.width / width))
                 else:
-                    img.liquid_rescale(int(img.height * width / height), img.height)
+                    img.liquid_rescale(
+                        int(img.height * width / height), img.height)
             elif img.height > height and img.width > width:
                 if img.height / img.width > height / width:
                     # need to downscale the height to the right aspect ratio
-                    img.liquid_rescale(img.width, int(height * img.width / width))
+                    img.liquid_rescale(img.width, int(
+                        height * img.width / width))
                 else:
-                    img.liquid_rescale(int(img.height * width / height), img.height)
+                    img.liquid_rescale(
+                        int(img.height * width / height), img.height)
             else:
                 # one dimension is smaller, the other one larger, upscale the right one
                 if img.height < height:
@@ -275,18 +369,20 @@ class TuckBoxDrawing:
 
 
 if __name__ == "__main__":
-    paper = {'width': 200, 'height': 200}
-    tuckbox = {'height': 50, 'width': 40, 'depth': 20}
+    paper = {'width': 210, 'height': 297}
+    tuckbox = {'height': 100, 'width': 80, 'depth': 40}
     options = {'left_angle': 3, 'right_angle': 1, 'bottom_angle': 2}
-    with open("house.png", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
+    with open("front.jpg", "rb") as front, open("house.png", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
         faces = {'front': front, 'back': back, 'left': left,
                  'right': right, 'top': top, 'bottom': bottom}
         box = TuckBoxDrawing(tuckbox, paper, faces, options)
         box.create_box_file("example.pdf")
-    with open("house.png", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
-        faces = {'front': front, 'back': back, 'left': left,
-                 'right': right, 'top': top, 'bottom': bottom}
-        options.update({'front_smart_rescale': True, 'bottom_smart_rescale': True,
-                        'left_smart_rescale': True, 'right_smart_rescale': True})
-        box2 = TuckBoxDrawing(tuckbox, paper, faces, options)
-        box2.create_box_file("example2.pdf")
+
+    if False:
+        with open("house.png", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
+            faces = {'front': front, 'back': back, 'left': left,
+                     'right': right, 'top': top, 'bottom': bottom}
+            options.update({'front_smart_rescale': True, 'bottom_smart_rescale': True,
+                            'left_smart_rescale': True, 'right_smart_rescale': True})
+            box2 = TuckBoxDrawing(tuckbox, paper, faces, options)
+            box2.create_box_file("example2.pdf")

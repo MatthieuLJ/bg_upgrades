@@ -34,7 +34,7 @@ def index(request):
 
 
 def preview(request):
-    tmp = tempfile.NamedTemporaryFile(suffix=".png")
+    tmp = tempfile.NamedTemporaryFile(delete=True, suffix=".png")
     print(tmp.name)
 
     data = json.loads(request.body)
@@ -59,7 +59,6 @@ def check_fit(request):
 
     return HttpResponse(status=200 if my_box.will_it_fit() else 406)
 
-
 def pattern(request):
     if request.method != 'POST':
         return redirect('index')
@@ -69,10 +68,9 @@ def pattern(request):
         print("Something went wrong in the form"+str(form.errors))
         return redirect('index')
 
-    result_pdf = tempfile.NamedTemporaryFile(delete=True, suffix=".pdf")
-    print(result_pdf.name)
+    result_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    print("Generating to file "+result_pdf.name)
 
-    # hardcode for now
     paper = {'width': float(form.cleaned_data['paper_width']),
              'height': float(form.cleaned_data['paper_height'])}
     tuckbox = {'width': float(form.cleaned_data['width']),

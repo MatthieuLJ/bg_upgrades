@@ -171,25 +171,26 @@ class TuckBoxDrawing:
                         (0, 180))
 
         # dashed lines
-        dashed_draw.stroke_color = Color('rgb(100,100,100)')
-        dashed_draw.fill_opacity = 0
-        dashed_draw.stroke_width = 2 / POINT_PER_MM
-        dashed_draw.stroke_dash_array = dash_array
-        dashed_draw.stroke_dash_offset = 1
-        dashed_draw.line(
-            (0, 0), (self.tuckbox['depth']*2 + self.tuckbox['width'], 0))
-        dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
-                         (self.tuckbox['depth'] + self.tuckbox['width']*.8, -self.tuckbox['depth']))
-        dashed_draw.line((0, self.tuckbox['height']),
-                         (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
-        dashed_draw.line((self.tuckbox['depth'], 0),
-                         (self.tuckbox['depth'], self.tuckbox['height']))
-        dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width'], 0),
-                         (self.tuckbox['depth'] + self.tuckbox['width'], self.tuckbox['height']))
-        dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
-                         (self.tuckbox['depth']*2 + self.tuckbox['width'], self.tuckbox['height']))
-        dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width']*2, 0),
-                         (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
+        if self.options["folds_dashed"]:
+            dashed_draw.stroke_color = Color('rgb(100,100,100)')
+            dashed_draw.fill_opacity = 0
+            dashed_draw.stroke_width = 2 / POINT_PER_MM
+            dashed_draw.stroke_dash_array = dash_array
+            dashed_draw.stroke_dash_offset = 1
+            dashed_draw.line(
+                (0, 0), (self.tuckbox['depth']*2 + self.tuckbox['width'], 0))
+            dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
+                            (self.tuckbox['depth'] + self.tuckbox['width']*.8, -self.tuckbox['depth']))
+            dashed_draw.line((0, self.tuckbox['height']),
+                            (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
+            dashed_draw.line((self.tuckbox['depth'], 0),
+                            (self.tuckbox['depth'], self.tuckbox['height']))
+            dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width'], 0),
+                            (self.tuckbox['depth'] + self.tuckbox['width'], self.tuckbox['height']))
+            dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
+                            (self.tuckbox['depth']*2 + self.tuckbox['width'], self.tuckbox['height']))
+            dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width']*2, 0),
+                            (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
 
         # Prepare the face pictures first
         face_sizes = {
@@ -257,7 +258,8 @@ class TuckBoxDrawing:
         # Draw all the lines over
         draw.draw(image)
         finger_draw.draw(image)
-        dashed_draw.draw(image)
+        if self.options["folds_dashed"]:
+            dashed_draw.draw(image)
 
         if (self.options["folding_guides"] if "folding_guides" in self.options else False):
             folding_guides_draw = Drawing()
@@ -403,7 +405,7 @@ if __name__ == "__main__":
     paper = {'width': 210, 'height': 297}
     tuckbox = {'height': 100, 'width': 80, 'depth': 40}
     options = {'left_angle': 3, 'right_angle': 1,
-               'bottom_angle': 2, 'folding_guides': True}
+               'bottom_angle': 2, 'folding_guides': True, "folds_dashed": False}
     with open("front.jpg", "rb") as front, open("house.png", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
         faces = {'front': front, 'back': back, 'left': left,
                  'right': right, 'top': top, 'bottom': bottom}

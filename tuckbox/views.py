@@ -27,6 +27,7 @@ class PatternForm(forms.Form):
     bottom_smart_rescale = forms.CheckboxInput()
     top_smart_rescale = forms.CheckboxInput()
     folding_guides = forms.CheckboxInput()
+    folds_dashed = forms.CheckboxInput()
 
 
 def index(request):
@@ -87,6 +88,7 @@ def pattern(request):
         options[face+"_smart_rescale"] = face+"_smart_rescale" in form.data
 
     options["folding_guides"] = "folding_guides" in form.data
+    options["folds_dashed"] = "folds_dashed" in form.data
 
     my_box = box.TuckBoxDrawing(tuckbox, paper, faces, options)
     my_box.create_box_file(result_pdf.name)

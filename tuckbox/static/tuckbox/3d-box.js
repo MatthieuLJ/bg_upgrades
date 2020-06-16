@@ -38,7 +38,7 @@ function draw_3d_box(container, data) {
     spotlight.position.set(5, 5, 0);
     scene.add(spotlight);
 
-    var group = new THREE.Group();
+    let group = new THREE.Group();
     group.scale.set(1, 1, 1);
     scene.add(group)
 
@@ -103,5 +103,9 @@ function load_face_image(file, face) {
             });
     }
     reader.readAsDataURL(file);
-    
+}
+
+function clear_face_image(face) {
+    materials[face].map = null;
+    materials[face].needsUpdate = true;
 }

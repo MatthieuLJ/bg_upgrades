@@ -30,3 +30,7 @@ h1 {
 .icon {
     padding: 1px 6px;
 }
+
+button > * {
+    pointer-events: none;
+  }

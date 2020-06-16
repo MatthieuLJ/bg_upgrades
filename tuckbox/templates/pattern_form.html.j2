@@ -177,13 +177,24 @@
 
                     if (file && file.type.split("/")[0] == "image") {
                         load_face_image(file, index + 1);
+                    } else {
+                        clear_face_image(index+1);
                     }
-                    $(this).next().html(file.name);
+                    if (file && "name" in file) {
+                        $(this).next().html(file.name);
+                    } else {
+                        $(this).next().html("");
+                    }
                 });
                 $("#id_rotate_" + face).click(function () {
                     $("#id_" + face + "_angle").val((index, currentValue) => { return (parseInt(currentValue) + 1) % 4; });
                     rotate_face_image($("#id_" + face + "_angle").val(), index + 1)
                     $("#id_" + face).trigger("change");
+                });
+                $("#id_clear_" + face).click(function() {
+                    console.log("clear!");
+                    $("#id_" + face).val("").trigger("change").next().html();
+
                 });
             }
             );

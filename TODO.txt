@@ -1,7 +1,7 @@
 Next steps:
 * The pattern on the lip should be full visibility at least for the size of the notch
 * Look at gathering some metrics (options, image created, computation time, data upload time)
-? Draw at higher precision than mm?
+? Draw at higher precision than mm
 ? Add a watermark on the generated PDF (with tool version number)
 ? Look if it needs a progress bar when uploading large files
 ? Drag and drop the pictures into the different fields

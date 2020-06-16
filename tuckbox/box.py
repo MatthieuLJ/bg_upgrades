@@ -14,8 +14,8 @@ class TuckBoxDrawing:
     def __init__(self, tuckbox, paper, faces, options):
         self.tuckbox = tuckbox
         self.paper = paper
-        self.faces = faces
-        self.options = options
+        self.faces = faces if faces is not None else {}
+        self.options = options if options is not None else {}
 
     def lip_size(self):
         # the lip is the minimum of
@@ -171,7 +171,7 @@ class TuckBoxDrawing:
                         (0, 180))
 
         # dashed lines
-        if self.options["folds_dashed"]:
+        if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.stroke_color = Color('rgb(100,100,100)')
             dashed_draw.fill_opacity = 0
             dashed_draw.stroke_width = 2 / POINT_PER_MM
@@ -258,10 +258,10 @@ class TuckBoxDrawing:
         # Draw all the lines over
         draw.draw(image)
         finger_draw.draw(image)
-        if self.options["folds_dashed"]:
+        if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.draw(image)
 
-        if (self.options["folding_guides"] if "folding_guides" in self.options else False):
+        if "folding_guides" in self.options and self.options["folding_guides"]:
             folding_guides_draw = Drawing()
             folding_guides_draw.scale(POINT_PER_MM, POINT_PER_MM)
 

@@ -3,3 +3,16 @@ To setup an environment, use virtualenv and install the packages listed in requi
 $ virtualenv --python=/your/path/to/python2 venv
 $ source venv/bin/activate
 $ pip install -r requirements.txt
+
+To find packages that need to be updated
+$ pip list --outdated
+Then update:
+$ pip install <package_name> --upgrade
+Record the packages:
+$ pip freeze > requirements.txt
+
+When the data needs to change for the tests:
+(top project folder) $ python -m tuckbox.tests_box
+
+To run the tests:
+$ ./manage.py test

@@ -1,6 +1,7 @@
 # temp files
 *.swp
 *.pyc
+.DS_Store
 
 # environment folder
 venv/

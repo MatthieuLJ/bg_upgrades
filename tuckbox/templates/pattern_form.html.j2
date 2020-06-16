@@ -285,29 +285,34 @@
         {% with faces='front back left right top bottom' %}
         {% for face in faces.split %}
         <div class="form-group row image-files">
-            <label class="form-control-label col-4 align-self-center"> {{ face|title }} image: </label>
-            <div class="custom-file col-3">
+            <label class="form-control-label col-md-4 col-sm-4 align-self-center"> {{ face|title }} image: </label>
+            <div class="custom-file col-md-3 col-sm-6">
                 <input type="file" name="{{ face }}" id="id_{{ face }}" class="custom-file-input">
                 <label class="custom-file-label" for="id_{{ face }}">Pick an image file...</label>
             </div>
-            <div class="col-1">
+            <div class="col-md-1 offset-md-0 offset-sm-4 col-sm-1" style="display: flex;">
                 <button type="button" name="rotate_{{ face }}" id="id_rotate_{{ face }}"
-                    class="form-control btn img-rounded">
+                    class="form-control btn img-rounded icon">
                     <object type="image/svg+xml" data="{% static 'tuckbox/rotate.svg' %}">
                         Rotate
                     </object>
                 </button>
                 <input type="hidden" name="{{ face }}_angle" id="id_{{ face }}_angle" value="0" />
+                <button type="button" name="clear_{{ face }}" id="id_clear_{{ face }}"
+                    class="form-control btn img-rounded icon">
+                    <object type="image/svg+xml" data="{% static 'tuckbox/broom.svg' %}">
+                        Clear
+                    </object>
+                </button>
             </div>
-            <div class="col-2">
-                <input id="id_{{ face }}_smart_rescale" name="{{ face }}_smart_rescale" type="checkbox"
-                    data-toggle="toggle" data-on="Smart resizing" data-off="Regular resizing"
-                    style="display: inline-block;">
-                <div class="align-self-center" style="display: inline-block;">
+            <div class="col-md-2 col-sm-6" style="display: flex;">
+                <input id="id_{{ face }}_smart_rescale"  name="{{ face }}_smart_rescale" type="checkbox"
+                    data-toggle="toggle" data-on="Smart resizing" data-off="Regular resizing">
+                <span class="align-self-center icon">
                     <object type="image/svg+xml" data="{% static 'tuckbox/info.svg' %}"  data-toggle="tooltip" data-placement="top"  title="Smart resizing will generally produce better looking images, but may not keep proportions or alignement with the different faces">
                         Info
                     </object>
-                </div>
+                </span>
             </div>
         </div>
         {% endfor %}

@@ -26,3 +26,7 @@ h1 {
 .top-row {
     margin-top: 50px;
 }
+
+.icon {
+    padding: 1px 6px;
+}

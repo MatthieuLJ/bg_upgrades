@@ -1,5 +1,4 @@
 Next steps:
--> Adjust the form's layout so that the (i) always stays next to the button and to be able to reset the file input fields
 * The pattern on the lip should be full visibility at least for the size of the notch
 * Look at gathering some metrics (options, image created, computation time, data upload time)
 ? Draw at higher precision than mm?

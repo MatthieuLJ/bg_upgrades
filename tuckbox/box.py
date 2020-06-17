@@ -11,7 +11,7 @@ POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
 
 
 class TuckBoxDrawing:
-    def __init__(self, tuckbox, paper, faces, options):
+    def __init__(self, tuckbox, paper, faces = None, options = None):
         self.tuckbox = tuckbox
         self.paper = paper
         self.faces = faces if faces is not None else {}

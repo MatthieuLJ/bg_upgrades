@@ -14,5 +14,7 @@ $ pip freeze > requirements.txt
 When the data needs to change for the tests:
 (top project folder) $ python -m tuckbox.tests_box
 
+$ webdrivermanager chrome --linkpath ~/.bin
+
 To run the tests:
 $ ./manage.py test

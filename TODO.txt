@@ -1,5 +1,7 @@
 Next steps:
 * Make the "work" asynchronous (Celery...etc... progress bar?)
+    -> Change the form submission and opening the PDF as all javascript
+    - Change the back-end to process things asynchronously
 * Look at gathering some metrics (options, image created, computation time, data upload time)
     - https://github.com/frankwiles/django-app-metrics
 ? Draw at higher precision than mm

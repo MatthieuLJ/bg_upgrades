@@ -138,6 +138,37 @@
 
         // Entry function when the page is loaded
         $(function () {
+            // Disable the default form submission and redirect to Ajax
+            $("#id_form").submit(function(event) {
+                // Stop the browser from submitting the form.
+                event.preventDefault();
+
+                let formData = $(this).serialize();
+                let form = $(this);
+
+                // Submit the form using AJAX.
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: formData,
+                    processData: false,
+                    xhrFields: {
+                        responseType: 'arraybuffer' // force for receiving binary data
+                    },
+                }).then(function(response) {
+                    // Open a new page with the pdf data
+                    var file = new Blob([response], {type: 'application/pdf'});
+                    var fileURL = URL.createObjectURL(file);
+                    window.open(fileURL);
+                }).fail(function(data) {
+                    if (data.responseText !== '') {
+                        alert(data.responseText);
+                    } else {
+                        alert("Oops! An error occured, it's not you, it's me.");
+                    }
+                });
+            });
+
             // For all the elements with the "tuck_input_num" class
             // hook the check number function with the error label also
             $(".tuck_input_num").change(function () { check_number(this) });
@@ -256,7 +287,7 @@
         }
     </style>
 
-    <form action="{% url 'pattern' %}" method="post" target="_blank" class="form-horizontal"
+    <form action="{% url 'pattern' %}" id="id_form" method="post" target="_blank" class="form-horizontal"
         enctype="multipart/form-data">
         {% csrf_token %}
 

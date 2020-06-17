@@ -350,8 +350,16 @@ class TuckBoxDrawing:
 
         lip_image.crop(top=lip_image.height - lip_full_mask_image.height)
 
-        lip_image = lip_image.fx("u+1-sin(pi*j/(2*h))")
-
+        # u = image pixel
+        # h = height
+        # j = row
+        # Radius of the hold is {self.tuckbox['width']*.1}
+        # if value is 1 (or more_, it's white
+        # Top is the tip of the lip, bottom is attached to the box
+        # finger_hold_size_save is the row # at which it should be no attenuation below
+        finger_hold_size_save = str(int(lip_image.height - math.ceil(self.tuckbox['width'] * POINT_PER_MM * 0.1)))
+        lip_image = lip_image.fx("j>"+finger_hold_size_save+"?u:1+(u-1)*(j/"+finger_hold_size_save+")")
+        
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
         return lip_image
@@ -406,7 +414,7 @@ if __name__ == "__main__":
     tuckbox = {'height': 100, 'width': 80, 'depth': 40}
     options = {'left_angle': 3, 'right_angle': 1,
                'bottom_angle': 2, 'folding_guides': True, "folds_dashed": False}
-    with open("front.jpg", "rb") as front, open("house.png", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
+    with open("front.jpg", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
         faces = {'front': front, 'back': back, 'left': left,
                  'right': right, 'top': top, 'bottom': bottom}
         box = TuckBoxDrawing(tuckbox, paper, faces, options)

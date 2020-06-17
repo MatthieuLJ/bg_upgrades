@@ -1,7 +1,7 @@
 Next steps:
--> Add unit tests
-* The pattern on the lip should be full visibility at least for the size of the notch
+* Make the "work" asynchronous (Celery...etc... progress bar?)
 * Look at gathering some metrics (options, image created, computation time, data upload time)
+    - https://github.com/frankwiles/django-app-metrics
 ? Draw at higher precision than mm
 ? Add a watermark on the generated PDF (with tool version number)
 ? Look if it needs a progress bar when uploading large files

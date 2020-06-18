@@ -5,7 +5,7 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{% static 'tuckbox/favicon.svg' %}">
-    <link rel="alternate icon" href="{% static 'tuckbox/favicon.ico' %}">
+    <link rel="alternate icon" href="{% static 'tuckbox/favicon.png' %}">
 
     <!-- Include jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -60,6 +60,85 @@
             "height": 356
         };
 
+        let request_in_progress = false;
+
+        function change_wont_fit_display(show) {
+            if (show) {
+                $("#id_wont_fit").css('display', '');
+            } else {
+                $("#id_wont_fit").css('display', 'none');
+            }
+        }
+
+        function change_throbber_display(show) {
+            request_in_progress = show;
+            if (show) {
+                $("#id_throbber").css('display', '');
+            } else {
+                $("#id_throbber").css('display', 'none');
+            }
+            check_to_enable_submit();
+        }
+
+        // entry point for any number field changing
+        function check_number(field) {
+            change_wont_fit_display(false);
+
+            if (field.value != "" && (isNaN(field.value) || (field.value < 0))) {
+                $(field).css('color', 'red');
+
+                check_to_enable_submit();
+            } else {
+                $(field).css('color', 'black');
+                // check if all other dimension fields have valid data
+                check_for_preview();
+            }
+        }
+
+        // check if all fields are not empty and valid
+        function check_for_all_fields_valid() {
+            let fields_to_check = [$("#id_height"), $("#id_width"), $("#id_depth")];
+            if ($("#id_paper_size").val() == "Custom") {
+                fields_to_check.concat([$("#id_paper_height"), $("#id_paper_width")]);
+            }
+            let valid = true;
+            fields_to_check.forEach(function (field) {
+                if (field.val() == "" || isNaN(field.val()) || field.val() < 0) {
+                    valid = false;
+                }
+            });
+
+            return valid;
+        }
+
+        // check if we should show the preview
+        function check_for_preview() {
+            let valid = check_for_all_fields_valid();
+
+            if (valid) {
+                // show a 3D model
+                generate_preview();
+
+                // check if the pattern will fit on paper
+                check_pattern_fit();
+            } else {
+                $("#image_preview").empty();
+
+                check_to_enable_submit();
+            }
+        }
+
+        // Draw a 3D box
+        function generate_preview() {
+            let data = {};
+            data.tuckbox = {};
+            ["width", "height", "depth"].forEach(dim => {
+                data.tuckbox[dim] = parseInt($("#id_" + dim).val())
+            });
+
+            draw_3d_box($("#image_preview"), data);
+        }
+
         function check_pattern_fit() {
             let data = {
                 "tuckbox": {
@@ -83,64 +162,33 @@
 
         function check_fit_response(data, status) {
             if (status != "success") {
-                $("#id_wont_fit").css('display', '');
-                $("#id_submit").prop('disabled', true);
+                change_wont_fit_display(true);
             } else {
-                $("#id_wont_fit").css('display', 'none');
+                change_wont_fit_display(false);
+            }
+            check_to_enable_submit();
+        }
+
+        function check_to_enable_submit() {
+            let valid = check_for_all_fields_valid();
+
+            if (($("#id_wont_fit").css('display') == 'none') &&
+                (!request_in_progress) &&
+                (valid)) {
                 $("#id_submit").prop('disabled', false);
             }
-        }
-
-        function check_for_preview() {
-            let fields_to_check = [$("#id_height"), $("#id_width"), $("#id_depth")];
-            if ($("#id_paper_size").val() == "Custom") {
-                fields_to_check.concat([$("#id_paper_height"), $("#id_paper_width")]);
-            }
-            let valid = true;
-            fields_to_check.forEach(function (field) {
-                if (field.val() == "" || isNaN(field.val()) || field.val() < 0) {
-                    valid = false;
-                }
-            });
-
-            if (valid) {
-                // show a 3D model
-                generate_preview();
-
-                // check if the pattern will fit on paper
-                check_pattern_fit();
-            } else {
-                $("#image_preview").empty();
-                $("#id_wont_fit").css('display', 'none');
+            else {
                 $("#id_submit").prop('disabled', true);
             }
-        }
-
-        function check_number(field) {
-            if (field.value != "" && (isNaN(field.value) || (field.value < 0))) {
-                $(field).css('color', 'red');
-            } else {
-                $(field).css('color', 'black');
-                // check if all other dimension fields have valid data
-                check_for_preview();
-            }
-        }
-
-        function generate_preview() {
-            let data = {};
-            data.tuckbox = {};
-            ["width", "height", "depth"].forEach(dim => {
-                data.tuckbox[dim] = parseInt($("#id_" + dim).val())
-            });
-
-            draw_3d_box($("#image_preview"), data);
         }
 
         // Entry function when the page is loaded
         $(function () {
             // Disable the default form submission and redirect to Ajax
             $("#id_form").submit(function(event) {
-                // Stop the browser from submitting the form.
+                change_throbber_display(true);
+
+                // Stop the submit button from submitting the form.
                 event.preventDefault();
 
                 let formData = $(this).serialize();
@@ -160,27 +208,30 @@
                     var file = new Blob([response], {type: 'application/pdf'});
                     var fileURL = URL.createObjectURL(file);
                     window.open(fileURL);
+                    change_throbber_display(false);
+
                 }).fail(function(data) {
                     if (data.responseText !== '') {
                         alert(data.responseText);
                     } else {
                         alert("Oops! An error occured, it's not you, it's me.");
                     }
+                    change_throbber_display(false);
                 });
             });
 
+            change_throbber_display(false);
+
             // For all the elements with the "tuck_input_num" class
             // hook the check number function with the error label also
-            $(".tuck_input_num").change(function () { check_number(this) });
-
-            // Hide the entries for custom paper sizes and set them to appear
-            // on that specific selection
-            $("#id_wont_fit").css('display', 'none');
+            $(".tuck_input_num").change(function () { check_number(this); });
 
             // Initialize all tooltips
             $('[data-toggle="tooltip"]').tooltip();
 
             $("#id_paper_size").change(function () {
+                change_wont_fit_display(false);
+
                 if (this.value == "Custom") {
                     $(".paper_custom").css('display', '');
                 } else {
@@ -232,8 +283,7 @@
                     $("#id_" + face).val("").trigger("change").next().html();
 
                 });
-            }
-            );
+            });
         });
     </script>
 </head>
@@ -374,7 +424,7 @@
             <label class="form-control-label col-2 align-self-center"> On-pattern folds: </label>
             <div class="col-1">
                 <input type="checkbox" name="folds_dashed" id="id_folds_dashed" data-toggle="toggle" data-on="On"
-                    data-off="Off">
+                    data-off="Off" />
             </div>
         </div>
 
@@ -384,9 +434,12 @@
             </div>
         </div>
         <div class="form-group row">
-            <div class="col-4 offset-4">
-                <input type="submit" id="id_submit" value="Generate PDF" class="form-control">
-            </div>
+            <button id="id_submit" class="form-control col-4 offset-4">
+            Generate PDF
+            <span height="2em" width="2em">
+            <img id="id_throbber" src="{% static 'tuckbox/ajax-loader.gif' %}" />
+            </span>
+            </button>
         </div>
     </form>
 </body>

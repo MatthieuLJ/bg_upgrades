@@ -5,6 +5,50 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
+#  ------------------
+# | Dimension field  |                                /    \
+# |    is changed    |-+                             /      \
+#  ------------------  |   +----------------+       /Empty or\      +-------------------+
+#                      +-->|Hide "won't fit"|------>  valid   ----->|Make field text red|--+
+#                      |   +----------------+       \ input? /      +-------------------+  |
+#                      |                             \      /                              |
+#  ------------------  |                              \    /                               |
+# |Custom paper size |-+                                |                                  |
+# |   is changed     |                                  v                                  |
+#  ------------------                        +---------------------+                       |
+#                                            |Make field text black|                       |
+#                                            +---------------------+                       |
+#                                                       |                                  |
+#     +----------+                                      v                                  |
+#     |Paper size|                                /          \                             |
+#     |is changed|----+                          /            \                            |
+#     +----------+    |  +----------------+     /Are all fields\       +--------------+    |
+#                     +->|Hide "won't fit"|--->  valid numbers  ------>|Remove preview|----+
+#                     |  +----------------+     \and not empty?/       +--------------+    |
+#    +--------------+ |                          \            /                            |
+#    |Page is loaded|-+                           \          /                             |
+#    +--------------+                                   |                                  |
+#                                                       v                                  |
+#                                              +----------------+                          |
+#                                              |Generate preview|                          |
+#                                              +----------------+                          |
+#    +------------+                                     |                                  |
+#    |PDF is being|     +-----------------+             v                                  |
+#    |  generated | --->|Show the throbber|-----+    /     \                               |
+#    +------------+     +-----------------+     |   /Does it\         +----------------+   |
+#                                               +-->  fit?    ------->|Show "won't fit"|---+
+#   +---------------+     +-----------------+   |   \       /         +----------------+   |
+#   |PDF is received|---->|Hide the throbber|---|    \     /                               v
+#   +---------------+     +-----------------+           |                          +-----------------+
+#                                                       +------------------------->|Check to enable  |
+#                                                                                  |the submit button|
+#                                                                                  +-----------------+
+#                                                                               Submit button is enabled if:
+#                                                                             * All the numeric fields are valid and not empty
+#                                                                             * It fits
+#                                                                             * There is no request already ongoing
+
+
 class ViewTestCase(TestCase):
     def test_tuckPage(self):
         c = Client()

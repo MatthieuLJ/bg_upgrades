@@ -1,10 +1,11 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase, Client
 from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
+
 
 #  ------------------
 # | Dimension field  |                                /    \
@@ -49,6 +50,8 @@ from selenium.webdriver.support import expected_conditions as EC
 #                                                                             * It fits
 #                                                                             * There is no request already ongoing
 
+# Useful links:
+#  https://selenium-python.readthedocs.io/index.html
 
 class ViewTestCase(TestCase):
     def test_tuckPage(self):
@@ -134,6 +137,7 @@ class MySeleniumTests(StaticLiveServerTestCase):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
 
         height_field = self.selenium.find_element_by_id("id_height")
+
         height_field.clear()
         height_field.send_keys("abc")
         height_field.send_keys(Keys.TAB)
@@ -153,6 +157,30 @@ class MySeleniumTests(StaticLiveServerTestCase):
         height_field.send_keys("101")
         height_field.send_keys(Keys.TAB)
         self.assertEqual(height_field.value_of_css_property("color"), "rgba(0, 0, 0, 1)")
+
+        paper_select = Select(self.selenium.find_element_by_id('id_paper_size'))
+        paper_select.select_by_visible_text('Custom')
+        custom_paper_height = self.selenium.find_element_by_id("id_paper_height")
+
+        custom_paper_height.clear()
+        custom_paper_height.send_keys("abc")
+        custom_paper_height.send_keys(Keys.TAB)
+        self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
+
+        custom_paper_height.clear()
+        custom_paper_height.send_keys("-2")
+        custom_paper_height.send_keys(Keys.TAB)
+        self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
+
+        custom_paper_height.clear()
+        custom_paper_height.send_keys("10$1")
+        custom_paper_height.send_keys(Keys.TAB)
+        self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
+
+        custom_paper_height.clear()
+        custom_paper_height.send_keys("101")
+        custom_paper_height.send_keys(Keys.TAB)
+        self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(0, 0, 0, 1)")
 
 
 # TODO:

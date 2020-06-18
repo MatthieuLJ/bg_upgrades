@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 
 #  ------------------
@@ -103,11 +104,56 @@ class MySeleniumTests(StaticLiveServerTestCase):
         children = model_container.find_elements_by_xpath(".//*")
         self.assertEqual(1, len(children))
 
-    def test_findWontFit(self):
+    def test_atLoadTime(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
-        
+
+        # Won't fit label should be hidden
         wont_fit = self.selenium.find_element_by_id("id_wont_fit")
         self.assertFalse(wont_fit.is_displayed())
+
+        # Throbber should be hidden
+        throbber = self.selenium.find_element_by_id("id_throbber")
+        self.assertFalse(throbber.is_displayed())
+
+        # Custom paper size fields should be hidden and values should be loaded with some default
+        custom_paper_height = self.selenium.find_element_by_id("id_paper_height")
+        self.assertFalse(custom_paper_height.is_displayed())
+        val = self.selenium.execute_script("return document.getElementById('id_paper_height').value;")
+        self.assertNotEqual(val, "")
+
+        custom_paper_width = self.selenium.find_element_by_id("id_paper_width")
+        self.assertFalse(custom_paper_width.is_displayed())
+        val = self.selenium.execute_script("return document.getElementById('id_paper_width').value;")
+        self.assertNotEqual(val, "")
+
+        # Submit button should be disabled
+        submit_button = self.selenium.find_element_by_id("id_submit")
+        self.assertFalse(submit_button.is_enabled())
+
+    def test_badEntriesInNumField(self):
+        self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
+
+        height_field = self.selenium.find_element_by_id("id_height")
+        height_field.clear()
+        height_field.send_keys("abc")
+        height_field.send_keys(Keys.TAB)
+        self.assertEqual(height_field.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
+
+        height_field.clear()
+        height_field.send_keys("-2")
+        height_field.send_keys(Keys.TAB)
+        self.assertEqual(height_field.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
+
+        height_field.clear()
+        height_field.send_keys("10$1")
+        height_field.send_keys(Keys.TAB)
+        self.assertEqual(height_field.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
+
+        height_field.clear()
+        height_field.send_keys("101")
+        height_field.send_keys(Keys.TAB)
+        self.assertEqual(height_field.value_of_css_property("color"), "rgba(0, 0, 0, 1)")
+
 
 # TODO:
 #  - Wont_fit is shown with some parameters

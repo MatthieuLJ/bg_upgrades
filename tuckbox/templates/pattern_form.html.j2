@@ -203,6 +203,27 @@
                     xhrFields: {
                         responseType: 'arraybuffer' // force for receiving binary data
                     },
+                    xhr: function()
+                        {
+                            var xhr = new window.XMLHttpRequest();
+                            //Upload progress
+                            xhr.upload.addEventListener("progress", function(evt){
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                //Do something with upload progress
+                                console.log("upload:"+percentComplete);
+                            }
+                            }, false);
+                            //Download progress
+                            xhr.addEventListener("progress", function(evt){
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                //Do something with download progress
+                                console.log("download:"+percentComplete);
+                            }
+                            }, false);
+                            return xhr;
+                        },
                 }).then(function(response) {
                     // Open a new page with the pdf data
                     var file = new Blob([response], {type: 'application/pdf'});

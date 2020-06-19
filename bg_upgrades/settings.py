@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tuckbox',
     'django_nose',
+    'celery',
 ]
 
 MIDDLEWARE = [

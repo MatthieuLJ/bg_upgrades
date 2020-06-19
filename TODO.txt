@@ -9,6 +9,7 @@ Next steps:
 ? Drag and drop the pictures into the different fields
 * Give the option for boxes with openings on both ends
 * Generate box template that go over two pages (give a warning when that happens)
+    - https://stackoverflow.com/questions/3444645/merge-pdf-files
 * Adapt to be able to build bitboxes
 
 
@@ -17,3 +18,8 @@ https://hackernoon.com/django-celery-redis-and-flower-implementation-gy663ysy
 https://stackabuse.com/asynchronous-tasks-in-django-with-redis-and-celery/
 https://docs.celeryproject.org/en/stable/django/first-steps-with-django.html
 https://buildwithdjango.com/blog/post/celery-progress-bars/
+
+$ redis-server
+$ celery -A bg_upgrades worker -l info
+$ flower -A bg_upgrades
+$ ./manage.py runserver

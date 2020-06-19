@@ -2,7 +2,7 @@ import base64
 import json
 import tempfile
 import os
-from . import box
+from . import box, tasks
 from django.shortcuts import render, redirect
 from django.http import FileResponse, HttpResponse
 from django import forms

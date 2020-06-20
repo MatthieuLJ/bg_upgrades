@@ -1,17 +1,21 @@
-
-import tempfile
 from celery import shared_task
-from django.conf import settings
+from celery.result import AsyncResult
 from . import box
 
 
 @shared_task(bind=True)
-def build_box(self, parameters, task_id=None):
+def build_box(self, parameters):
     my_box = box.TuckBoxDrawing(parameters['tuckbox'],
                                 parameters['paper'], parameters['faces'], parameters['options'])
 
-    result_pdf = tempfile.NamedTemporaryFile(delete=False, dir = settings.TMP_ROOT, suffix=".pdf")
+    my_box.create_box_file(parameters['filename'])
 
-    my_box.create_box_file(result_pdf.name)
+    return "success"
 
-    return str(self.request.id) + " -- " + result_pdf.name
+def get_status(task_id):
+    work = AsyncResult(task_id)
+    if work and work.ready():
+        result = work.get(timeout=1)
+        return result.filename
+    else:
+        return None

@@ -3,6 +3,7 @@ import json
 import tempfile
 import os
 from . import box, tasks
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django import forms
@@ -86,13 +87,18 @@ def pattern(request):
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data
 
+    result_pdf = tempfile.NamedTemporaryFile(
+        delete=False, dir=settings.TMP_ROOT, suffix=".pdf")
+
+
     parameters = {
         'tuckbox': tuckbox,
         'paper': paper,
         'options': options,
         'faces': faces,
+        'filename': result_pdf.name,
     }
 
     async_result = tasks.build_box.delay(parameters)
 
-    return JsonResponse(data={'task_id': async_result.id}, status=202)
+    return JsonResponse(data={'task_id': async_result.id, 'url': settings.TMP_URL + os.path.basename(result_pdf.name)}, status=202)

@@ -182,6 +182,11 @@
             }
         }
 
+        function get_result(url) {
+            change_throbber_display(false);
+            window.open(url, "_blank", "location=no, menubar=no");
+        }
+
         // Entry function when the page is loaded
         $(function () {
             // Disable the default form submission and redirect to Ajax
@@ -230,7 +235,11 @@
                 }).then(function(response) {
                     // Open a new page with the pdf data
                     //alert("Request completed with task_id: " + response.task_id);
-                    change_throbber_display(false);
+
+                    // Get the output 10s later
+                    setTimeout(function() {
+                        get_result(response.url);
+                    }, 10000);
 
                 }).fail(function(data) {
                     if (data.responseText !== '') {

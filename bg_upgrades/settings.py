@@ -137,8 +137,9 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'tuckbox/static'),
 )
 
-# To store temporary files
+# To store temporary files and the address that will be used to retrieve them
 TMP_ROOT = os.path.join(BASE_DIR, 'tmp')
+TMP_URL = '/result/'
 
 # Celery
 CELERY_BROKER_URL = 'redis://localhost:6379'

@@ -4,7 +4,7 @@ import tempfile
 import os
 from . import box, tasks
 from django.shortcuts import render, redirect
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 from django import forms
 
 
@@ -67,11 +67,7 @@ def pattern(request):
 
     form = PatternForm(request.POST)
     if not form.is_valid():
-        print("Something went wrong in the form"+str(form.errors))
-        return redirect('index')
-
-    result_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-    print("Generating to file "+result_pdf.name)
+        return JsonResponse(data= {'error_text': "Form has invalid data"}, status=400)
 
     paper = {'width': float(form.cleaned_data['paper_width']),
              'height': float(form.cleaned_data['paper_height'])}
@@ -90,7 +86,13 @@ def pattern(request):
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data
 
-    my_box = box.TuckBoxDrawing(tuckbox, paper, faces, options)
-    my_box.create_box_file(result_pdf.name)
+    parameters = {
+        'tuckbox': tuckbox,
+        'paper': paper,
+        'options': options,
+        'faces': faces,
+    }
 
-    return FileResponse(result_pdf)
+    async_result = tasks.build_box.delay(parameters)
+
+    return JsonResponse(data={'task_id': async_result.id}, status=202)

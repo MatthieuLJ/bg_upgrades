@@ -206,9 +206,6 @@
                     processData: false,
                     contentType: false,
                     timeout: 30000,
-                    xhrFields: {
-                        responseType: 'arraybuffer' // force for receiving binary data
-                    },
                     xhr: function()
                         {
                             var xhr = new window.XMLHttpRequest();
@@ -232,9 +229,7 @@
                         },
                 }).then(function(response) {
                     // Open a new page with the pdf data
-                    var file = new Blob([response], {type: 'application/pdf'});
-                    var fileURL = URL.createObjectURL(file);
-                    window.open(fileURL);
+                    //alert("Request completed with task_id: " + response.task_id);
                     change_throbber_display(false);
 
                 }).fail(function(data) {

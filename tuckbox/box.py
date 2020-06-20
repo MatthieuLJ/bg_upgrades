@@ -4,7 +4,6 @@ from wand.color import Color
 from wand.drawing import Drawing
 from wand.image import Image
 import sys
-from .tasks import test
 
 
 RESOLUTION = 600  # Dots Per Inch
@@ -42,8 +41,6 @@ class TuckBoxDrawing:
         return True
 
     def draw_box(self):
-        test(param = {'test':"abc"})
-
         if not self.check_paper_layout():
             return None
 

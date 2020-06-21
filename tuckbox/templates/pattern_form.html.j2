@@ -191,15 +191,20 @@
                 // Stop the submit button from submitting the form.
                 event.preventDefault();
 
-                let formData = $(this).serialize();
-                let form = $(this);
+                var postData = new FormData($(this)[0]);
+                /*
+                for (var pair of postData.entries()) {
+                    console.log(pair[0]+ ', ' + pair[1]);
+                }
+                */
 
                 // Submit the form using AJAX.
                 $.ajax({
                     type: 'POST',
-                    url: form.attr('action'),
-                    data: formData,
+                    url: $(this).attr('action'),
+                    data: postData,
                     processData: false,
+                    contentType: false,
                     timeout: 30000,
                     xhrFields: {
                         responseType: 'arraybuffer' // force for receiving binary data

@@ -1,13 +1,11 @@
 Next steps:
-* Make the "work" asynchronous (Celery...etc... progress bar?)
-    - Change the back-end to process things asynchronously
 * Add unit tests for the flow and celery tasks
 * Add unit tests for Three.js 3D model
 * Look at gathering some metrics (options, image created, computation time, data upload time)
     - https://github.com/frankwiles/django-app-metrics
-? Draw at higher precision than mm
+* Look at proper deployment (secret key, debug mode, admin account, flower interface)
+? Draw at higher precision than mm (accept floats for dimensions)
 ? Add a watermark on the generated PDF (with tool version number)
-? Look if it needs a progress bar when uploading large files
 ? Drag and drop the pictures into the different fields
 * Give the option for boxes with openings on both ends
 * Generate box template that go over two pages (give a warning when that happens)

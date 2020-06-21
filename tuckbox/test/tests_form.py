@@ -21,27 +21,27 @@ from selenium.webdriver.support import expected_conditions as EC
 #                                            |Make field text black|                       |
 #                                            +---------------------+                       |
 #                                                       |                                  |
-#     +----------+                                      v                                  |
+#      ----------                                       v                                  |
 #     |Paper size|                                /          \                             |
 #     |is changed|----+                          /            \                            |
-#     +----------+    |  +----------------+     /Are all fields\       +--------------+    |
+#      ----------     |  +----------------+     /Are all fields\       +--------------+    |
 #                     +->|Hide "won't fit"|--->  valid numbers  ------>|Remove preview|----+
 #                     |  +----------------+     \and not empty?/       +--------------+    |
-#    +--------------+ |                          \            /                            |
+#     --------------  |                          \            /                            |
 #    |Page is loaded|-+                           \          /                             |
-#    +--------------+                                   |                                  |
+#     --------------                                    |                                  |
 #                                                       v                                  |
 #                                              +----------------+                          |
 #                                              |Generate preview|                          |
 #                                              +----------------+                          |
-#    +------------+                                     |                                  |
+#     ------------                                      |                                  |
 #    |PDF is being|     +-----------------+             v                                  |
-#    |  generated | --->|Show the throbber|-----+    /     \                               |
-#    +------------+     +-----------------+     |   /Does it\         +----------------+   |
+#    |  generated | --->|Show the progress|-----+    /     \                               |
+#     ------------      +-----------------+     |   /Does it\         +----------------+   |
 #                                               +-->  fit?    ------->|Show "won't fit"|---+
-#   +---------------+     +-----------------+   |   \       /         +----------------+   |
-#   |PDF is received|---->|Hide the throbber|---|    \     /                               v
-#   +---------------+     +-----------------+           |                          +-----------------+
+#    ---------------      +-----------------+   |   \       /         +----------------+   |
+#   |PDF is received|---->|Hide the progress|---|    \     /                               v
+#    ---------------      +-----------------+           |                          +-----------------+
 #                                                       +------------------------->|Check to enable  |
 #                                                                                  |the submit button|
 #                                                                                  +-----------------+
@@ -114,9 +114,9 @@ class MySeleniumTests(StaticLiveServerTestCase):
         wont_fit = self.selenium.find_element_by_id("id_wont_fit")
         self.assertFalse(wont_fit.is_displayed())
 
-        # Throbber should be hidden
-        throbber = self.selenium.find_element_by_id("id_throbber")
-        self.assertFalse(throbber.is_displayed())
+        # Progress should be hidden
+        progress = self.selenium.find_element_by_id("id_progress_container")
+        self.assertFalse(progress.is_displayed())
 
         # Custom paper size fields should be hidden and values should be loaded with some default
         custom_paper_height = self.selenium.find_element_by_id("id_paper_height")

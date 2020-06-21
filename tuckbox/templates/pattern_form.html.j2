@@ -70,12 +70,12 @@
             }
         }
 
-        function change_throbber_display(show) {
+        function change_progress_display(show) {
             request_in_progress = show;
             if (show) {
-                $("#id_throbber").css('display', '');
+                $("#id_progress_container").css('display', '');
             } else {
-                $("#id_throbber").css('display', 'none');
+                $("#id_progress_container").css('display', 'none');
             }
             check_to_enable_submit();
         }
@@ -185,15 +185,20 @@
         function check_for_result(data, status) {
             if (status != "success") {
                 // TODO: show/log some error
-                change_throbber_display(false);
+                change_progress_display(false);
             } else if (data.state == 'SUCCESS') {
                 window.open(data.info, "_blank", "location=no, menubar=no");
-                change_throbber_display(false);
+                change_progress_display(false);
             } else if (data.state == 'FAILURE') {
                 // TODO: show/log some error
-                change_throbber_display(false);
-            } else if (data.state == 'STARTED') {
+                change_progress_display(false);
+            } else if ((data.state == 'STARTED') || (data.state == 'SAVING')) {
                 console.log("Got progress: "+data.info.percent)
+                if (data.state == 'STARTED') {
+                    update_progress(data.info.percent, 'process');
+                } else {
+                    update_progress(data.info.percent, 'saving');
+                }
                 let send_data = {'task_id': data.task_id};
                 setTimeout(function() {
                     $.get('check_progress', send_data, check_for_result);
@@ -206,11 +211,30 @@
             }
         }
 
+        let saving_progress = 0;
+        function update_progress(percent, mode) {
+            if (mode == 'upload') {
+                $("#id_progress").text("Uploading");
+                saving_progress = 0;
+            } else if (mode == 'process') {
+                $("#id_progress").text("Processing");
+            } else if (mode == 'saving') {
+                if (saving_progress < 90) {
+                    saving_progress += 10;
+                } else if (saving_progress < 99) {
+                    saving_progress += 1;
+                }
+                $("#id_progress").text("Saving");
+                percent = saving_progress;
+            }
+            $("#id_progress").attr("aria-valuenow", percent).css("width", percent+"%");
+        }
+
         // Entry function when the page is loaded
         $(function () {
             // Disable the default form submission and redirect to Ajax
             $("#id_form").submit(function(event) {
-                change_throbber_display(true);
+                change_progress_display(true);
 
                 // Stop the submit button from submitting the form.
                 event.preventDefault();
@@ -237,8 +261,7 @@
                             xhr.upload.addEventListener("progress", function(evt){
                             if (evt.lengthComputable) {
                                 var percentComplete = evt.loaded / evt.total;
-                                //Do something with upload progress
-                                console.log("upload:"+percentComplete);
+                                update_progress(Math.round(percentComplete), 'upload');
                             }
                             }, false);
                             return xhr;
@@ -255,11 +278,11 @@
                     } else {
                         alert("Oops! An error occured, it's not you, it's me.");
                     }
-                    change_throbber_display(false);
+                    change_progress_display(false);
                 });
             });
 
-            change_throbber_display(false);
+            change_progress_display(false);
 
             // For all the elements with the "tuck_input_num" class
             // hook the check number function with the error label also
@@ -472,12 +495,14 @@
                 The pattern is too large
             </div>
         </div>
+        <div class="row" id="id_progress_container">
+            <div class="progress col-4 offset-4">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" id="id_progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
         <div class="form-group row">
             <button id="id_submit" class="form-control col-4 offset-4">
             Generate PDF
-            <span height="2em" width="2em">
-            <img id="id_throbber" src="{% static 'tuckbox/ajax-loader.gif' %}" />
-            </span>
             </button>
         </div>
     </form>

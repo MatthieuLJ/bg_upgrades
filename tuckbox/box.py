@@ -11,13 +11,13 @@ POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
 
 
 class TuckBoxDrawing:
-    def __init__(self, tuckbox, paper, faces = None, options = None):
+    def __init__(self, tuckbox, paper, faces=None, options=None):
         self.tuckbox = tuckbox
         self.paper = paper
         self.faces = faces if faces is not None else {}
         self.options = options if options is not None else {}
 
-    def create_box_file(self, filename, progress_tracker = None):
+    def create_box_file(self, filename, progress_tracker=None):
         image = self.draw_box(progress_tracker)
 
         if image is not None:
@@ -46,8 +46,14 @@ class TuckBoxDrawing:
             self.paper['width'], self.paper['height'] = self.paper['height'], self.paper['width']
         return True
 
-    def draw_box(self, progress_tracker = None):
+    def draw_box(self, progress_tracker=None):
         if not self.check_paper_layout():
+            return None
+
+        tuckbox_dimensions = ['width', 'height', 'depth']
+        paper_dimensions = ['width', 'height']
+        if ((not all(dimension in self.tuckbox for dimension in tuckbox_dimensions)) or 
+            (not all(dimension in self.paper for dimension in paper_dimensions))):
             return None
 
         draw = Drawing()
@@ -189,17 +195,17 @@ class TuckBoxDrawing:
             dashed_draw.line(
                 (0, 0), (self.tuckbox['depth']*2 + self.tuckbox['width'], 0))
             dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
-                            (self.tuckbox['depth'] + self.tuckbox['width']*.8, -self.tuckbox['depth']))
+                             (self.tuckbox['depth'] + self.tuckbox['width']*.8, -self.tuckbox['depth']))
             dashed_draw.line((0, self.tuckbox['height']),
-                            (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
+                             (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
             dashed_draw.line((self.tuckbox['depth'], 0),
-                            (self.tuckbox['depth'], self.tuckbox['height']))
+                             (self.tuckbox['depth'], self.tuckbox['height']))
             dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width'], 0),
-                            (self.tuckbox['depth'] + self.tuckbox['width'], self.tuckbox['height']))
+                             (self.tuckbox['depth'] + self.tuckbox['width'], self.tuckbox['height']))
             dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
-                            (self.tuckbox['depth']*2 + self.tuckbox['width'], self.tuckbox['height']))
+                             (self.tuckbox['depth']*2 + self.tuckbox['width'], self.tuckbox['height']))
             dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width']*2, 0),
-                            (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
+                             (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
 
         if progress_tracker is not None:
             progress_tracker(10)
@@ -265,8 +271,8 @@ class TuckBoxDrawing:
                 progress_tracker(10*(counter+2))
 
         # Draw the lip
-        if "back" in self.faces:
-            lip = self.draw_lip()
+        lip = self.draw_lip()
+        if lip is not None:
             image.composite(lip, *face_positions['lip'])
 
         if progress_tracker is not None:
@@ -293,8 +299,10 @@ class TuckBoxDrawing:
                               margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']*2]
             vertical_folds_length = min(0.6 * margin_height, 20)
             for x in vertical_folds:
-                folding_guides_draw.line((x, 0.6 * margin_height - vertical_folds_length), (x, 0.6 * margin_height))
-                folding_guides_draw.line((x, self.paper['height'] - 0.6 * margin_height + vertical_folds_length), (x, self.paper['height'] - 0.6 * margin_height))
+                folding_guides_draw.line(
+                    (x, 0.6 * margin_height - vertical_folds_length), (x, 0.6 * margin_height))
+                folding_guides_draw.line(
+                    (x, self.paper['height'] - 0.6 * margin_height + vertical_folds_length), (x, self.paper['height'] - 0.6 * margin_height))
 
             horizontal_folds = [margin_height + self.lip_size(),
                                 margin_height + self.lip_size() +
@@ -304,17 +312,22 @@ class TuckBoxDrawing:
                                 margin_height + self.lip_size() + self.tuckbox['depth']*2 + self.tuckbox['height']]
             horizontal_folds_length = min(0.6*margin_width, 20)
             for y in horizontal_folds:
-                folding_guides_draw.line((0.6*margin_width - horizontal_folds_length, y), (0.6*margin_width, y))
-                folding_guides_draw.line((self.paper['width'] - 0.6*margin_width + horizontal_folds_length, y), (self.paper['width'] - 0.6*margin_width, y))
+                folding_guides_draw.line(
+                    (0.6*margin_width - horizontal_folds_length, y), (0.6*margin_width, y))
+                folding_guides_draw.line(
+                    (self.paper['width'] - 0.6*margin_width + horizontal_folds_length, y), (self.paper['width'] - 0.6*margin_width, y))
 
             folding_guides_draw.draw(image)
 
         if progress_tracker is not None:
-                progress_tracker(90)
+            progress_tracker(100)
 
         return image
 
     def draw_lip(self):
+        if "back" not in self.faces:
+            return None
+
         # First draw a full mask with the lip shape
         lip_full_mask_image = Image(width=math.ceil(self.tuckbox['width'] * POINT_PER_MM),
                                     height=math.ceil(self.lip_size() * POINT_PER_MM))
@@ -357,7 +370,7 @@ class TuckBoxDrawing:
         # Prepare the front image
         lip_image = Image(file=self.faces['back'])
 
-        if "front_angle" in self.options:
+        if "back_angle" in self.options:
             lip_image.rotate((self.options["back_angle"]+2)*90)
         else:
             lip_image.rotate(180)
@@ -377,9 +390,11 @@ class TuckBoxDrawing:
         # if value is 1 (or more_, it's white
         # Top is the tip of the lip, bottom is attached to the box
         # finger_hold_size_save is the row # at which it should be no attenuation below
-        finger_hold_size_save = str(int(lip_image.height - math.ceil(self.tuckbox['width'] * POINT_PER_MM * 0.1)))
-        lip_image = lip_image.fx("j>"+finger_hold_size_save+"?u:1+(u-1)*(j/"+finger_hold_size_save+")")
-        
+        finger_hold_size_save = str(
+            int(lip_image.height - math.ceil(self.tuckbox['width'] * POINT_PER_MM * 0.1)))
+        lip_image = lip_image.fx(
+            "j>"+finger_hold_size_save+"?u:1+(u-1)*(j/"+finger_hold_size_save+")")
+
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
         return lip_image

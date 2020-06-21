@@ -16,7 +16,7 @@ def build_box(self, parameters):
     def progress_tracker(percent):
         print("Getting progress "+str(percent))
         self.update_state(
-            state="STARTED",
+            state="STARTED" if percent<100 else "SAVING",
             meta={
                 'percent': percent,
             }

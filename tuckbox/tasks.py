@@ -10,15 +10,25 @@ def build_box(self, parameters):
     my_box = box.TuckBoxDrawing(parameters['tuckbox'],
                                 parameters['paper'], parameters['faces'], parameters['options'])
 
-    my_box.create_box_file(parameters['filename'])
+    def progress_tracker(percent):
+        print("Getting progress "+str(percent))
+        self.update_state(
+            state="STARTED",
+            meta={
+                'percent': percent,
+            }
+        )
+
+    my_box.create_box_file(parameters['filename'], progress_tracker)
 
     # TODO: Should set a timeout timer here to forget the tasks / delete the file from here
 
-    return os.path.basename(parameters['filename'])
+    return settings.TMP_URL + os.path.basename(parameters['filename'])
+
 
 def get_status(task_id):
     work = AsyncResult(task_id)
     if work.state == "SUCCESS":
         return "SUCCESS", work.get()
     else:
-        return work.state, None
+        return work.state, work.info

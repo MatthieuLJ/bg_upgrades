@@ -40,7 +40,7 @@ class TuckBoxDrawing:
             self.paper['width'], self.paper['height'] = self.paper['height'], self.paper['width']
         return True
 
-    def draw_box(self):
+    def draw_box(self, progress_tracker = None):
         if not self.check_paper_layout():
             return None
 
@@ -62,6 +62,9 @@ class TuckBoxDrawing:
         dashed_draw = Drawing(draw)
 
         draw.fill_opacity = 0
+
+        if progress_tracker is not None:
+            progress_tracker(5)
 
         #        ---------
         #       /         \
@@ -192,6 +195,9 @@ class TuckBoxDrawing:
             dashed_draw.line((self.tuckbox['depth']*2 + self.tuckbox['width']*2, 0),
                             (self.tuckbox['depth']*2 + self.tuckbox['width']*2, self.tuckbox['height']))
 
+        if progress_tracker is not None:
+            progress_tracker(10)
+
         # Prepare the face pictures first
         face_sizes = {
             "front": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
@@ -241,7 +247,7 @@ class TuckBoxDrawing:
         image.unit = 'pixelsperinch'
 
         # Apply those face pictures
-        for side in ["front", "back", "left", "right", "top", "bottom"]:
+        for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
             if side in self.faces:
                 with Image(file=self.faces[side]) as i:
                     i.rotate(face_angles[side] * 90)
@@ -249,11 +255,16 @@ class TuckBoxDrawing:
                         i, face_smart_rescale[side], *face_sizes[side])
                     image.composite(i, *face_positions[side])
                 self.faces[side].seek(0)
+            if progress_tracker is not None:
+                progress_tracker(10*(counter+2))
 
         # Draw the lip
         if "back" in self.faces:
             lip = self.draw_lip()
             image.composite(lip, *face_positions['lip'])
+
+        if progress_tracker is not None:
+            progress_tracker(80)
 
         # Draw all the lines over
         draw.draw(image)
@@ -291,6 +302,9 @@ class TuckBoxDrawing:
                 folding_guides_draw.line((self.paper['width'] - 0.6*margin_width + horizontal_folds_length, y), (self.paper['width'] - 0.6*margin_width, y))
 
             folding_guides_draw.draw(image)
+
+        if progress_tracker is not None:
+                progress_tracker(90)
 
         return image
 
@@ -402,8 +416,8 @@ class TuckBoxDrawing:
         # finally resize to the right
         img.resize(width, height)
 
-    def create_box_file(self, filename):
-        image = self.draw_box()
+    def create_box_file(self, filename, progress_tracker = None):
+        image = self.draw_box(progress_tracker)
 
         if image is not None:
             image.save(filename=filename)

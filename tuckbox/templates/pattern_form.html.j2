@@ -187,16 +187,22 @@
                 // TODO: show/log some error
                 change_throbber_display(false);
             } else if (data.state == 'SUCCESS') {
-                window.open(data.url, "_blank", "location=no, menubar=no");
+                window.open(data.info, "_blank", "location=no, menubar=no");
                 change_throbber_display(false);
             } else if (data.state == 'FAILURE') {
                 // TODO: show/log some error
                 change_throbber_display(false);
-            } else{
+            } else if (data.state == 'STARTED') {
+                console.log("Got progress: "+data.info.percent)
                 let send_data = {'task_id': data.task_id};
                 setTimeout(function() {
                     $.get('check_progress', send_data, check_for_result);
-                }, 1000);
+                }, 500);
+            } else {
+                let send_data = {'task_id': data.task_id};
+                setTimeout(function() {
+                    $.get('check_progress', send_data, check_for_result);
+                }, 500);
             }
         }
 
@@ -242,7 +248,7 @@
                     //alert("Request completed with task_id: " + response.task_id);
 
                     // Get the output 10s later
-                    check_for_result({'task_id': response.task_id, 'url': response.url, 'state': "not yet"}, "success");
+                    check_for_result({'task_id': response.task_id, 'state': "not yet"}, "success");
                 }).fail(function(data) {
                     if (data.responseText != '') {
                         alert(data.responseText);

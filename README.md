@@ -3,6 +3,7 @@ To setup an environment, use virtualenv and install the packages listed in requi
 $ virtualenv --python=/your/path/to/python2 venv
 $ source venv/bin/activate
 $ pip install -r requirements.txt
+$ brew install imagemagick
 
 To find packages that need to be updated
 $ pip list --outdated

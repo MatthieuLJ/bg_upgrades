@@ -108,11 +108,11 @@ def check_progress(request):
     print(request.GET)
     try:
         task_id = request.GET['task_id']
-        state, url = tasks.get_status(task_id)
+        state, info = tasks.get_status(task_id)
         data = {'task_id': task_id,
-                'state': state}
-        if url is not None:
-            data['url'] =  settings.TMP_URL + url
+                'state': state,
+                'info': info}
+        print("Sending back: "+ str(data))
         return JsonResponse(data)
     except:
         return HttpResponse(status=400)

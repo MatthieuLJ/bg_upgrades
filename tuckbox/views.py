@@ -62,13 +62,14 @@ def check_fit(request):
 
     return HttpResponse(status=200 if my_box.will_it_fit() else 406)
 
+
 def pattern(request):
     if request.method != 'POST':
         return redirect('index')
 
     form = PatternForm(request.POST)
     if not form.is_valid():
-        return JsonResponse(data= {'error_text': "Form has invalid data"}, status=400)
+        return JsonResponse(data={'error_text': "Form has invalid data"}, status=400)
 
     paper = {'width': float(form.cleaned_data['paper_width']),
              'height': float(form.cleaned_data['paper_height'])}
@@ -90,7 +91,6 @@ def pattern(request):
     result_pdf = tempfile.NamedTemporaryFile(
         delete=False, dir=settings.TMP_ROOT, suffix=".pdf")
 
-
     parameters = {
         'tuckbox': tuckbox,
         'paper': paper,
@@ -102,3 +102,17 @@ def pattern(request):
     async_result = tasks.build_box.delay(parameters)
 
     return JsonResponse(data={'task_id': async_result.id, 'url': settings.TMP_URL + os.path.basename(result_pdf.name)}, status=202)
+
+
+def check_progress(request):
+    print(request.GET)
+    try:
+        task_id = request.GET['task_id']
+        state, url = tasks.get_status(task_id)
+        data = {'task_id': task_id,
+                'state': state}
+        if url is not None:
+            data['url'] =  settings.TMP_URL + url
+        return JsonResponse(data)
+    except:
+        return HttpResponse(status=400)

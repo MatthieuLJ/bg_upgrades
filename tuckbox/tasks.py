@@ -1,5 +1,7 @@
+import os
 from celery import shared_task
 from celery.result import AsyncResult
+from django.conf import settings
 from . import box
 
 
@@ -10,12 +12,13 @@ def build_box(self, parameters):
 
     my_box.create_box_file(parameters['filename'])
 
-    return "success"
+    # TODO: Should set a timeout timer here to forget the tasks / delete the file from here
+
+    return os.path.basename(parameters['filename'])
 
 def get_status(task_id):
     work = AsyncResult(task_id)
-    if work and work.ready():
-        result = work.get(timeout=1)
-        return result.filename
+    if work.state == "SUCCESS":
+        return "SUCCESS", work.get()
     else:
-        return None
+        return work.state, None

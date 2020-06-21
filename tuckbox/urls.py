@@ -5,5 +5,6 @@ urlpatterns = [
         path('', views.index, name='index'),
         path('pattern', views.pattern, name='pattern'),
         path('preview', views.preview),
-        path('check_fit', views.check_fit)
+        path('check_fit', views.check_fit),
+        path('check_progress', views.check_progress),
 ]

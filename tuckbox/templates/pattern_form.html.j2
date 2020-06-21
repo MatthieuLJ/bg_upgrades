@@ -182,9 +182,22 @@
             }
         }
 
-        function get_result(url) {
-            change_throbber_display(false);
-            window.open(url, "_blank", "location=no, menubar=no");
+        function check_for_result(data, status) {
+            if (status != "success") {
+                // TODO: show/log some error
+                change_throbber_display(false);
+            } else if (data.state == 'SUCCESS') {
+                window.open(data.url, "_blank", "location=no, menubar=no");
+                change_throbber_display(false);
+            } else if (data.state == 'FAILURE') {
+                // TODO: show/log some error
+                change_throbber_display(false);
+            } else{
+                let send_data = {'task_id': data.task_id};
+                setTimeout(function() {
+                    $.get('check_progress', send_data, check_for_result);
+                }, 1000);
+            }
         }
 
         // Entry function when the page is loaded
@@ -222,14 +235,6 @@
                                 console.log("upload:"+percentComplete);
                             }
                             }, false);
-                            //Download progress
-                            xhr.addEventListener("progress", function(evt){
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                //Do something with download progress
-                                console.log("download:"+percentComplete);
-                            }
-                            }, false);
                             return xhr;
                         },
                 }).then(function(response) {
@@ -237,12 +242,9 @@
                     //alert("Request completed with task_id: " + response.task_id);
 
                     // Get the output 10s later
-                    setTimeout(function() {
-                        get_result(response.url);
-                    }, 10000);
-
+                    check_for_result({'task_id': response.task_id, 'url': response.url, 'state': "not yet"}, "success");
                 }).fail(function(data) {
-                    if (data.responseText !== '') {
+                    if (data.responseText != '') {
                         alert(data.responseText);
                     } else {
                         alert("Oops! An error occured, it's not you, it's me.");

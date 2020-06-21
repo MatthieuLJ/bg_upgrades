@@ -17,6 +17,12 @@ class TuckBoxDrawing:
         self.faces = faces if faces is not None else {}
         self.options = options if options is not None else {}
 
+    def create_box_file(self, filename, progress_tracker = None):
+        image = self.draw_box(progress_tracker)
+
+        if image is not None:
+            image.save(filename=filename)
+
     def lip_size(self):
         # the lip is the minimum of
         # the depth
@@ -415,30 +421,3 @@ class TuckBoxDrawing:
 
         # finally resize to the right
         img.resize(width, height)
-
-    def create_box_file(self, filename, progress_tracker = None):
-        image = self.draw_box(progress_tracker)
-
-        if image is not None:
-            image.save(filename=filename)
-
-
-if __name__ == "__main__":
-    paper = {'width': 210, 'height': 297}
-    tuckbox = {'height': 100, 'width': 80, 'depth': 40}
-    options = {'left_angle': 3, 'right_angle': 1,
-               'bottom_angle': 2, 'folding_guides': True, "folds_dashed": False}
-    with open("front.jpg", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
-        faces = {'front': front, 'back': back, 'left': left,
-                 'right': right, 'top': top, 'bottom': bottom}
-        box = TuckBoxDrawing(tuckbox, paper, faces, options)
-        box.create_box_file("example.pdf")
-
-    if False:
-        with open("house.png", "rb") as front, open("back.jpg", "rb") as back, open("left.jpg", "rb") as left, open("right.jpg", "rb") as right, open("top.jpg", "rb") as top, open("bottom.jpg", "rb") as bottom:
-            faces = {'front': front, 'back': back, 'left': left,
-                     'right': right, 'top': top, 'bottom': bottom}
-            options.update({'front_smart_rescale': True, 'bottom_smart_rescale': True,
-                            'left_smart_rescale': True, 'right_smart_rescale': True})
-            box2 = TuckBoxDrawing(tuckbox, paper, faces, options)
-            box2.create_box_file("example2.pdf")

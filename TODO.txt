@@ -1,6 +1,8 @@
 Next steps:
 * Make the "work" asynchronous (Celery...etc... progress bar?)
     - Change the back-end to process things asynchronously
+* Add unit tests for the flow and celery tasks
+* Add unit tests for Three.js 3D model
 * Look at gathering some metrics (options, image created, computation time, data upload time)
     - https://github.com/frankwiles/django-app-metrics
 ? Draw at higher precision than mm
@@ -13,13 +15,8 @@ Next steps:
 * Adapt to be able to build bitboxes
 
 
-Links:
-https://hackernoon.com/django-celery-redis-and-flower-implementation-gy663ysy
-https://stackabuse.com/asynchronous-tasks-in-django-with-redis-and-celery/
-https://docs.celeryproject.org/en/stable/django/first-steps-with-django.html
-https://buildwithdjango.com/blog/post/celery-progress-bars/
 
 $ redis-server                           -> $ redis-cli
-$ celery -A bg_upgrades worker -l info
+$ celery -A bg_upgrades worker [-l info]
 $ flower -A bg_upgrades                  -> http://localhost:5555/dashboard
 $ ./manage.py runserver

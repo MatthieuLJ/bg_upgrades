@@ -1,11 +1,18 @@
-# temp files
+# Ignore files
 *.swp
 *.pyc
 .DS_Store
 db.sqlite3
+.vscode
+.coverage
+*.code-workspace
+dump.rdb
 
 # environment folder
 venv/
 
 # Folder for static files
 staticfiles/
+
+# Temporary products
+tmp/tmp*

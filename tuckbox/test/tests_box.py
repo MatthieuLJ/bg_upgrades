@@ -20,7 +20,7 @@ class BoxTestCase(TestCase):
         ref_image = Image(filename=test_file)
         _, compare_metric = i.compare(ref_image, metric='absolute')
 
-        self.assertLess(compare_metric, 1.0)
+        self.assertLessEqual(compare_metric, 10.0)
 
     def test_DrawSimpleWithDash(self, save_image = False):
         test_file = os.path.dirname(__file__) + "/test_simple_dashes.png"
@@ -38,7 +38,7 @@ class BoxTestCase(TestCase):
         ref_image = Image(filename=test_file)
         _, compare_metric = i.compare(ref_image, metric='absolute')
 
-        self.assertLess(compare_metric, 1.0)
+        self.assertLessEqual(compare_metric, 10.0)
 
     def test_DrawSimpleWithGuides(self, save_image = False):
         test_file = os.path.dirname(__file__) + "/test_simple_guides.png"
@@ -56,7 +56,7 @@ class BoxTestCase(TestCase):
         ref_image = Image(filename=test_file)
         _, compare_metric = i.compare(ref_image, metric='absolute')
 
-        self.assertLess(compare_metric, 1.0)
+        self.assertLessEqual(compare_metric, 10.0)
 
     def test_DrawAdjustLayout(self, save_image = False):
         test_file = os.path.dirname(__file__) + "/test_adjust_layout.png"
@@ -72,7 +72,7 @@ class BoxTestCase(TestCase):
         ref_image = Image(filename=test_file)
         _, compare_metric = i.compare(ref_image, metric='absolute')
 
-        self.assertLess(compare_metric, 1.0)
+        self.assertLessEqual(compare_metric, 10.0)
 
     def test_DrawWithFaces(self, save_image=False):
         test_file = os.path.dirname(__file__) + "/test_faces.png"
@@ -92,7 +92,7 @@ class BoxTestCase(TestCase):
             ref_image = Image(filename=test_file)
             _, compare_metric = i.compare(ref_image, metric='absolute')
 
-            self.assertLess(compare_metric, 1.0)
+            self.assertLessEqual(compare_metric, 10.0)
 
     def test_DrawWithRotations(self, save_image=False):
         test_file = os.path.dirname(__file__) + "/test_rotation.png"
@@ -114,7 +114,7 @@ class BoxTestCase(TestCase):
             ref_image = Image(filename=test_file)
             _, compare_metric = i.compare(ref_image, metric='absolute')
 
-            self.assertLess(compare_metric, 1.0)
+            self.assertLessEqual(compare_metric, 10.0)
 
     def test_DrawResize(self, save_image=False):
         test_file = os.path.dirname(__file__) + "/test_resize.png"
@@ -134,7 +134,7 @@ class BoxTestCase(TestCase):
             ref_image = Image(filename=test_file)
             _, compare_metric = i.compare(ref_image, metric='absolute')
 
-            self.assertLess(compare_metric, 1.0)
+            self.assertLessEqual(compare_metric, 10.0)
 
 
     def test_Fit(self):

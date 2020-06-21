@@ -2,6 +2,7 @@ import base64
 import json
 import tempfile
 import os
+import shutil
 from . import box, tasks
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -81,7 +82,11 @@ def pattern(request):
 
     for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
         if face in request.FILES:
-            faces[face] = request.FILES[face]
+            # Need to copy the contents to a temporary file
+            _, file_extension = os.path.splitext(request.FILES[face].name)
+            new_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
+            shutil.copyfileobj(request.FILES[face], new_file)
+            faces[face] = new_file.name
         options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
         options[face+"_smart_rescale"] = face+"_smart_rescale" in form.data
 

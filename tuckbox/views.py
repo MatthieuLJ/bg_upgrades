@@ -2,9 +2,11 @@ import base64
 import json
 import tempfile
 import os
-from . import box
+import shutil
+from . import box, tasks
+from django.conf import settings
 from django.shortcuts import render, redirect
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 from django import forms
 
 
@@ -61,17 +63,14 @@ def check_fit(request):
 
     return HttpResponse(status=200 if my_box.will_it_fit() else 406)
 
+
 def pattern(request):
     if request.method != 'POST':
         return redirect('index')
 
     form = PatternForm(request.POST)
     if not form.is_valid():
-        print("Something went wrong in the form"+str(form.errors))
-        return redirect('index')
-
-    result_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-    print("Generating to file "+result_pdf.name)
+        return JsonResponse(data={'error_text': "Form has invalid data"}, status=400)
 
     paper = {'width': float(form.cleaned_data['paper_width']),
              'height': float(form.cleaned_data['paper_height'])}
@@ -83,14 +82,42 @@ def pattern(request):
 
     for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
         if face in request.FILES:
-            faces[face] = request.FILES[face]
+            # Need to copy the contents to a temporary file
+            _, file_extension = os.path.splitext(request.FILES[face].name)
+            new_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
+            shutil.copyfileobj(request.FILES[face], new_file)
+            faces[face] = new_file.name
         options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
         options[face+"_smart_rescale"] = face+"_smart_rescale" in form.data
 
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data
 
-    my_box = box.TuckBoxDrawing(tuckbox, paper, faces, options)
-    my_box.create_box_file(result_pdf.name)
+    result_pdf = tempfile.NamedTemporaryFile(
+        delete=False, dir=settings.TMP_ROOT, suffix=".pdf")
 
-    return FileResponse(result_pdf)
+    parameters = {
+        'tuckbox': tuckbox,
+        'paper': paper,
+        'options': options,
+        'faces': faces,
+        'filename': result_pdf.name,
+    }
+
+    async_result = tasks.build_box.delay(parameters)
+
+    return JsonResponse(data={'task_id': async_result.id, 'url': settings.TMP_URL + os.path.basename(result_pdf.name)}, status=202)
+
+
+def check_progress(request):
+    print(request.GET)
+    try:
+        task_id = request.GET['task_id']
+        state, info = tasks.get_status(task_id)
+        data = {'task_id': task_id,
+                'state': state,
+                'info': info}
+        print("Sending back: "+ str(data))
+        return JsonResponse(data)
+    except:
+        return HttpResponse(status=400)

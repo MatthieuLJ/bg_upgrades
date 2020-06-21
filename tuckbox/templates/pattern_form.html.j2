@@ -182,6 +182,30 @@
             }
         }
 
+        function check_for_result(data, status) {
+            if (status != "success") {
+                // TODO: show/log some error
+                change_throbber_display(false);
+            } else if (data.state == 'SUCCESS') {
+                window.open(data.info, "_blank", "location=no, menubar=no");
+                change_throbber_display(false);
+            } else if (data.state == 'FAILURE') {
+                // TODO: show/log some error
+                change_throbber_display(false);
+            } else if (data.state == 'STARTED') {
+                console.log("Got progress: "+data.info.percent)
+                let send_data = {'task_id': data.task_id};
+                setTimeout(function() {
+                    $.get('check_progress', send_data, check_for_result);
+                }, 500);
+            } else {
+                let send_data = {'task_id': data.task_id};
+                setTimeout(function() {
+                    $.get('check_progress', send_data, check_for_result);
+                }, 500);
+            }
+        }
+
         // Entry function when the page is loaded
         $(function () {
             // Disable the default form submission and redirect to Ajax
@@ -206,9 +230,6 @@
                     processData: false,
                     contentType: false,
                     timeout: 30000,
-                    xhrFields: {
-                        responseType: 'arraybuffer' // force for receiving binary data
-                    },
                     xhr: function()
                         {
                             var xhr = new window.XMLHttpRequest();
@@ -220,25 +241,16 @@
                                 console.log("upload:"+percentComplete);
                             }
                             }, false);
-                            //Download progress
-                            xhr.addEventListener("progress", function(evt){
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                //Do something with download progress
-                                console.log("download:"+percentComplete);
-                            }
-                            }, false);
                             return xhr;
                         },
                 }).then(function(response) {
                     // Open a new page with the pdf data
-                    var file = new Blob([response], {type: 'application/pdf'});
-                    var fileURL = URL.createObjectURL(file);
-                    window.open(fileURL);
-                    change_throbber_display(false);
+                    //alert("Request completed with task_id: " + response.task_id);
 
+                    // Get the output 10s later
+                    check_for_result({'task_id': response.task_id, 'state': "not yet"}, "success");
                 }).fail(function(data) {
-                    if (data.responseText !== '') {
+                    if (data.responseText != '') {
                         alert(data.responseText);
                     } else {
                         alert("Oops! An error occured, it's not you, it's me.");

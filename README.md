@@ -6,6 +6,7 @@ $ pip install -r requirements.txt
 $ brew install imagemagick
 
 To find packages that need to be updated
+https://requires.io/github/MatthieuLJ/bg_upgrades/requirements/?branch=master
 $ pip list --outdated
 Then update:
 $ pip install <package_name> --upgrade

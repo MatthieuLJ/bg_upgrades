@@ -1,8 +1,12 @@
 Next steps:
 * Add unit tests for the flow and celery tasks
+    - https://www.distributedpython.com/2018/05/01/unit-testing-celery-tasks/
+    - https://docs.celeryproject.org/en/stable/userguide/testing.html
 * Add unit tests for Three.js 3D model
 * Look at gathering some metrics (options, image created, computation time, data upload time)
-    - https://github.com/frankwiles/django-app-metrics
+    - https://docs.timescale.com/latest/tutorials/tutorial-howto-monitor-django-prometheus
+    - https://github.com/korfuri/django-prometheus
+    - https://github.com/prometheus/client_python
 * Look at proper deployment (secret key, debug mode, admin account, flower interface)
 ? Draw at higher precision than mm (accept floats for dimensions)
 ? Add a watermark on the generated PDF (with tool version number)

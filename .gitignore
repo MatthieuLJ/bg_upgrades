@@ -12,7 +12,7 @@ dump.rdb
 venv/
 
 # Folder for static files
-staticfiles/
+staticfiles/*
 
 # Temporary products
 tmp/tmp*

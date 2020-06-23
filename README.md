@@ -6,22 +6,22 @@ BG upgrades is using the **django** framework at its core.
 
 The overall architecture should be pretty standard with one central form generated from `tuckbox/templates/pattern_form.html.j2`
 
+It uses Redis and Celery to process the requests asynchronously (and report on progress).
+
 Requirements
 ============
 
-Python 3
-
-Pip packages listed in requirements.txt
-
-imagemagick
-nginx (for full deployment)
+* Python 3
+* pip packages listed in requirements.txt
+* `imagemagick`
+* `nginx` (for full deployment)
 
 Development
 ===========
 
 To setup an environment, use virtualenv and install the packages listed in requirements.txt
 
-    $ virtualenv --python=/your/path/to/python2 venv
+    $ virtualenv [--python=/your/path/to/python3] venv
     $ source venv/bin/activate
     $ pip install -r requirements.txt
     $ webdrivermanager chrome --linkpath [folder in your PATH]

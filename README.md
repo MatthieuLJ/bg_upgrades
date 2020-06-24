@@ -30,8 +30,32 @@ To run the tests:
 
     $ ./manage.py test
 
+Run only Django's test server:
+
+    $ ./manage.poy migrate
+    $ ./manage.py runserver
+
+Run uwsgi with the CLI options
+
+    $ uwsgi -H venv --socket mysite.sock --module bg_upgrades.wsgi --chmod-socket=664
+
 Startup / Deploy
 ================
+
+
+To deploy, you need to setup those environment variables:
+
+* `DJANGO_DEBUG` to 'False'
+* `DJANGO_SECRET_KEY`. This can be generated:
+
+    $ python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+
+* `DJANGO_PROJECT_PATH` to the folder with the project
+
+Configuration for nginx should be updated with the right paths and placed in the right folder
+* `/usr/local/etc/nginx/servers/` on mac
+* `/etc/nginx/servers/` on linux
+
 
 Start all those different services:
 
@@ -41,13 +65,16 @@ Start all those different services:
     $ ./manage.py migrate
     $ ./manage.py collectstatic
 
+    $ uwsgi --ini uwsgi.ini
+
+Start the nginx server
+    $ brew services restart nginx
+
+    $ sudo /etc/init.d/nginx restart
+
 Optionally:
 
     $ flower -A bg_upgrades
-
-To deploy, you need to setup those environment variables `DJANGO_DEBUG` to 'False' and `DJANGO_SECRET_KEY`. This latter one can be generated:
-
-    $ python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 
 The overall deployment framework is using nginx and uWSGI as documented (here)[https://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html].
 

@@ -1,9 +1,11 @@
 import math
+import os
+import stat
+import sys
 from wand.api import library
 from wand.color import Color
 from wand.drawing import Drawing
 from wand.image import Image
-import sys
 
 
 RESOLUTION = 600  # Dots Per Inch
@@ -22,6 +24,7 @@ class TuckBoxDrawing:
 
         if image is not None:
             image.save(filename=filename)
+            os.chmod(filename, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
 
     def lip_size(self):
         # the lip is the minimum of

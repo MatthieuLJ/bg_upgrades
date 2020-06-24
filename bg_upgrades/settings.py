@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'to2a5#&-dgyxi3x7))!oy+!vo7n)h7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ["52.40.238.231", "127.0.0.1"]
+ALLOWED_HOSTS = ["52.40.238.231", ".bg-upgrades.net", "127.0.0.1"]
 
 
 # Application definition

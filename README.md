@@ -11,10 +11,11 @@ It uses Redis and Celery to process the requests asynchronously (and report on p
 Requirements
 ============
 
-* Python 3
+* Python 3 (possibly also python3.X-dev on ubuntu)
 * pip packages listed in requirements.txt
 * `imagemagick`
 * `nginx` (for full deployment)
+* `redis`
 
 Development
 ===========
@@ -60,7 +61,7 @@ Configuration for nginx should be updated with the right paths and placed in the
 Start all those different services:
 
     $ redis-server
-    $ celery =A bg_upgrades worker -l info
+    $ celery -A bg_upgrades worker -l info
 
     $ ./manage.py migrate
     $ ./manage.py collectstatic

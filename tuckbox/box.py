@@ -8,7 +8,7 @@ from wand.drawing import Drawing
 from wand.image import Image
 
 
-RESOLUTION = 600  # Dots Per Inch
+RESOLUTION = 200  # Dots Per Inch
 POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
 
 

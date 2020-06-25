@@ -283,6 +283,10 @@ class TuckBoxDrawing:
 
         # Draw all the lines over
         draw.draw(image)
+
+        if progress_tracker is not None:
+            progress_tracker(90)
+
         finger_draw.draw(image)
         if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.draw(image)

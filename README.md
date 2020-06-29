@@ -33,6 +33,9 @@ To run the tests:
 
 Run only Django's test server:
 
+    $ redis-server
+    $ watchmedo auto-restart --directory=./ --pattern="*.py" --recursive -- celery -A bg_upgrades worker -l info
+
     $ ./manage.poy migrate
     $ ./manage.py runserver
 

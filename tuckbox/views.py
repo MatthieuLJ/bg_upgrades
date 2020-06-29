@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django import forms
 
+from memory_profiler import profile
 
 class PatternForm(forms.Form):
     height = forms.CharField()
@@ -63,7 +64,7 @@ def check_fit(request):
 
     return HttpResponse(status=200 if my_box.will_it_fit() else 406)
 
-
+@profile
 def pattern(request):
     if request.method != 'POST':
         return redirect('index')

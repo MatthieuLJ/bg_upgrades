@@ -43,6 +43,12 @@ Run uwsgi with the CLI options
 
     $ uwsgi -H venv --socket mysite.sock --module bg_upgrades.wsgi --chmod-socket=664
 
+Memory profiling
+To use the memory profiler, launch celery and Django with with the following commands:
+
+    $ python -m memory_profiler celery -A bg_upgrades worker
+    $ python -m memory_profiler manage.py runserver
+
 Startup / Deploy
 ================
 

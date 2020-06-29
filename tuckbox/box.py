@@ -9,6 +9,8 @@ from wand.drawing import Drawing
 from wand.image import Image
 from wand.resource import limits
 
+from memory_profiler import profile
+
 
 RESOLUTION = 600  # Dots Per Inch
 POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
@@ -21,10 +23,11 @@ class TuckBoxDrawing:
         self.paper = paper
         self.faces = faces if faces is not None else {}
         self.options = options if options is not None else {}
-
+        
         # Use disk when using more than 100MB of memory
         limits['memory'] = 100 * 1024 * 1024
 
+    @profile
     def create_box_file(self, filename, progress_tracker=None):
         image = self.draw_box(progress_tracker)
 
@@ -55,6 +58,7 @@ class TuckBoxDrawing:
             self.paper['width'], self.paper['height'] = self.paper['height'], self.paper['width']
         return True
 
+    @profile
     def draw_box(self, progress_tracker=None):
         if not self.check_paper_layout():
             return None
@@ -344,6 +348,7 @@ class TuckBoxDrawing:
             if progress_tracker is not None:
                 progress_tracker(10*(counter+2))
 
+    @profile
     def draw_lip(self):
         if "back" not in self.faces:
             return None

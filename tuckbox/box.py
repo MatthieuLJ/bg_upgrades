@@ -10,6 +10,7 @@ from wand.image import Image
 
 RESOLUTION = 600  # Dots Per Inch
 POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
+WATERMARK = "Tuckbox generated @ https://www.bg-upgrades.net/  -  v1.0 "
 
 
 class TuckBoxDrawing:
@@ -288,6 +289,9 @@ class TuckBoxDrawing:
             progress_tracker(90)
 
         finger_draw.draw(image)
+
+        self.draw_watermark(image)
+
         if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.draw(image)
 
@@ -342,7 +346,7 @@ class TuckBoxDrawing:
 
         lip_full_draw.scale(POINT_PER_MM, POINT_PER_MM)
 
-        lip_full_draw.stroke_width = 2 / POINT_PER_MM
+        lip_full_draw.stroke_width = 3 / POINT_PER_MM
 
         lip_full_draw.fill_color = Color('white')
         lip_full_draw.color(0, 0, 'reset')
@@ -443,3 +447,16 @@ class TuckBoxDrawing:
 
         # finally resize to the right
         img.resize(width, height)
+
+
+    def draw_watermark(self, img):
+        watermark_draw = Drawing()
+        watermark_draw.stroke_color = Color('black')
+        watermark_draw.font = os.path.join(os.path.dirname(__file__), "Colombia-Regular.ttf")
+        watermark_draw.font_size = 3 * POINT_PER_MM
+        watermark_draw.text_antialias = True
+        metrics = watermark_draw.get_font_metrics(img, WATERMARK)
+        watermark_draw.text(max(0, math.floor((POINT_PER_MM * self.paper['width']) - metrics.text_width)),
+                            max(0, math.floor((POINT_PER_MM * self.paper['height']) - metrics.text_height)),
+                            WATERMARK)
+        watermark_draw.draw(img)

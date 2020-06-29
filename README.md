@@ -108,6 +108,6 @@ Whenever the packages change, record the packages:
 
 When the data needs to change for the tests, run:
 
-    $ python -m tuckbox.tests_box
+    $ python -m tuckbox.test.tests_box
 
 

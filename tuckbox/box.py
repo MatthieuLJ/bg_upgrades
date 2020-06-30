@@ -319,8 +319,7 @@ class TuckBoxDrawing:
                                 margin_height + self.lip_size() +
                                 self.tuckbox['depth'],
                                 margin_height + self.lip_size() +
-                                self.tuckbox['depth'] + self.tuckbox['height'],
-                                margin_height + self.lip_size() + self.tuckbox['depth']*2 + self.tuckbox['height']]
+                                self.tuckbox['depth'] + self.tuckbox['height']]
             horizontal_folds_length = min(0.6*margin_width, 20)
             for y in horizontal_folds:
                 folding_guides_draw.line(

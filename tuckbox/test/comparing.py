@@ -4,7 +4,7 @@ import sys
 from functools import reduce
 from wand.image import Image, COMPARE_METRICS
 
-folder1 = 'high'
+folder1 = 'good'
 folder2 = 'bad'
 
 filenames = list(map(lambda x: os.path.split(x)[1], glob.glob(os.path.join(os.path.dirname(__file__), folder2, "*.png"))))

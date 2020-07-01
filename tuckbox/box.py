@@ -214,47 +214,6 @@ class TuckBoxDrawing:
         if progress_tracker is not None:
             progress_tracker(10)
 
-        # Prepare the face pictures first
-        face_sizes = {
-            "front": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                      math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "back": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                     math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "left": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
-                     math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "right": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
-                      math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "top": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                    math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
-            "bottom": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                       math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
-            "lip": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                    math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
-        }
-        face_positions = {
-            "front": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                      math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "back": (math.floor((margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']) * POINT_PER_MM),
-                     math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "left": (math.floor(margin_width * POINT_PER_MM),
-                     math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "right": (math.floor((margin_width + self.tuckbox['depth'] + self.tuckbox['width']) * POINT_PER_MM),
-                      math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "top": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                    math.floor((margin_height + self.lip_size()) * POINT_PER_MM)),
-            "bottom": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                       math.floor((margin_height + self.lip_size() + self.tuckbox['depth'] + self.tuckbox['height']) * POINT_PER_MM)),
-            "lip": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                    math.floor((margin_height) * POINT_PER_MM)),
-        }
-        face_angles = {}
-        face_smart_rescale = {}
-        for face in ["front", "back", "left", "right", "top", "bottom"]:
-            face_angles[face] = self.options[face +
-                                             "_angle"] if face+"_angle" in self.options else 0
-            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face + \
-                "_smart_rescale" in self.options else False
-
         # Create the image
         image = Image(width=math.ceil(self.paper['width'] * POINT_PER_MM),
                       height=math.ceil(self.paper['height'] * POINT_PER_MM),
@@ -262,22 +221,15 @@ class TuckBoxDrawing:
         image.resolution = RESOLUTION
         image.unit = 'pixelsperinch'
 
-        # Apply those face pictures
-        for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
-            if side in self.faces:
-                with Image(file=self.faces[side]) as i:
-                    i.rotate(face_angles[side] * 90)
-                    self.resize_image(
-                        i, face_smart_rescale[side], *face_sizes[side])
-                    image.composite(i, *face_positions[side])
-                self.faces[side].seek(0)
-            if progress_tracker is not None:
-                progress_tracker(10*(counter+2))
+        # Draw the faces
+        self.draw_faces(image, progress_tracker)
 
         # Draw the lip
         lip = self.draw_lip()
         if lip is not None:
-            image.composite(lip, *face_positions['lip'])
+            image.composite(lip,
+                            math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                            math.floor((margin_height) * POINT_PER_MM))
 
         if progress_tracker is not None:
             progress_tracker(80)
@@ -333,6 +285,60 @@ class TuckBoxDrawing:
             progress_tracker(100)
 
         return image
+
+    def draw_faces(self, image, progress_tracker):
+        margin_height = (self.paper['height'] - self.pattern_height()) / 2
+        margin_width = (self.paper['width'] - self.pattern_width()) / 2
+
+        face_sizes = {
+            "front": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "back": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "left": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "right": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "top": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                    math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
+            "bottom": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
+        }
+
+        face_positions = {
+            "front": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "back": (math.floor((margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "left": (math.floor(margin_width * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "right": (math.floor((margin_width + self.tuckbox['depth'] + self.tuckbox['width']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "top": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                    math.floor((margin_height + self.lip_size()) * POINT_PER_MM)),
+            "bottom": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth'] + self.tuckbox['height']) * POINT_PER_MM)),
+        }
+
+        face_angles = {}
+        face_smart_rescale = {}
+        for face in ["front", "back", "left", "right", "top", "bottom"]:
+            face_angles[face] = self.options[face +
+                                             "_angle"] if face+"_angle" in self.options else 0
+            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face + \
+                "_smart_rescale" in self.options else False
+
+        # Apply those face pictures
+        for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
+            if side in self.faces:
+                with Image(file=self.faces[side]) as i:
+                    i.rotate(face_angles[side] * 90)
+                    self.resize_image(
+                        i, face_smart_rescale[side], *face_sizes[side])
+                    image.composite(i, *face_positions[side])
+                self.faces[side].seek(0)
+            if progress_tracker is not None:
+                progress_tracker(10*(counter+2))
 
     def draw_lip(self):
         if "back" not in self.faces:
@@ -407,6 +413,8 @@ class TuckBoxDrawing:
             "j>"+finger_hold_size_save+"?u:1+(u-1)*(j/"+finger_hold_size_save+")")
 
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
+
+        self.faces['back'].seek(0)
 
         return lip_image
 

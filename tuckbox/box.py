@@ -65,7 +65,7 @@ class TuckBoxDrawing:
         draw.scale(POINT_PER_MM, POINT_PER_MM)
 
         draw.stroke_color = Color('black')
-        draw.stroke_width = 3 / POINT_PER_MM
+        draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
 
         # How much white space on the sides
         margin_height = (self.paper['height'] - self.pattern_height()) / 2
@@ -193,7 +193,7 @@ class TuckBoxDrawing:
         if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.stroke_color = Color('rgb(100,100,100)')
             dashed_draw.fill_opacity = 0
-            dashed_draw.stroke_width = 2 / POINT_PER_MM
+            dashed_draw.stroke_width = RESOLUTION / (300 * POINT_PER_MM)
             dashed_draw.stroke_dash_array = dash_array
             dashed_draw.stroke_dash_offset = 1
             dashed_draw.line(
@@ -300,7 +300,7 @@ class TuckBoxDrawing:
             folding_guides_draw.scale(POINT_PER_MM, POINT_PER_MM)
 
             folding_guides_draw.stroke_color = Color('black')
-            folding_guides_draw.stroke_width = 3 / POINT_PER_MM
+            folding_guides_draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
 
             vertical_folds = [margin_width + self.tuckbox['depth'],
                               margin_width +
@@ -345,7 +345,8 @@ class TuckBoxDrawing:
 
         lip_full_draw.scale(POINT_PER_MM, POINT_PER_MM)
 
-        lip_full_draw.stroke_width = 3 / POINT_PER_MM
+        # This cannot be too "thin" or the floodfill later would spill over
+        lip_full_draw.stroke_width = max(2 / POINT_PER_MM, RESOLUTION / (200 * POINT_PER_MM))
 
         lip_full_draw.fill_color = Color('white')
         lip_full_draw.color(0, 0, 'reset')

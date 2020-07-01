@@ -33,6 +33,9 @@ To run the tests:
 
 Run only Django's test server:
 
+    $ redis-server
+    $ watchmedo auto-restart --directory=./ --pattern="*.py" --recursive -- celery -A bg_upgrades worker -l info
+
     $ ./manage.poy migrate
     $ ./manage.py runserver
 
@@ -79,7 +82,16 @@ Optionally:
 
 The overall deployment framework is using nginx and uWSGI as documented (here)[https://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html].
 
+SSL / TLS
+=========
 
+Set the environment variables: `DOMAIN` to bg-upgrades.net and `WILDCARD` to `*.$DOMAIN`
+
+    $ sudo add-apt-repository ppa:certbot/certbot
+    $ sudo apt install python-certbot-nginx
+    $ sudo certbot -d $DOMAIN -d $WILDCARD --nginx --preferred-challenges dns certonly
+
+Instructions also (here)[https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/]
 
 Maintenance
 ===========
@@ -96,6 +108,6 @@ Whenever the packages change, record the packages:
 
 When the data needs to change for the tests, run:
 
-    $ python -m tuckbox.tests_box
+    $ python -m tuckbox.test.tests_box
 
 

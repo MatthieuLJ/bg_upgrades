@@ -10,6 +10,7 @@ from wand.image import Image
 
 RESOLUTION = 200  # Dots Per Inch
 POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
+WATERMARK = "Tuckbox generated @ https://www.bg-upgrades.net/  -  v1.0 "
 
 
 class TuckBoxDrawing:
@@ -64,7 +65,7 @@ class TuckBoxDrawing:
         draw.scale(POINT_PER_MM, POINT_PER_MM)
 
         draw.stroke_color = Color('black')
-        draw.stroke_width = 3 / POINT_PER_MM
+        draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
 
         # How much white space on the sides
         margin_height = (self.paper['height'] - self.pattern_height()) / 2
@@ -192,7 +193,7 @@ class TuckBoxDrawing:
         if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.stroke_color = Color('rgb(100,100,100)')
             dashed_draw.fill_opacity = 0
-            dashed_draw.stroke_width = 2 / POINT_PER_MM
+            dashed_draw.stroke_width = RESOLUTION / (300 * POINT_PER_MM)
             dashed_draw.stroke_dash_array = dash_array
             dashed_draw.stroke_dash_offset = 1
             dashed_draw.line(
@@ -213,47 +214,6 @@ class TuckBoxDrawing:
         if progress_tracker is not None:
             progress_tracker(10)
 
-        # Prepare the face pictures first
-        face_sizes = {
-            "front": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                      math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "back": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                     math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "left": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
-                     math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "right": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
-                      math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
-            "top": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                    math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
-            "bottom": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                       math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
-            "lip": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                    math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
-        }
-        face_positions = {
-            "front": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                      math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "back": (math.floor((margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']) * POINT_PER_MM),
-                     math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "left": (math.floor(margin_width * POINT_PER_MM),
-                     math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "right": (math.floor((margin_width + self.tuckbox['depth'] + self.tuckbox['width']) * POINT_PER_MM),
-                      math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
-            "top": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                    math.floor((margin_height + self.lip_size()) * POINT_PER_MM)),
-            "bottom": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                       math.floor((margin_height + self.lip_size() + self.tuckbox['depth'] + self.tuckbox['height']) * POINT_PER_MM)),
-            "lip": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
-                    math.floor((margin_height) * POINT_PER_MM)),
-        }
-        face_angles = {}
-        face_smart_rescale = {}
-        for face in ["front", "back", "left", "right", "top", "bottom"]:
-            face_angles[face] = self.options[face +
-                                             "_angle"] if face+"_angle" in self.options else 0
-            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face + \
-                "_smart_rescale" in self.options else False
-
         # Create the image
         image = Image(width=math.ceil(self.paper['width'] * POINT_PER_MM),
                       height=math.ceil(self.paper['height'] * POINT_PER_MM),
@@ -261,29 +221,29 @@ class TuckBoxDrawing:
         image.resolution = RESOLUTION
         image.unit = 'pixelsperinch'
 
-        # Apply those face pictures
-        for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
-            if side in self.faces:
-                with Image(file=self.faces[side]) as i:
-                    i.rotate(face_angles[side] * 90)
-                    self.resize_image(
-                        i, face_smart_rescale[side], *face_sizes[side])
-                    image.composite(i, *face_positions[side])
-                self.faces[side].seek(0)
-            if progress_tracker is not None:
-                progress_tracker(10*(counter+2))
+        # Draw the faces
+        self.draw_faces(image, progress_tracker)
 
         # Draw the lip
         lip = self.draw_lip()
         if lip is not None:
-            image.composite(lip, *face_positions['lip'])
+            image.composite(lip,
+                            math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                            math.floor((margin_height) * POINT_PER_MM))
 
         if progress_tracker is not None:
             progress_tracker(80)
 
         # Draw all the lines over
         draw.draw(image)
+
+        if progress_tracker is not None:
+            progress_tracker(90)
+
         finger_draw.draw(image)
+
+        self.draw_watermark(image)
+
         if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.draw(image)
 
@@ -292,7 +252,7 @@ class TuckBoxDrawing:
             folding_guides_draw.scale(POINT_PER_MM, POINT_PER_MM)
 
             folding_guides_draw.stroke_color = Color('black')
-            folding_guides_draw.stroke_width = 3 / POINT_PER_MM
+            folding_guides_draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
 
             vertical_folds = [margin_width + self.tuckbox['depth'],
                               margin_width +
@@ -311,8 +271,7 @@ class TuckBoxDrawing:
                                 margin_height + self.lip_size() +
                                 self.tuckbox['depth'],
                                 margin_height + self.lip_size() +
-                                self.tuckbox['depth'] + self.tuckbox['height'],
-                                margin_height + self.lip_size() + self.tuckbox['depth']*2 + self.tuckbox['height']]
+                                self.tuckbox['depth'] + self.tuckbox['height']]
             horizontal_folds_length = min(0.6*margin_width, 20)
             for y in horizontal_folds:
                 folding_guides_draw.line(
@@ -327,6 +286,60 @@ class TuckBoxDrawing:
 
         return image
 
+    def draw_faces(self, image, progress_tracker):
+        margin_height = (self.paper['height'] - self.pattern_height()) / 2
+        margin_width = (self.paper['width'] - self.pattern_width()) / 2
+
+        face_sizes = {
+            "front": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "back": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "left": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "right": (math.ceil(self.tuckbox['depth'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM)),
+            "top": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                    math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
+            "bottom": (math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['depth'] * POINT_PER_MM)),
+        }
+
+        face_positions = {
+            "front": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "back": (math.floor((margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "left": (math.floor(margin_width * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "right": (math.floor((margin_width + self.tuckbox['depth'] + self.tuckbox['width']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM)),
+            "top": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                    math.floor((margin_height + self.lip_size()) * POINT_PER_MM)),
+            "bottom": (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                        math.floor((margin_height + self.lip_size() + self.tuckbox['depth'] + self.tuckbox['height']) * POINT_PER_MM)),
+        }
+
+        face_angles = {}
+        face_smart_rescale = {}
+        for face in ["front", "back", "left", "right", "top", "bottom"]:
+            face_angles[face] = self.options[face +
+                                             "_angle"] if face+"_angle" in self.options else 0
+            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face + \
+                "_smart_rescale" in self.options else False
+
+        # Apply those face pictures
+        for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
+            if side in self.faces:
+                with Image(file=self.faces[side]) as i:
+                    i.rotate(face_angles[side] * 90)
+                    self.resize_image(
+                        i, face_smart_rescale[side], *face_sizes[side])
+                    image.composite(i, *face_positions[side])
+                self.faces[side].seek(0)
+            if progress_tracker is not None:
+                progress_tracker(10*(counter+2))
+
     def draw_lip(self):
         if "back" not in self.faces:
             return None
@@ -338,7 +351,8 @@ class TuckBoxDrawing:
 
         lip_full_draw.scale(POINT_PER_MM, POINT_PER_MM)
 
-        lip_full_draw.stroke_width = 2 / POINT_PER_MM
+        # This cannot be too "thin" or the floodfill later would spill over
+        lip_full_draw.stroke_width = max(2 / POINT_PER_MM, RESOLUTION / (200 * POINT_PER_MM))
 
         lip_full_draw.fill_color = Color('white')
         lip_full_draw.color(0, 0, 'reset')
@@ -400,6 +414,8 @@ class TuckBoxDrawing:
 
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
+        self.faces['back'].seek(0)
+
         return lip_image
 
     def resize_image(self, img, smart_rescale, width, height):
@@ -439,3 +455,16 @@ class TuckBoxDrawing:
 
         # finally resize to the right
         img.resize(width, height)
+
+
+    def draw_watermark(self, img):
+        watermark_draw = Drawing()
+        watermark_draw.stroke_color = Color('black')
+        watermark_draw.font = os.path.join(os.path.dirname(__file__), "Colombia-Regular.ttf")
+        watermark_draw.font_size = 3 * POINT_PER_MM
+        watermark_draw.text_antialias = True
+        metrics = watermark_draw.get_font_metrics(img, WATERMARK)
+        watermark_draw.text(max(0, math.floor((POINT_PER_MM * self.paper['width']) - metrics.text_width)),
+                            max(0, math.floor((POINT_PER_MM * self.paper['height']) - metrics.text_height)),
+                            WATERMARK)
+        watermark_draw.draw(img)

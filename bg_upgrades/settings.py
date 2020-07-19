@@ -59,7 +59,8 @@ ROOT_URLCONF = 'bg_upgrades.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [ os.path.join(BASE_DIR, 'templates'),
+                ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,13 +120,13 @@ USE_L10N = True
 USE_TZ = True
 
 # Use nose to run all tests
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+#TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
-NOSE_ARGS = [
-    '--with-coverage',
-    '--cover-package=tuckbox',
-]
+#NOSE_ARGS = [
+#    '--with-coverage',
+#    '--cover-package=tuckbox',
+#]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/

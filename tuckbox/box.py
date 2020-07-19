@@ -6,6 +6,7 @@ from wand.api import library
 from wand.color import Color
 from wand.drawing import Drawing
 from wand.image import Image
+from wand.resource import limits
 
 
 RESOLUTION = 200  # Dots Per Inch
@@ -19,6 +20,9 @@ class TuckBoxDrawing:
         self.paper = paper
         self.faces = faces if faces is not None else {}
         self.options = options if options is not None else {}
+
+        # Use disk when using more than 100MB of memory
+        limits['memory'] = 100 * 1024 * 1024
 
     def create_box_file(self, filename, progress_tracker=None):
         image = self.draw_box(progress_tracker)

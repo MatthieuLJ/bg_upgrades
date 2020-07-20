@@ -3,8 +3,8 @@ from django.test import TestCase
 from wand.image import Image
 from tuckbox import box
 
-comparison_metric = 'perceptual_hash'
-comparison_threshold = 10  # This allows to change resolution of the output
+comparison_metric = 'mean_absolute'
+comparison_threshold = 10
 
 class BoxTestCase(TestCase):
     def compare_images(self, test_filename, my_box, save_image):
@@ -17,6 +17,7 @@ class BoxTestCase(TestCase):
         i = my_box.draw_box()
         ref_image = Image(filename=test_file)
         i.resize(ref_image.width, ref_image.height)
+        i.fuzz = i.quantum_range * 0.20
         _, compare_metric = i.compare(ref_image, metric=comparison_metric)
 
         #print("For file " + test_filename + ", got error "+str(compare_metric))

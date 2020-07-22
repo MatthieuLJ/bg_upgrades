@@ -417,6 +417,8 @@ class TuckBoxDrawing:
 
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
+        os.remove(tmp_file)
+
         return lip_image
 
     def resize_rotate_image(self, filename, destination_filename, smart_rescale, angle=0, width=0, height=0):
@@ -432,36 +434,13 @@ class TuckBoxDrawing:
         if angle == 90 or angle == 270:
             height, width = width, height
 
-        # Algorithm http://www.imagemagick.org/Usage/resize/
-        #  if the picture is the wrong aspect ratio and smart_rescale is enabled:
-        #    -> liquid resize to the right aspect ratio
-        #         - up on one side if both are smaller
-        #         - down on one side if both are larger
-        #         - up on one side to the right size and down on the other
-        #  -> regular scaling
         scaled_file = os.path.join(os.path.dirname(filename), "s_" + os.path.basename(filename))
 
-        if img_height < height and img_width < width:
-            # The image is currently smaller in both dimensions
-            if img_height / img_width < height / width:
-                # need to upscale the height to the right aspect ratio
-                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, img_width, int((height * img_width) / width))
-            else:
-                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, int(img_height * width / height), img_height)
-        elif img_height > height and img_width > width:
-            if img_height / img_width > height / width:
-                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, img_width, int((height * img_width) / width))
-            else:
-                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, int(img_height * width / height), img_height)
+        # We want to use seam carving to downscale one dimension to the right aspect ratio
+        if img_height / img_width > height / width:
+            self.resize_rotate_image_cmd(filename, scaled_file, True, 0, img_width, int((height * img_width) / width))
         else:
-            # one dimension is smaller, the other one larger, upscale the right one
-            scaled_file2 = os.path.join(os.path.dirname(filename), "s2_" + os.path.basename(filename))
-            if img_height < height:
-                self.resize_rotate_image_cmd(filename, scaled_file2, True, 0, img_width, height)
-            else:
-                self.resize_rotate_image_cmd(filename, scaled_file2, True, 0, width, img_height)
-            self.resize_rotate_image_cmd(scaled_file2, scaled_file, True, 0, width, img_height)
-            os.remove(scaled_file2)
+            self.resize_rotate_image_cmd(filename, scaled_file, True, 0, int(img_height * width / height), img_height)
 
         # restore the right size we want
         if angle == 90 or angle == 270:
@@ -487,6 +466,7 @@ class TuckBoxDrawing:
             cmd.append("{}x{}!".format(int(width), int(height)))
         cmd.append(destination_filename)
         subprocess.run(cmd)
+        #print("running the command {}".format(cmd))
 
 
     def draw_watermark(self, img):

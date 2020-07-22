@@ -1,6 +1,7 @@
 import math
 import os
 import stat
+import subprocess
 import sys
 from wand.api import library
 from wand.color import Color
@@ -335,12 +336,11 @@ class TuckBoxDrawing:
         # Apply those face pictures
         for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
             if side in self.faces:
-                with Image(file=self.faces[side]) as i:
-                    i.rotate(face_angles[side] * 90)
-                    self.resize_image(
-                        i, face_smart_rescale[side], *face_sizes[side])
+                tmp_file = os.path.join(os.path.dirname(self.faces[side]), "_" + os.path.basename(self.faces[side]))
+                self.resize_rotate_image(self.faces[side], tmp_file, face_smart_rescale[side], face_angles[side] * 90, *face_sizes[side])
+                with Image(filename=tmp_file) as i:
                     image.composite(i, *face_positions[side])
-                self.faces[side].seek(0)
+                os.remove(tmp_file)
             if progress_tracker is not None:
                 progress_tracker(10*(counter+2))
 
@@ -389,18 +389,17 @@ class TuckBoxDrawing:
         lip_full_draw.draw(lip_full_mask_image)
 
         # Prepare the front image
-        lip_image = Image(file=self.faces['back'])
-
         if "back_angle" in self.options:
-            lip_image.rotate((self.options["back_angle"]+2)*90)
+            angle = (self.options["back_angle"]+2)*90
         else:
-            lip_image.rotate(180)
+            angle = 180
 
-        self.resize_image(lip_image,
-                          "back_smart_rescale" in self.options and
-                          self.options["back_smart_rescale"],
-                          math.ceil(self.tuckbox['width'] * POINT_PER_MM),
-                          math.ceil(self.tuckbox['height'] * POINT_PER_MM))
+        tmp_file = os.path.join(os.path.dirname(self.faces['back']), "l_" + os.path.basename(self.faces['back']))
+        self.resize_rotate_image(self.faces['back'], tmp_file, "back_smart_rescale" in self.options and
+                        self.options["back_smart_rescale"], angle, math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+                        math.ceil(self.tuckbox['height'] * POINT_PER_MM))
+
+        lip_image = Image(filename=tmp_file)
 
         lip_image.crop(top=lip_image.height - lip_full_mask_image.height)
 
@@ -418,11 +417,21 @@ class TuckBoxDrawing:
 
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
-        self.faces['back'].seek(0)
-
         return lip_image
 
-    def resize_image(self, img, smart_rescale, width, height):
+    def resize_rotate_image(self, filename, destination_filename, smart_rescale, angle=0, width=0, height=0):
+        if not smart_rescale or width == 0 or height == 0:
+            self.resize_rotate_image_cmd(filename, destination_filename, False, angle, width, height)
+            return
+
+        with Image(filename=filename) as i:
+            img_height = i.height
+            img_width = i.width
+
+        # we just care about the right aspect ratio for now, we'll take care of the rotation at the end
+        if angle == 90 or angle == 270:
+            height, width = width, height
+
         # Algorithm http://www.imagemagick.org/Usage/resize/
         #  if the picture is the wrong aspect ratio and smart_rescale is enabled:
         #    -> liquid resize to the right aspect ratio
@@ -430,35 +439,54 @@ class TuckBoxDrawing:
         #         - down on one side if both are larger
         #         - up on one side to the right size and down on the other
         #  -> regular scaling
-        if smart_rescale and img.height / img.width != height / width:
-            # will use some seam carving to get to the right aspect ratio
-            if img.height < height and img.width < width:
-                if img.height / img.width < height / width:
-                    # need to upscale the height to the right aspect ratio
-                    img.liquid_rescale(img.width, int(
-                        height * img.width / width))
-                else:
-                    img.liquid_rescale(
-                        int(img.height * width / height), img.height)
-            elif img.height > height and img.width > width:
-                if img.height / img.width > height / width:
-                    # need to downscale the height to the right aspect ratio
-                    img.liquid_rescale(img.width, int(
-                        height * img.width / width))
-                else:
-                    img.liquid_rescale(
-                        int(img.height * width / height), img.height)
-            else:
-                # one dimension is smaller, the other one larger, upscale the right one
-                if img.height < height:
-                    img.liquid_rescale(img.width, height)
-                else:
-                    img.liquid_rescale(width, img.height)
-                # downscale the other one
-                img.liquid_rescale(width, height)
+        scaled_file = os.path.join(os.path.dirname(filename), "s_" + os.path.basename(filename))
 
-        # finally resize to the right
-        img.resize(width, height)
+        if img_height < height and img_width < width:
+            # The image is currently smaller in both dimensions
+            if img_height / img_width < height / width:
+                # need to upscale the height to the right aspect ratio
+                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, img_width, int((height * img_width) / width))
+            else:
+                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, int(img_height * width / height), img_height)
+        elif img_height > height and img_width > width:
+            if img_height / img_width > height / width:
+                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, img_width, int((height * img_width) / width))
+            else:
+                self.resize_rotate_image_cmd(filename, scaled_file, True, 0, int(img_height * width / height), img_height)
+        else:
+            # one dimension is smaller, the other one larger, upscale the right one
+            scaled_file2 = os.path.join(os.path.dirname(filename), "s2_" + os.path.basename(filename))
+            if img_height < height:
+                self.resize_rotate_image_cmd(filename, scaled_file2, True, 0, img_width, height)
+            else:
+                self.resize_rotate_image_cmd(filename, scaled_file2, True, 0, width, img_height)
+            self.resize_rotate_image_cmd(scaled_file2, scaled_file, True, 0, width, img_height)
+            os.remove(scaled_file2)
+
+        # restore the right size we want
+        if angle == 90 or angle == 270:
+            height, width = width, height
+
+        self.resize_rotate_image_cmd(scaled_file, destination_filename, False, angle, width, height)
+        os.remove(scaled_file)
+
+    def resize_rotate_image_cmd(self, filename, destination_filename, smart_rescale, angle=0, width=0, height=0):
+        # convert filename =rotate angle -liquid-rescale widthxheight! destination_filename
+        cmd = ["convert"]
+        cmd.append(filename)
+        if angle == 0 and (width == 0 or height == 0):
+            return
+        if angle != 0:
+            cmd.append("-rotate")
+            cmd.append("{}".format(int(angle)))
+        if width != 0 and height != 0:
+            if smart_rescale:
+                cmd.append("-liquid-rescale")
+            else:
+                cmd.append("-resize")
+            cmd.append("{}x{}!".format(int(width), int(height)))
+        cmd.append(destination_filename)
+        subprocess.run(cmd)
 
 
     def draw_watermark(self, img):

@@ -3,6 +3,7 @@ import os
 import stat
 import subprocess
 import sys
+import tempfile
 from wand.api import library
 from wand.color import Color
 from wand.drawing import Drawing
@@ -12,7 +13,7 @@ from wand.resource import limits
 
 RESOLUTION = 600  # Dots Per Inch
 POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
-WATERMARK = "Tuckbox generated @ https://www.bg-upgrades.net/  -  v1.0 "
+WATERMARK = "Tuckbox generated @ https://www.bg-upgrades.net/  "
 
 
 class TuckBoxDrawing:
@@ -336,11 +337,12 @@ class TuckBoxDrawing:
         # Apply those face pictures
         for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
             if side in self.faces:
-                tmp_file = os.path.join(os.path.dirname(self.faces[side]), "_" + os.path.basename(self.faces[side]))
-                self.resize_rotate_image(self.faces[side], tmp_file, face_smart_rescale[side], face_angles[side] * 90, *face_sizes[side])
-                with Image(filename=tmp_file) as i:
+                _, file_extension = os.path.splitext(os.path.basename(self.faces[side]))
+                tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
+                self.resize_rotate_image(self.faces[side], tmp_file.name, face_smart_rescale[side], face_angles[side] * 90, *face_sizes[side])
+                with Image(filename=tmp_file.name) as i:
                     image.composite(i, *face_positions[side])
-                os.remove(tmp_file)
+
             if progress_tracker is not None:
                 progress_tracker(10*(counter+2))
 
@@ -394,12 +396,13 @@ class TuckBoxDrawing:
         else:
             angle = 180
 
-        tmp_file = os.path.join(os.path.dirname(self.faces['back']), "l_" + os.path.basename(self.faces['back']))
-        self.resize_rotate_image(self.faces['back'], tmp_file, "back_smart_rescale" in self.options and
+        _, file_extension = os.path.splitext(self.faces['back'])
+        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
+        self.resize_rotate_image(self.faces['back'], tmp_file.name, "back_smart_rescale" in self.options and
                         self.options["back_smart_rescale"], angle, math.ceil(self.tuckbox['width'] * POINT_PER_MM),
                         math.ceil(self.tuckbox['height'] * POINT_PER_MM))
 
-        lip_image = Image(filename=tmp_file)
+        lip_image = Image(filename=tmp_file.name)
 
         lip_image.crop(top=lip_image.height - lip_full_mask_image.height)
 
@@ -417,8 +420,6 @@ class TuckBoxDrawing:
 
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
-        os.remove(tmp_file)
-
         return lip_image
 
     def resize_rotate_image(self, filename, destination_filename, smart_rescale, angle=0, width=0, height=0):
@@ -434,23 +435,23 @@ class TuckBoxDrawing:
         if angle == 90 or angle == 270:
             height, width = width, height
 
-        scaled_file = os.path.join(os.path.dirname(filename), "s_" + os.path.basename(filename))
+        _, file_extension = os.path.splitext(os.path.basename(filename))
+        scaled_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
 
         # We want to use seam carving to downscale one dimension to the right aspect ratio
         if img_height / img_width > height / width:
-            self.resize_rotate_image_cmd(filename, scaled_file, True, 0, img_width, int((height * img_width) / width))
+            self.resize_rotate_image_cmd(filename, scaled_file.name, True, 0, img_width, int((height * img_width) / width))
         else:
-            self.resize_rotate_image_cmd(filename, scaled_file, True, 0, int(img_height * width / height), img_height)
+            self.resize_rotate_image_cmd(filename, scaled_file.name, True, 0, int(img_height * width / height), img_height)
 
         # restore the right size we want
         if angle == 90 or angle == 270:
             height, width = width, height
 
-        self.resize_rotate_image_cmd(scaled_file, destination_filename, False, angle, width, height)
-        os.remove(scaled_file)
+        self.resize_rotate_image_cmd(scaled_file.name, destination_filename, False, angle, width, height)
 
     def resize_rotate_image_cmd(self, filename, destination_filename, smart_rescale, angle=0, width=0, height=0):
-        # convert filename =rotate angle -liquid-rescale widthxheight! destination_filename
+        # convert filename [-rotate angle] [-liquid-rescale|-resize widthxheight!] destination_filename
         cmd = ["convert"]
         cmd.append(filename)
         if angle == 0 and (width == 0 or height == 0):
@@ -465,8 +466,9 @@ class TuckBoxDrawing:
                 cmd.append("-resize")
             cmd.append("{}x{}!".format(int(width), int(height)))
         cmd.append(destination_filename)
-        subprocess.run(cmd)
         #print("running the command {}".format(cmd))
+        subprocess.run(cmd)
+        #print("done")
 
 
     def draw_watermark(self, img):

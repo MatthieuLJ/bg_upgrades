@@ -13,7 +13,7 @@ from wand.resource import limits
 
 RESOLUTION = 200  # Dots Per Inch
 POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
-WATERMARK = "Tuckbox generated @ https://www.bg-upgrades.net/  -  v1.2 "
+WATERMARK = "Tuckbox generated @ https://www.bg-upgrades.net/  -  v1.2.1 "
 
 
 class TuckBoxDrawing:

@@ -5,7 +5,7 @@ from celery import Celery
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bg_upgrades.settings')
 
-app = Celery('bg_upgrades', backend='redis', broker='redis://localhost:6379')
+app = Celery('bg_upgrades', backend='redis', broker='redis://localhost:6379/1')
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.

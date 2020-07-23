@@ -118,6 +118,10 @@ def check_progress(request):
                 'state': state,
                 'info': info}
         print("Sending back: "+ str(data))
-        return JsonResponse(data)
+        return JsonResponse(data, status=200)
     except:
-        return HttpResponse(status=400)
+        task_id = request.GET['task_id']
+        data = {'task_id': task_id,
+                'state': 'FAILURE' }
+        print("Sending back: "+ str(data))
+        return JsonResponse(data, status=200)

@@ -251,22 +251,24 @@
 
                 // Submit the form using AJAX.
                 $.ajax({
+                    async: true,
                     type: 'POST',
                     url: $(this).attr('action'),
                     data: postData,
-                    processData: false,
                     contentType: false,
-                    timeout: 30000,
+                    processData: false,
+                    timeout: 60000,
                     xhr: function()
                         {
                             var xhr = new window.XMLHttpRequest();
                             //Upload progress
-                            xhr.upload.addEventListener("progress", function(evt){
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                update_progress(Math.round(percentComplete), 'upload');
-                            }
-                            }, false);
+                            xhr.upload.onprogress = function(evt){
+                                if (evt.lengthComputable) {
+                                    var percentComplete = 100 * evt.loaded / evt.total;
+                                    update_progress(Math.round(percentComplete), 'upload');
+                                }
+                            };
+                            xhr.upload.onload = function() { console.log("Done uploading!");};
                             return xhr;
                         },
                 }).then(function(response) {

@@ -12,7 +12,7 @@ from wand.resource import limits
 
 
 RESOLUTION = 600  # Dots Per Inch
-POINT_PER_MM = RESOLUTION / 24.5  # 24.5 mm per inch
+POINT_PER_MM = RESOLUTION / 25.4  # 25.4 mm per inch
 WATERMARK = "Tuckbox generated @ https://www.bg-upgrades.net/  "
 
 

@@ -1,4 +1,6 @@
 
+![Works on my machine](https://forthebadge.com/images/badges/works-on-my-machine.svg)
+
 Architecture
 ============
 

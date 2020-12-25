@@ -22,12 +22,6 @@ class PatternForm(forms.Form):
     right_angle = forms.CharField()
     top_angle = forms.CharField()
     bottom_angle = forms.CharField()
-    front_smart_rescale = forms.CheckboxInput()
-    back_smart_rescale = forms.CheckboxInput()
-    left_smart_rescale = forms.CheckboxInput()
-    right_smart_rescale = forms.CheckboxInput()
-    bottom_smart_rescale = forms.CheckboxInput()
-    top_smart_rescale = forms.CheckboxInput()
     folding_guides = forms.CheckboxInput()
     folds_dashed = forms.CheckboxInput()
 
@@ -88,7 +82,6 @@ def pattern(request):
             shutil.copyfileobj(request.FILES[face], new_file)
             faces[face] = new_file.name
         options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
-        options[face+"_smart_rescale"] = face+"_smart_rescale" in form.data
 
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data

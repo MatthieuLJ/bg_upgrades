@@ -469,15 +469,6 @@
                     </object>
                 </button>
             </div>
-            <div class="col-md-2 col-sm-6" style="display: flex;">
-                <input id="id_{{ face }}_smart_rescale"  name="{{ face }}_smart_rescale" type="checkbox"
-                    data-toggle="toggle" data-on="Smart resizing" data-off="Regular resizing">
-                <span class="align-self-center icon">
-                    <object type="image/svg+xml" data="{% static 'tuckbox/info.svg' %}"  data-toggle="tooltip" data-placement="top"  title="Smart resizing will generally produce better looking images, but may not keep proportions or alignement with the different faces">
-                        Info
-                    </object>
-                </span>
-            </div>
         </div>
         {% endfor %}
         {% endwith %}

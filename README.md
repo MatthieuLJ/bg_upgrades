@@ -16,6 +16,7 @@ Requirements
 * `imagemagick`
 * `nginx` (for full deployment)
 * `redis`
+* [`chromedriver`](https://chromedriver.chromium.org/)
 
 Development
 ===========

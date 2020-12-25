@@ -30,6 +30,9 @@
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
 
+    <!-- Color picker -->
+    <script src="https://unpkg.com/vanilla-picker@2"></script>
+
     <!-- Three JS -->
     <script src="https://threejs.org/build/three.min.js"></script>
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -242,9 +245,9 @@
                 // Stop the submit button from submitting the form.
                 event.preventDefault();
 
-                var postData = new FormData($(this)[0]);
+                let postData = new FormData($(this)[0]);
                 /*
-                for (var pair of postData.entries()) {
+                for (let pair of postData.entries()) {
                     console.log(pair[0]+ ', ' + pair[1]);
                 }
                 */
@@ -260,11 +263,11 @@
                     timeout: 60000,
                     xhr: function()
                         {
-                            var xhr = new window.XMLHttpRequest();
+                            let xhr = new window.XMLHttpRequest();
                             //Upload progress
                             xhr.upload.onprogress = function(evt){
                                 if (evt.lengthComputable) {
-                                    var percentComplete = 100 * evt.loaded / evt.total;
+                                    let percentComplete = 100 * evt.loaded / evt.total;
                                     update_progress(Math.round(percentComplete), 'upload');
                                 }
                             };
@@ -292,9 +295,6 @@
             // For all the elements with the "tuck_input_num" class
             // hook the check number function with the error label also
             $(".tuck_input_num").change(function () { check_number(this); });
-
-            // Initialize all tooltips
-            $('[data-toggle="tooltip"]').tooltip();
 
             $("#id_paper_size").change(function () {
                 change_wont_fit_display(false);
@@ -325,6 +325,8 @@
                 check_for_preview();
             }).trigger("change");
 
+            let color_buttons = [], color_pickers = [];
+            
             ["front", "back", "left", "right", "top", "bottom"].forEach(function (face, index) {
                 $("#id_" + face).change(function () {
                     let file = $(this)[0].files[0];
@@ -348,8 +350,16 @@
                 $("#id_clear_" + face).click(function() {
                     console.log("clear!");
                     $("#id_" + face).val("").trigger("change").next().html();
-
                 });
+                color_buttons[face] = $("#id_color_" + face)[0];
+                console.log(color_buttons[face]);
+                color_pickers[face] = new Picker({parent: color_buttons[face], 
+                                           alpha: false,
+                                           editor: false,
+                                           editorFormat: 'rgb'});
+                color_pickers[face].onChange = function(color) {
+                    color_buttons[face].style.backgroundColor = color.rgbaString;
+                }
             });
         });
     </script>
@@ -468,6 +478,13 @@
                         Clear
                     </object>
                 </button>
+            </div>
+            <div class="col-md-2 col-sm-6" style="display: flex;">
+                <input id="id_{{ face }}_plain_color"  name="{{ face }}_plain_color" type="checkbox"
+                    data-toggle="toggle" data-on="Plain Color" data-off="Picture">
+                <span class="align-self-center icon">
+                    <a href="#" class="button" id="id_color_{{ face }}">Color</a>
+                </span>
             </div>
         </div>
         {% endfor %}

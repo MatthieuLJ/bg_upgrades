@@ -33,6 +33,9 @@
     <!-- Color picker -->
     <script src="https://unpkg.com/vanilla-picker@2"></script>
 
+    <!-- Name that color -->
+    <script type="text/javascript" src="https://chir.ag/projects/ntc/ntc.js"></script>
+
     <!-- Three JS -->
     <script src="https://threejs.org/build/three.min.js"></script>
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -348,17 +351,21 @@
                     $("#id_" + face).trigger("change");
                 });
                 $("#id_clear_" + face).click(function() {
-                    console.log("clear!");
                     $("#id_" + face).val("").trigger("change").next().html();
                 });
+
                 color_buttons[face] = $("#id_color_" + face)[0];
-                console.log(color_buttons[face]);
                 color_pickers[face] = new Picker({parent: color_buttons[face], 
                                            alpha: false,
                                            editor: false,
+                                           popup: 'left',
                                            editorFormat: 'rgb'});
-                color_pickers[face].onChange = function(color) {
+                color_pickers[face].onDone = function(color) {
+                    // find the name of that color
+                    let color_name = ntc.name(color.hex.substring(0, color.hex.length - 2))[1];
+                    // update the button with the background color and text
                     color_buttons[face].style.backgroundColor = color.rgbaString;
+                    color_buttons[face].textContent = color_name;
                 }
             });
         });
@@ -419,8 +426,8 @@
         {% csrf_token %}
 
         <div class="form-group row top-row">
-            <label class="form-control-label col-4 align-self-center"> Paper size: </label>
-            <select id="id_paper_size" class="form-control col-6" name="paper_size">
+            <label class="form-control-label col-3 align-self-center"> Paper size: </label>
+            <select id="id_paper_size" class="form-control col-7" name="paper_size">
                 <option value="A4">A4</option>
                 <option value="A3">A3</option>
                 <option value="Letter">Letter</option>
@@ -429,42 +436,37 @@
             </select>
         </div>
         <div class="form-group row paper_custom">
-            <label class="form-control-label col-4 align-self-center"> Paper Height (mm): </label>
-            <input type="text" name="paper_height" id="id_paper_height" class="col-6 tuck_input_num form-control">
+            <label class="form-control-label col-3 align-self-center"> Paper Height (mm): </label>
+            <input type="text" name="paper_height" id="id_paper_height" class="col-7 tuck_input_num form-control">
         </div>
         <div class="form-group row paper_custom">
-            <label class="form-control-label col-4 align-self-center"> Paper Width (mm): </label>
-            <input type="text" name="paper_width" id="id_paper_width" class="col-6 tuck_input_num form-control">
+            <label class="form-control-label col-3 align-self-center"> Paper Width (mm): </label>
+            <input type="text" name="paper_width" id="id_paper_width" class="col-7 tuck_input_num form-control">
         </div>
 
         {% with dimensions='height width depth' %}
         {% for dim in dimensions.split %}
         <div class="form-group row">
-            <label class="form-control-label col-4 align-self-center" for="id_{{ dim }}"> Tuckbox {{ dim|title }} (mm):</label>
-            <input type="text" name="{{ dim }}" id="id_{{ dim }}" class="col-6 tuck_input_num form-control">
+            <label class="form-control-label col-3 align-self-center" for="id_{{ dim }}"> Tuckbox {{ dim|title }} (mm):</label>
+            <input type="text" name="{{ dim }}" id="id_{{ dim }}" class="col-7 tuck_input_num form-control">
         </div>
         {% endfor %}
         {% endwith %}
 
-        <div class="form-group row" style="display:none">
-            <label class="form-control-label col-4 align-self-center"> Openings: </label>
-            <input class="col-4" type="checkbox" data-toggle="toggle" data-on="Both ends" data-off="One end">
-        </div>
-
         <div class="form-group row">
-            <div id="image_preview" class="col-4 offset-4">
+            <div id="image_preview" class="col-4 offset-md-4">
             </div>
         </div>
 
         {% with faces='front back left right top bottom' %}
         {% for face in faces.split %}
         <div class="form-group row image-files">
-            <label class="form-control-label col-md-4 col-sm-4 align-self-center"> {{ face|title }} image: </label>
-            <div class="custom-file col-md-3 col-sm-6">
+            <label class="form-control-label col-md-3 align-self-center"> {{ face|title }} image: </label>
+            <div class="custom-file col-md-3">
                 <input type="file" name="{{ face }}" id="id_{{ face }}" class="custom-file-input">
                 <label class="custom-file-label" for="id_{{ face }}">Pick an image file...</label>
             </div>
-            <div class="col-md-1 offset-md-0 offset-sm-4 col-sm-1" style="display: flex;">
+            <div class="col-md-1" style="display: flex;">
                 <button type="button" name="rotate_{{ face }}" id="id_rotate_{{ face }}"
                     class="form-control btn img-rounded icon">
                     <object type="image/svg+xml" data="{% static 'tuckbox/rotate.svg' %}">
@@ -479,42 +481,38 @@
                     </object>
                 </button>
             </div>
-            <div class="col-md-2 col-sm-6" style="display: flex;">
-                <input id="id_{{ face }}_plain_color"  name="{{ face }}_plain_color" type="checkbox"
-                    data-toggle="toggle" data-on="Plain Color" data-off="Picture">
-                <span class="align-self-center icon">
-                    <a href="#" class="button" id="id_color_{{ face }}">Color</a>
-                </span>
-            </div>
+            <input id="id_{{ face }}_plain_color"  name="{{ face }}_plain_color" type="checkbox"
+                class="col-md-1" data-toggle="toggle" data-on="Color" data-off="Picture">
+            <a href="#" class="col-md-2 button btn btn-default" id="id_color_{{ face }}">Color</a>    
         </div>
         {% endfor %}
         {% endwith %}
 
         <div class="form-group row">
-            <label class="form-control-label col-2 offset-2 align-self-center"> Folding guides: </label>
-            <div class="col-1">
+            <label class="form-control-label col-md-2 offset-md-2 align-self-center"> Folding guides: </label>
+            <div class="col-md-1">
                 <input type="checkbox" name="folding_guides" id="id_folding_guides" data-toggle="toggle" data-on="On"
                     data-off="Off">
             </div>
-            <label class="form-control-label col-2 align-self-center"> On-pattern folds: </label>
-            <div class="col-1">
+            <label class="form-control-label col-md-2 align-self-center"> On-pattern folds: </label>
+            <div class="col-md-1">
                 <input type="checkbox" name="folds_dashed" id="id_folds_dashed" data-toggle="toggle" data-on="On"
                     data-off="Off" />
             </div>
         </div>
 
         <div id="id_wont_fit" class="form-group row">
-            <div class="col-4 offset-4">
+            <div class="col-md-4 offset-md-4">
                 The pattern is too large
             </div>
         </div>
         <div class="row" id="id_progress_container">
-            <div class="progress col-4 offset-4">
+            <div class="progress col-md-4 offset-md-4">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" id="id_progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
         </div>
         <div class="form-group row">
-            <button id="id_submit" class="form-control col-4 offset-4">
+            <button id="id_submit" class="form-control col-md-4 offset-md-4">
             Generate PDF
             </button>
         </div>

@@ -97,15 +97,17 @@ function set_face_usage(use_color, face) {
         materials[face].map = null;
         if (colors[face]) {
             materials[face].color = colors[face];
-            materials[face].needsUpdate = true;
         }
     } else {
         materials[face].color = new THREE.Color(0xffffff);
         if (textures[face]) {
             materials[face].map = textures[face];
-            materials[face].needsUpdate = true;
+            materials[face].map.center.x = 0.5;
+            materials[face].map.center.y = 0.5;
+            materials[face].map.rotation = - face_rotations[face] * Math.PI / 2;
         }
     }
+    materials[face].needsUpdate = true;
 }
 
 function load_face_color(color, face) {
@@ -124,12 +126,12 @@ function load_face_image(file, face) {
         loader.load(e.target.result,
             onLoad = function(tx) {
                 textures[face] = tx;
-                materials[face].map.center.x = 0.5;
-                materials[face].map.center.y = 0.5;
-                materials[face].map.rotation = - face_rotations[face] * Math.PI / 2;
                 materials[face].needsUpdate = true;
                 if (!use_colors[face]) {
                     materials[face].map = tx;
+                    materials[face].map.center.x = 0.5;
+                    materials[face].map.center.y = 0.5;
+                    materials[face].map.rotation = - face_rotations[face] * Math.PI / 2;
                 }
             });
     }

@@ -353,12 +353,16 @@
                 $("#id_clear_" + face).click(function() {
                     $("#id_" + face).val("").trigger("change").next().html();
                 });
+                $("#id_" + face + "_plain_color").change(function() {
+                    set_face_usage($(this).prop("checked"), index + 1)
+                });
 
                 color_buttons[face] = $("#id_color_" + face)[0];
                 color_pickers[face] = new Picker({parent: color_buttons[face], 
                                            alpha: false,
                                            editor: false,
                                            popup: 'left',
+                                           color: 0xffffff,
                                            editorFormat: 'rgb'});
                 color_pickers[face].onDone = function(color) {
                     // find the name of that color
@@ -369,6 +373,8 @@
                     // check the brightness
                     var luminance = ( 0.299 * color.rgba[0] + 0.587 * color.rgba[1] + 0.114 * color.rgba[2])/255;
                     color_buttons[face].style.color = (luminance < 0.5) ? "white" : "black";
+
+                    load_face_color(color.hex.substring(0, color.hex.length - 2), index + 1);
                 }
             });
         });

@@ -8,6 +8,9 @@ let materials = [
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // bottom
 ]
 
+let textures = Array(7)
+let colors = Array(7)
+let use_colors = Array(7).fill(false) // true if using colors, false if using pictures  (by default)
 let face_rotations = Array(7).fill(0);
 
 function draw_3d_box(container, data) {
@@ -88,6 +91,31 @@ function rotate_face_image(rotation, face) {
     face_rotations[face]=rotation;
 }
 
+function set_face_usage(use_color, face) {
+    use_colors[face] = use_color;
+    if (use_color) {
+        materials[face].map = null;
+        if (colors[face]) {
+            materials[face].color = colors[face];
+            materials[face].needsUpdate = true;
+        }
+    } else {
+        materials[face].color = new THREE.Color(0xffffff);
+        if (textures[face]) {
+            materials[face].map = textures[face];
+            materials[face].needsUpdate = true;
+        }
+    }
+}
+
+function load_face_color(color, face) {
+    colors[face] = new THREE.Color(color);
+    if (use_colors[face]) {
+        materials[face].color = colors[face];
+        materials[face].needsUpdate = true;
+    }
+}
+
 // face is an index: 1=front, 2=back, 3=left, 4=right, 5=top, 6=bottom
 function load_face_image(file, face) {
     let reader = new FileReader();
@@ -95,11 +123,14 @@ function load_face_image(file, face) {
         let loader = new THREE.TextureLoader();
         loader.load(e.target.result,
             onLoad = function(tx) {
-                materials[face].map = tx;
+                textures[face] = tx;
                 materials[face].map.center.x = 0.5;
                 materials[face].map.center.y = 0.5;
                 materials[face].map.rotation = - face_rotations[face] * Math.PI / 2;
                 materials[face].needsUpdate = true;
+                if (!use_colors[face]) {
+                    materials[face].map = tx;
+                }
             });
     }
     reader.readAsDataURL(file);

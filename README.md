@@ -109,8 +109,22 @@ Whenever the packages change, record the packages:
 
     $ pip freeze > requirements.txt
 
-When the data needs to change for the tests, run:
+When the reference data needs to change for the graphics tests, run:
 
     $ python -m tuckbox.test.tests_box
 
 
+Dependencies
+============
+
+The libraries this web application uses:
+
+* Django
+* Redis
+* Celery
+* ImageMagick
+* Bootstrap CSS
+* jQuery
+* ThreeJS
+* Vanilla picker (color picker): https://github.com/Sphinxxxx/vanilla-picker
+* Name That Color

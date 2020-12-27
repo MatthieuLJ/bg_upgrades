@@ -366,6 +366,9 @@
                     // update the button with the background color and text
                     color_buttons[face].style.backgroundColor = color.rgbaString;
                     color_buttons[face].textContent = color_name;
+                    // check the brightness
+                    var luminance = ( 0.299 * color.rgba[0] + 0.587 * color.rgba[1] + 0.114 * color.rgba[2])/255;
+                    color_buttons[face].style.color = (luminance < 0.5) ? "white" : "black";
                 }
             });
         });
@@ -483,7 +486,7 @@
             </div>
             <input id="id_{{ face }}_plain_color"  name="{{ face }}_plain_color" type="checkbox"
                 class="col-md-1" data-toggle="toggle" data-on="Color" data-off="Picture">
-            <a href="#" class="col-md-2 button btn btn-default" id="id_color_{{ face }}">Color</a>    
+            <a href="#" class="col-md-2 button btn btn-default" id="id_color_{{ face }}" color="black" backgroundColor="white">White</a>
         </div>
         {% endfor %}
         {% endwith %}

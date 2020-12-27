@@ -249,11 +249,15 @@
                 event.preventDefault();
 
                 let postData = new FormData($(this)[0]);
-                /*
-                for (let pair of postData.entries()) {
-                    console.log(pair[0]+ ', ' + pair[1]);
-                }
-                */
+
+                // do not upload image files if we are using plain colors
+                ["front", "back", "left", "right", "top", "bottom"].forEach(function (face, index) {
+                    if ($("#id_" + face + "_plain_color").prop('checked')) {
+                        postData.delete(face);
+                    }
+                });
+
+                //console.log(JSON.stringify(postData.entries(), null, 2));
 
                 // Submit the form using AJAX.
                 $.ajax({

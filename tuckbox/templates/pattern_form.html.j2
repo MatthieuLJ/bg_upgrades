@@ -369,8 +369,9 @@
                                            color: 0xffffff,
                                            editorFormat: 'rgb'});
                 color_pickers[face].onDone = function(color) {
+                    let hex_color = color.hex.substring(0, color.hex.length - 2)
                     // find the name of that color
-                    let color_name = ntc.name(color.hex.substring(0, color.hex.length - 2))[1];
+                    let color_name = ntc.name(hex_color)[1];
                     // update the button with the background color and text
                     color_buttons[face].style.backgroundColor = color.rgbaString;
                     color_buttons[face].textContent = color_name;
@@ -378,7 +379,8 @@
                     var luminance = ( 0.299 * color.rgba[0] + 0.587 * color.rgba[1] + 0.114 * color.rgba[2])/255;
                     color_buttons[face].style.color = (luminance < 0.5) ? "white" : "black";
 
-                    load_face_color(color.hex.substring(0, color.hex.length - 2), index + 1);
+                    load_face_color(hex_color, index + 1);
+                    $("#id_" + face + "_color").val(hex_color);
                 }
             });
         });
@@ -495,8 +497,11 @@
                 </button>
             </div>
             <input id="id_{{ face }}_plain_color"  name="{{ face }}_plain_color" type="checkbox"
-                class="col-md-1" data-toggle="toggle" data-on="Color" data-off="Picture">
-            <a href="#" class="col-md-2 button btn btn-default" id="id_color_{{ face }}" color="black" backgroundColor="white">White</a>
+                class="col-md-1" data-toggle="toggle" data-on="Color" data-off="Picture" />
+            <input type="hidden" name="{{ face }}_color" id="id_{{ face }}_color" value="0xffffff">
+            <button type="button" class="col-md-2 button btn btn-default form_control" name="{{ face }}_color" id="id_color_{{ face }}" backgroundColor="white">
+                White
+            </button>
         </div>
         {% endfor %}
         {% endwith %}

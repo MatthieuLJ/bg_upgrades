@@ -74,14 +74,19 @@ def pattern(request):
     faces = {}
     options = {}
 
+    # print(form.data)
+
     for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
-        if face in request.FILES:
+        if face + "_plain_color" in form.data:
+            #using color rather than image
+            faces[face] = form.data[face + "_color"]
+        elif face in request.FILES:
             # Need to copy the contents to a temporary file
             _, file_extension = os.path.splitext(request.FILES[face].name)
-            new_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
+            new_file = tempfile.NamedTemporaryFile(delete=False, prefix="_"+face, suffix=file_extension)
             shutil.copyfileobj(request.FILES[face], new_file)
             faces[face] = new_file.name
-        options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
+            options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
 
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data

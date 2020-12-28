@@ -1,4 +1,6 @@
 
+![Works on my machine](https://forthebadge.com/images/badges/works-on-my-machine.svg)
+
 Architecture
 ============
 
@@ -16,6 +18,7 @@ Requirements
 * `imagemagick`
 * `nginx` (for full deployment)
 * `redis`
+* [`chromedriver`](https://chromedriver.chromium.org/)
 
 Development
 ===========
@@ -106,8 +109,23 @@ Whenever the packages change, record the packages:
 
     $ pip freeze > requirements.txt
 
-When the data needs to change for the tests, run:
+When the reference data needs to change for the graphics tests, run:
 
     $ python -m tuckbox.test.tests_box
 
 
+Dependencies
+============
+
+The libraries this web application uses:
+
+* [Django](https://www.djangoproject.com/)
+* [Redis](https://redis.io/)
+* [Celery](https://docs.celeryproject.org/)
+* [ImageMagick](https://imagemagick.org/)
+* [Wand](https://docs.wand-py.org/)
+* [Bootstrap CSS](https://getbootstrap.com/)
+* [jQuery](https://jquery.com/)
+* [ThreeJS](https://threejs.org/)
+* [Vanilla picker (color picker)](https://github.com/Sphinxxxx/vanilla-picker)
+* [Name That Color](https://chir.ag/projects/ntc/)

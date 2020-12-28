@@ -22,7 +22,8 @@ def build_box(self, parameters):
     my_box.create_box_file(parameters['filename'], progress_tracker)
 
     for face in parameters['faces']:
-        os.remove(parameters['faces'][face])
+        if parameters['faces'][face][0] != '#':
+            os.remove(parameters['faces'][face])
     # TODO: Should set a timeout timer here to forget the tasks / delete the file from here
 
     return settings.TMP_URL + os.path.basename(parameters['filename'])

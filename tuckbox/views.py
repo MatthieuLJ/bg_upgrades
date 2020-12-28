@@ -22,12 +22,6 @@ class PatternForm(forms.Form):
     right_angle = forms.CharField()
     top_angle = forms.CharField()
     bottom_angle = forms.CharField()
-    front_smart_rescale = forms.CheckboxInput()
-    back_smart_rescale = forms.CheckboxInput()
-    left_smart_rescale = forms.CheckboxInput()
-    right_smart_rescale = forms.CheckboxInput()
-    bottom_smart_rescale = forms.CheckboxInput()
-    top_smart_rescale = forms.CheckboxInput()
     folding_guides = forms.CheckboxInput()
     folds_dashed = forms.CheckboxInput()
 
@@ -80,15 +74,19 @@ def pattern(request):
     faces = {}
     options = {}
 
+    # print(form.data)
+
     for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
-        if face in request.FILES:
+        if face + "_plain_color" in form.data:
+            #using color rather than image
+            faces[face] = form.data[face + "_color"]
+        elif face in request.FILES:
             # Need to copy the contents to a temporary file
             _, file_extension = os.path.splitext(request.FILES[face].name)
-            new_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
+            new_file = tempfile.NamedTemporaryFile(delete=False, prefix="_"+face, suffix=file_extension)
             shutil.copyfileobj(request.FILES[face], new_file)
             faces[face] = new_file.name
-        options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
-        options[face+"_smart_rescale"] = face+"_smart_rescale" in form.data
+            options[face+"_angle"] = int(form.cleaned_data[face+"_angle"])
 
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data

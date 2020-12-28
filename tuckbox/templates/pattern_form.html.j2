@@ -496,12 +496,16 @@
                     </object>
                 </button>
             </div>
-            <input id="id_{{ face }}_plain_color"  name="{{ face }}_plain_color" type="checkbox"
-                class="col-md-1" data-toggle="toggle" data-on="Color" data-off="Picture" />
-            <input type="hidden" name="{{ face }}_color" id="id_{{ face }}_color" value="0xffffff">
-            <button type="button" class="col-md-2 button btn btn-default form_control" name="{{ face }}_color" id="id_color_{{ face }}" backgroundColor="white">
-                White
-            </button>
+            <div class="col-md-1 gx-3">
+                <input id="id_{{ face }}_plain_color"  name="{{ face }}_plain_color" type="checkbox"
+                    data-toggle="toggle" data-on="Color" data-off="Picture" />
+            </div>
+            <div class="col-md-2 gx-3">
+                <input type="hidden" name="{{ face }}_color" id="id_{{ face }}_color" value="0xffffff">
+                <button type="button" class="btn form_control" name="{{ face }}_color" id="id_color_{{ face }}" backgroundColor="white">
+                    White
+                </button>
+            </div>
         </div>
         {% endfor %}
         {% endwith %}

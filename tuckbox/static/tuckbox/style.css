@@ -33,4 +33,9 @@ h1 {
 
 button > * {
     pointer-events: none;
+}
+
+button {
+    width:100%;
+    display:block;
   }

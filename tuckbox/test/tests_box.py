@@ -71,6 +71,20 @@ class BoxTestCase(TestCase):
 
         self.compare_images(test_file, my_box, save_image)
 
+    def test_DrawWithColors(self, save_image=False):
+        test_file = "test_colors.png"
+        paper = {'width': 200, 'height': 200}
+        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
+        faces = {'front': "0xff0000",
+                    'back': "0x00ff00",
+                    'left': "0x0000ff",
+                    'right': "0x888800",
+                    'top': "0x008888",
+                    'bottom': "0x880088"}
+        my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces)
+
+        self.compare_images(test_file, my_box, save_image)
+
     def test_DrawWithRotations(self, save_image=False):
         test_file = "test_rotation.png"
         paper = {'width': 200, 'height': 200}
@@ -103,37 +117,6 @@ class BoxTestCase(TestCase):
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
 
         self.compare_images(test_file, my_box, save_image)
-
-    def test_DrawResize(self, save_image=False):
-        test_file = "test_resize.png"
-        paper = {'width': 200, 'height': 200}
-        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
-        faces = {'front': os.path.join(os.path.dirname(__file__),"house.png") }
-        options = {'front_smart_rescale': True}
-        my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
-
-        self.compare_images(test_file, my_box, save_image)
-
-    def test_DrawResizeSmall(self, save_image=False):
-        test_file = "test_resize_small.png"
-        paper = {'width': 200, 'height': 200}
-        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
-        faces = {'front': os.path.join(os.path.dirname(__file__),"small_house.png") }
-        options = {'front_smart_rescale': True}
-        my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
-
-        self.compare_images(test_file, my_box, save_image)
-
-    def test_DrawResizeBig(self, save_image=False):
-        test_file = "test_resize_big.png"
-        paper = {'width': 200, 'height': 200}
-        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
-        faces = {'front': os.path.join(os.path.dirname(__file__),"big_house.png") }
-        options = {'front_smart_rescale': True}
-        my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
-
-        self.compare_images(test_file, my_box, save_image)
-
 
     def test_Fit(self):
         paper = {'width': 100, 'height': 100}

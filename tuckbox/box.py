@@ -93,7 +93,7 @@ class TuckBoxDrawing:
         #      +--S - - ---+
         #  +---+           +---+
         #  |   |           |   |
-        #  0- - - - - - - - - -+----T +----+--+
+        #  0- - - - - - - - - -+----X +----+--+
         #  |   |           |   |    +-+    |  |
         #  |                                  |
         #  |   |           |   |           |  |
@@ -103,21 +103,21 @@ class TuckBoxDrawing:
         #  |   |           |   |           |  |
         #  |                                  |
         #  |   |           |   |           |  |
-        #  +- - - - - - - - - - - - - - - -+--+
+        #  +- -T- - - - - -U- -V- - - - - -W--+
         #  |   |           |   |           |
         #  +---+           +---------------+
         #      +-----------+
         #
         # 0 is the origin
         # S is the start of the first polyline (going counter-clockwise)
-        # T is the start of the second one
+        # T, U, V, W, X are the start of the subsequent ones (between T-U and V-W would change if there are two openings)
 
         tab_length = min(.9 *
                          self.tuckbox['depth'], .4 * self.tuckbox['width'])
         dash_array = [min(self.tuckbox['depth'], self.tuckbox['width'],
                           self.tuckbox['height'])/13] * 2
 
-        # Draw the solid lines
+        # Draw the solid lines (S)
         draw.polyline([(self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
                        (self.tuckbox['depth'], -self.tuckbox['depth']),
                        (self.tuckbox['depth'], 0),
@@ -129,24 +129,39 @@ class TuckBoxDrawing:
                         self.tuckbox['height'] + tab_length),
                        (self.tuckbox['depth']*.9,
                         self.tuckbox['height'] + tab_length),
-                       (self.tuckbox['depth'], self.tuckbox['height']),
+                       (self.tuckbox['depth'], self.tuckbox['height'])])
+
+        # if no second opening (T)
+        draw.polyline([(self.tuckbox['depth'], self.tuckbox['height']),
                        (self.tuckbox['depth'],
                         self.tuckbox['height'] + self.tuckbox['depth']),
                        (self.tuckbox['depth'] + self.tuckbox['width'],
                         self.tuckbox['height'] + self.tuckbox['depth']),
                        (self.tuckbox['depth'] + self.tuckbox['width'],
+                        self.tuckbox['height'])])
+
+        # Keep going around (U)
+        draw.polyline([(self.tuckbox['depth'] + self.tuckbox['width'],
                         self.tuckbox['height']),
                        (self.tuckbox['depth']*1.1 + self.tuckbox['width'],
                         self.tuckbox['height'] + tab_length),
                        (self.tuckbox['depth']*1.9 + self.tuckbox['width'],
                         self.tuckbox['height'] + tab_length),
                        (self.tuckbox['depth']*2 +
+                        self.tuckbox['width'], self.tuckbox['height'])])
+
+        # if no second opening (V)
+        draw.polyline([(self.tuckbox['depth']*2 +
                         self.tuckbox['width'], self.tuckbox['height']),
                        (self.tuckbox['depth']*2 + self.tuckbox['width'],
                         self.tuckbox['height'] + self.tuckbox['depth']*.8),
                        (self.tuckbox['depth']*2 + self.tuckbox['width']*2,
                         self.tuckbox['height'] + self.tuckbox['depth']*.8),
                        (self.tuckbox['depth']*2 + self.tuckbox['width']*2,
+                        self.tuckbox['height'])])
+
+        # Keep going around (W)
+        draw.polyline([(self.tuckbox['depth']*2 + self.tuckbox['width']*2,
                         self.tuckbox['height']),
                        (self.tuckbox['depth']*2.8 + self.tuckbox['width']*2,
                         self.tuckbox['height']),
@@ -156,6 +171,8 @@ class TuckBoxDrawing:
                        (self.tuckbox['depth']*2 +
                         self.tuckbox['width']*1.6, 0),
                        ])
+
+        # Last bit after the notch
         draw.polyline([(self.tuckbox['depth']*2 + self.tuckbox['width']*1.4, 0),
                        (self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
                        (self.tuckbox['depth']*1.9 +
@@ -169,7 +186,7 @@ class TuckBoxDrawing:
                         * .8, -self.tuckbox['depth']),
                        ])
 
-        # 1/2 left of lip
+        # 1/2 left of top lip
         draw.bezier([(self.tuckbox['depth'], -self.tuckbox['depth']),
                      (self.tuckbox['depth'], -
                       self.tuckbox['depth'] - .75 * self.lip_size()),
@@ -178,7 +195,7 @@ class TuckBoxDrawing:
                      (self.tuckbox['depth'] + .5 * self.tuckbox['width'],
                       -self.tuckbox['depth'] - self.lip_size())])
 
-        # 1/2 right of lip
+        # 1/2 right of top lip
         draw.bezier([(self.tuckbox['depth'] + self.tuckbox['width'], -self.tuckbox['depth']),
                      (self.tuckbox['depth'] + self.tuckbox['width'],
                       -self.tuckbox['depth'] - .75*self.lip_size()),
@@ -187,7 +204,7 @@ class TuckBoxDrawing:
                      (self.tuckbox['depth'] + .5 * self.tuckbox['width'],
                       -self.tuckbox['depth'] - self.lip_size())])
 
-        # finger hold
+        # top finger hold
         finger_draw.fill_color = Color('white')
         finger_draw.fill_opacity = 1
         finger_draw.arc((self.tuckbox['depth']*2 + self.tuckbox['width']*1.4, -self.tuckbox['width']*.1),

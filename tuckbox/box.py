@@ -337,15 +337,14 @@ class TuckBoxDrawing:
         # Apply those face pictures
         for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
             if side in self.faces:
-                if self.faces[side][:2] == "0x":
+                if self.faces[side][:1] == "#":
                     # we are filling with color
                     color_face_draw = Drawing()
                     color_face_draw.stroke_width = 0
-                    color_face_draw.fill_color = Color("#" + self.faces[side][2:])
+                    color_face_draw.fill_color = Color(self.faces[side])
                     color_face_draw.rectangle(left = face_positions[side][0], top = face_positions[side][1],
                                             width = face_sizes[side][0], height = face_sizes[side][1])
                     color_face_draw.draw(image)
-                    pass
                 else:
                     _, file_extension = os.path.splitext(os.path.basename(self.faces[side]))
                     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
@@ -400,9 +399,9 @@ class TuckBoxDrawing:
 
         lip_full_draw.draw(lip_full_mask_image)
 
-        if self.faces['back'][:2] == "0x":
+        if self.faces['back'][:1] == "#":
             lip_image = Image(width = lip_full_mask_image.width, height = lip_full_mask_image.height,
-                            background = Color("#" + self.faces['back'][2:]))
+                            background = Color(self.faces['back']))
         else:
             # Prepare the front image
             if "back_angle" in self.options:

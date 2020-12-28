@@ -123,8 +123,9 @@ The libraries this web application uses:
 * Redis
 * Celery
 * ImageMagick
+* Wand
 * Bootstrap CSS
 * jQuery
 * ThreeJS
 * Vanilla picker (color picker): https://github.com/Sphinxxxx/vanilla-picker
-* Name That Color
+* Name That Color: https://chir.ag/projects/ntc/

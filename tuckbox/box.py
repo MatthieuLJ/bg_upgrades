@@ -131,14 +131,27 @@ class TuckBoxDrawing:
                         self.tuckbox['height'] + tab_length),
                        (self.tuckbox['depth'], self.tuckbox['height'])])
 
-        # if no second opening (T)
-        draw.polyline([(self.tuckbox['depth'], self.tuckbox['height']),
-                       (self.tuckbox['depth'],
-                        self.tuckbox['height'] + self.tuckbox['depth']),
-                       (self.tuckbox['depth'] + self.tuckbox['width'],
-                        self.tuckbox['height'] + self.tuckbox['depth']),
-                       (self.tuckbox['depth'] + self.tuckbox['width'],
-                        self.tuckbox['height'])])
+        # bottom flap (T)
+        if self.options["two_openings"]:
+            draw.polyline([(self.tuckbox['depth'], self.tuckbox['height']),
+                           (self.tuckbox['depth'],
+                            self.tuckbox['height'] + self.tuckbox['depth']),
+                           (self.tuckbox['depth'] + self.tuckbox['width']*.2,
+                            self.tuckbox['height'] + self.tuckbox['depth'])])
+            draw.polyline([(self.tuckbox['depth'] + self.tuckbox['width']*.8,
+                            self.tuckbox['height'] + self.tuckbox['depth']),
+                           (self.tuckbox['depth'] + self.tuckbox['width'],
+                            self.tuckbox['height'] + self.tuckbox['depth']),
+                           (self.tuckbox['depth'] + self.tuckbox['width'],
+                            self.tuckbox['height'])])
+        else:
+            draw.polyline([(self.tuckbox['depth'], self.tuckbox['height']),
+                           (self.tuckbox['depth'],
+                            self.tuckbox['height'] + self.tuckbox['depth']),
+                           (self.tuckbox['depth'] + self.tuckbox['width'],
+                            self.tuckbox['height'] + self.tuckbox['depth']),
+                           (self.tuckbox['depth'] + self.tuckbox['width'],
+                            self.tuckbox['height'])])
 
         # Keep going around (U)
         draw.polyline([(self.tuckbox['depth'] + self.tuckbox['width'],

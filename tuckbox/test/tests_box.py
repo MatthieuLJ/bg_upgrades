@@ -75,12 +75,12 @@ class BoxTestCase(TestCase):
         test_file = "test_colors.png"
         paper = {'width': 200, 'height': 200}
         tuckbox = {'height': 70, 'width': 50, 'depth': 20}
-        faces = {'front': "0xff0000",
-                    'back': "0x00ff00",
-                    'left': "0x0000ff",
-                    'right': "0x888800",
-                    'top': "0x008888",
-                    'bottom': "0x880088"}
+        faces = {'front': "#ff0000",
+                    'back': "#00ff00",
+                    'left': "#0000ff",
+                    'right': "#888800",
+                    'top': "#008888",
+                    'bottom': "#880088"}
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces)
 
         self.compare_images(test_file, my_box, save_image)
@@ -114,6 +114,21 @@ class BoxTestCase(TestCase):
                     'bottom': os.path.join(os.path.dirname(__file__),"bottom.jpg") }
         options = {'front_angle': 2, 'back_angle': 3, 'left_angle': 1,
                     'right_angle': 2, 'top_angle': 3, 'bottom_angle': 1}
+        my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
+
+        self.compare_images(test_file, my_box, save_image)
+
+    def test_DrawWithTwoOpenings(self, save_image=False):
+        test_file = "test_twoopenings.png"
+        paper = {'width': 200, 'height': 200}
+        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
+        faces = {'front': os.path.join(os.path.dirname(__file__),"front.jpg"),
+                    'back': os.path.join(os.path.dirname(__file__),"back.jpg"),
+                    'left': os.path.join(os.path.dirname(__file__),"left.jpg"),
+                    'right': os.path.join(os.path.dirname(__file__),"right.jpg"),
+                    'top': os.path.join(os.path.dirname(__file__),"top.jpg"),
+                    'bottom': os.path.join(os.path.dirname(__file__),"bottom.jpg") }
+        options = {'two_openings': "two_openings"}
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
 
         self.compare_images(test_file, my_box, save_image)

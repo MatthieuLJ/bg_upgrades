@@ -34,6 +34,15 @@ To run the tests:
 
     $ ./manage.py test
 
+To get coverage report on the tests:
+
+    $ coverage run --source='.' --omit='venv/*' manage.py test --parallel
+    $ coverage report
+
+or
+
+    $ coverage html
+
 Run only Django's test server:
 
     $ redis-server

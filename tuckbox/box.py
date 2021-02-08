@@ -301,11 +301,18 @@ class TuckBoxDrawing:
         self.draw_faces(image, progress_tracker)
 
         # Draw the lip
-        lip = self.draw_lip()
+        lip = self.draw_lip(top=True)
         if lip is not None:
             image.composite(lip,
                             math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
                             math.floor((margin_height) * POINT_PER_MM))
+
+        if two_openings:
+            lip = self.draw_lip(bottom=True)
+            if lip is not None:
+                image.composite(lip,
+                                math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
+                                math.floor((margin_height + self.tuckbox['depth']*2 + self.lip_size() + self.tuckbox['height']) * POINT_PER_MM))
 
         if progress_tracker is not None:
             progress_tracker(80)
@@ -397,12 +404,9 @@ class TuckBoxDrawing:
         }
 
         face_angles = {}
-        face_smart_rescale = {}
         for face in ["front", "back", "left", "right", "top", "bottom"]:
             face_angles[face] = self.options[face +
                                              "_angle"] if face+"_angle" in self.options else 0
-            face_smart_rescale[face] = self.options[face+"_smart_rescale"] if face + \
-                "_smart_rescale" in self.options else False
 
         # Apply those face pictures
         for counter, side in enumerate(["front", "back", "left", "right", "top", "bottom"]):
@@ -418,15 +422,18 @@ class TuckBoxDrawing:
                 else:
                     _, file_extension = os.path.splitext(os.path.basename(self.faces[side]))
                     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
-                    self.resize_rotate_image(self.faces[side], tmp_file.name, face_smart_rescale[side], face_angles[side] * 90, *face_sizes[side])
+                    self.resize_rotate_image(self.faces[side], tmp_file.name, face_angles[side] * 90, *face_sizes[side])
                     with Image(filename=tmp_file.name) as i:
                         image.composite(i, *face_positions[side])
 
             if progress_tracker is not None:
                 progress_tracker(10*(counter+2))
 
-    def draw_lip(self):
+    def draw_lip(self, top=False, bottom=False):
         if "back" not in self.faces:
+            return None
+
+        if not (top ^ bottom): # 1 and only 1 of top or bottom should be true
             return None
 
         # First draw a full mask with the lip shape
@@ -479,10 +486,12 @@ class TuckBoxDrawing:
             else:
                 angle = 180
 
+            if bottom:
+                angle = (angle + 180) % 360
+
             _, file_extension = os.path.splitext(self.faces['back'])
             tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
-            self.resize_rotate_image(self.faces['back'], tmp_file.name, "back_smart_rescale" in self.options and
-                            self.options["back_smart_rescale"], angle, math.ceil(self.tuckbox['width'] * POINT_PER_MM),
+            self.resize_rotate_image(self.faces['back'], tmp_file.name, angle, math.ceil(self.tuckbox['width'] * POINT_PER_MM),
                             math.ceil(self.tuckbox['height'] * POINT_PER_MM))
             lip_image = Image(filename=tmp_file.name)
             lip_image.crop(top=lip_image.height - lip_full_mask_image.height)
@@ -501,10 +510,13 @@ class TuckBoxDrawing:
 
         lip_image.composite(operator='lighten', image=lip_full_mask_image)
 
+        if bottom:
+            lip_image.rotate(180)
+
         return lip_image
 
-    def resize_rotate_image(self, filename, destination_filename, smart_rescale = False, angle=0, width=0, height=0):
-        # convert filename [-rotate angle] [-liquid-rescale|-resize widthxheight!] destination_filename
+    def resize_rotate_image(self, filename, destination_filename, angle=0, width=0, height=0):
+        # convert filename [-rotate angle] [-resize widthxheight!] destination_filename
         cmd = ["convert"]
         cmd.append(filename)
         if angle == 0 and (width == 0 or height == 0):

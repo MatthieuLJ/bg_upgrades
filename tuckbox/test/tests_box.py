@@ -133,6 +133,22 @@ class BoxTestCase(TestCase):
 
         self.compare_images(test_file, my_box, save_image)
 
+    def test_DrawWithTwoOpeningsRotation(self, save_image=False):
+        test_file = "test_twoopeningsrotation.png"
+        paper = {'width': 200, 'height': 200}
+        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
+        faces = {'front': os.path.join(os.path.dirname(__file__),"front.jpg"),
+                    'back': os.path.join(os.path.dirname(__file__),"back.jpg"),
+                    'left': os.path.join(os.path.dirname(__file__),"left.jpg"),
+                    'right': os.path.join(os.path.dirname(__file__),"right.jpg"),
+                    'top': os.path.join(os.path.dirname(__file__),"top.jpg"),
+                    'bottom': os.path.join(os.path.dirname(__file__),"bottom.jpg") }
+        options = {'two_openings': "two_openings", 'front_angle': 2, 'back_angle': 3,
+                    'left_angle': 1, 'right_angle': 2, 'top_angle': 3, 'bottom_angle': 1}
+        my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
+
+        self.compare_images(test_file, my_box, save_image)
+
     def test_Fit(self):
         paper = {'width': 100, 'height': 100}
         tuckbox = {'height': 30, 'width': 20, 'depth': 10}

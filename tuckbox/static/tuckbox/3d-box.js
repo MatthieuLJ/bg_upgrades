@@ -12,6 +12,7 @@ let textures = Array(7)
 let colors = Array(7)
 let use_colors = Array(7).fill(false) // true if using colors, false if using pictures  (by default)
 let face_rotations = Array(7).fill(0);
+let bottom_geometry;
 
 function draw_3d_box(container, data) {
     let tuckbox = data.tuckbox;
@@ -58,6 +59,8 @@ function draw_3d_box(container, data) {
         let back_plane = new THREE.Mesh(planeGeom, materials[material_index]);
         group.add(front_plane);
         group.add(back_plane);
+
+        return planeGeom;
     }
 
     create_plane(tuckbox.width, tuckbox.height, 0, 0, 0, 0, tuckbox.depth/2, 1);
@@ -65,7 +68,7 @@ function draw_3d_box(container, data) {
     create_plane(tuckbox.depth, tuckbox.height, 0, -Math.PI / 2, -tuckbox.width / 2, 0, 0, 3);
     create_plane(tuckbox.depth, tuckbox.height, 0, Math.PI / 2, tuckbox.width / 2, 0, 0, 4);
     create_plane(tuckbox.width, tuckbox.depth, -Math.PI / 4, 0, 0, tuckbox.height / 2 + tuckbox.depth * Math.sin(Math.PI * 0.25) / 2, (1 - Math.cos(Math.PI * 0.25)) * tuckbox.depth / 2, 5);
-    create_plane(tuckbox.width, tuckbox.depth, Math.PI / 2, 0, 0, -tuckbox.height / 2, 0, 6);
+    bottom_geometry = create_plane(tuckbox.width, tuckbox.depth, Math.PI / 2, 0, 0, -tuckbox.height / 2, 0, 6);
 
     let scaling = 3 / Math.max(tuckbox.depth, tuckbox.width, tuckbox.height)
     group.scale.set(scaling, scaling, scaling)
@@ -82,7 +85,14 @@ function draw_3d_box(container, data) {
         camera.getWorldPosition(v);
         spotlight.position.copy(v);
         renderer.render(scene, camera);
+    }
+}
 
+function open_bottom(is_open) {
+    if (is_open) {
+        bottom_geometry.rotateX(-Math.PI / 4);
+    } else {
+        bottom_geometry.rotateX(Math.PI / 4);
     }
 }
 

@@ -84,7 +84,7 @@ class TuckBoxDrawing:
 
         tuckbox_dimensions = ['width', 'height', 'depth']
         paper_dimensions = ['width', 'height']
-        if ((not all(dimension in self.tuckbox for dimension in tuckbox_dimensions)) or 
+        if ((not all(dimension in self.tuckbox for dimension in tuckbox_dimensions)) or
             (not all(dimension in self.paper for dimension in paper_dimensions))):
             return None
 
@@ -107,7 +107,7 @@ class TuckBoxDrawing:
         finger_draw.fill_opacity = 1
         finger_draw.fill_color = Color('white')
         finger_draw.push()
-        
+
         # Dashed draw
         dashed_draw = Drawing(draw)
         dash_array = [min(self.tuckbox['depth'], self.tuckbox['width'],
@@ -125,7 +125,6 @@ class TuckBoxDrawing:
         folding_guides_draw.stroke_color = Color('black')
         folding_guides_draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
         folding_guides_draw.push()
-
 
         if progress_tracker is not None:
             progress_tracker(5)
@@ -198,7 +197,7 @@ class TuckBoxDrawing:
                 vertical_folds.extend([margin_width +
                                        self.tuckbox['depth']*2 + self.tuckbox['width'],
                                        margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']*2])
-                
+
             horizontal_folds = [margin_height + self.lip_size(),
                                 margin_height + self.lip_size() +
                                 self.tuckbox['depth'],
@@ -208,7 +207,7 @@ class TuckBoxDrawing:
             if two_openings:
                 horizontal_folds.append(margin_height + self.lip_size() +
                                         self.tuckbox['depth'] * 2 + self.tuckbox['height'])
-    
+
             self.draw_folds(folding_guides_draw, vertical_folds, horizontal_folds, margin_height, margin_width)
 
             folding_guides_draw.draw(image)
@@ -238,7 +237,7 @@ class TuckBoxDrawing:
                         background=Color('white'))
             image2.resolution = RESOLUTION
             image2.unit = 'pixelsperinch'
-            
+
             # Draw the faces
             self.draw_faces(image2, progress_tracker, only_back=True)
 
@@ -352,15 +351,15 @@ class TuckBoxDrawing:
         #  +---+           +---+
         #  |   |           |   |
         #  0- - - - - - - - - -V
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
+        #  |   |           |
+        #  |
+        #  |   |           |
+        #  |
+        #  |   |           |
+        #  |
+        #  |   |           |
+        #  |
+        #  |   |           |
         #  +- -T- - - - - -U- -+
         #  |   |           |   |
         #  +---+           +----
@@ -372,15 +371,15 @@ class TuckBoxDrawing:
         #  +---+           +---+
         #  |   |           |   |
         #  0- - - - - - - - - -V
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
-        #  |                   
-        #  |   |           |   
+        #  |   |           |
+        #  |
+        #  |   |           |
+        #  |
+        #  |   |           |
+        #  |
+        #  |   |           |
+        #  |
+        #  |   |           |
         #  +- -T- - - - - -U- -+
         #  |   |           |   |
         #  +---+           +----
@@ -394,7 +393,7 @@ class TuckBoxDrawing:
 
         tab_length = min(.9 *
                          self.tuckbox['depth'], .4 * self.tuckbox['width'])
-        
+
         # Draw the solid lines (S)
         draw.polyline([(self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
                        (self.tuckbox['depth'], -self.tuckbox['depth']),
@@ -458,7 +457,7 @@ class TuckBoxDrawing:
                        (self.tuckbox['depth']*2 +
                         self.tuckbox['width'], self.tuckbox['height'])])
 
-        
+
         # Restart higher (V)
         draw.polyline([(self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
                        (self.tuckbox['depth']*1.9 +
@@ -504,7 +503,7 @@ class TuckBoxDrawing:
                              (self.tuckbox['depth'], self.tuckbox['height']))
             dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width'], 0),
                              (self.tuckbox['depth'] + self.tuckbox['width'], self.tuckbox['height']))
-        
+
     def draw_back(self, offset_left, draw, dashed_draw, finger_draw, two_openings):
         #  +----X +----+--+
         #  |    +-+    |  |
@@ -518,7 +517,7 @@ class TuckBoxDrawing:
         #  |           |  |
         #  V- - - - - -W--+
         #  |           |
-        #  ------------+  
+        #  ------------+
 
         #  +----X +----+--+
         #  |    +-+    |  |
@@ -562,7 +561,7 @@ class TuckBoxDrawing:
                             self.tuckbox['height'] + self.tuckbox['depth']*.8),
                            (offset_left + self.tuckbox['width'],
                             self.tuckbox['height'])])
-        
+
         finger_draw.arc((offset_left + self.tuckbox['width']*0.4, -self.tuckbox['width']*.1),
                         (offset_left + self.tuckbox['width']
                          * 0.6, self.tuckbox['width']*.1),

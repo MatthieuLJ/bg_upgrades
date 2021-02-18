@@ -41,13 +41,14 @@ class TuckBoxDrawing:
             image2.save(filename=filename2)
             os.chmod(filename2, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
 
-            merger = PdfFileMerger()
-            merger.append(filename1)
-            merger.append(filename2)
+            if filename[-3:].lower() == 'pdf':
+                merger = PdfFileMerger()
+                merger.append(filename1)
+                merger.append(filename2)
 
-            merger.write(filename)
-            merger.close()
-            os.chmod(filename, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+                merger.write(filename)
+                merger.close()
+                os.chmod(filename, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
 
     def lip_size(self):
         # the lip is the minimum of
@@ -100,13 +101,11 @@ class TuckBoxDrawing:
         draw.fill_opacity = 0
         draw.translate(margin_width,
                        margin_height + self.lip_size() + self.tuckbox['depth'])
-        draw.push()
 
         # Finger holds draw
         finger_draw = Drawing(draw)
         finger_draw.fill_opacity = 1
         finger_draw.fill_color = Color('white')
-        finger_draw.push()
 
         # Dashed draw
         dashed_draw = Drawing(draw)
@@ -117,14 +116,17 @@ class TuckBoxDrawing:
         dashed_draw.stroke_width = RESOLUTION / (300 * POINT_PER_MM)
         dashed_draw.stroke_dash_array = dash_array
         dashed_draw.stroke_dash_offset = 1
-        dashed_draw.push()
 
         # Folding guides draw
         folding_guides_draw = Drawing()
         folding_guides_draw.scale(POINT_PER_MM, POINT_PER_MM)
         folding_guides_draw.stroke_color = Color('black')
         folding_guides_draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
-        folding_guides_draw.push()
+
+        if 'two_pages' in self.options:
+            back_draw = Drawing(draw)
+            back_dashed_draw = Drawing(dashed_draw)
+            back_folding_guides_draw = Drawing(folding_guides_draw)
 
         if progress_tracker is not None:
             progress_tracker(5)
@@ -215,18 +217,13 @@ class TuckBoxDrawing:
         if progress_tracker is not None:
             progress_tracker(100)
 
-        draw.pop()
-        finger_draw.pop()
-        dashed_draw.pop()
-        folding_guides_draw.pop()
-
         #
         # Possibly draw the second page
         #
         if 'two_pages' in self.options:
-            self.draw_back(self.tuckbox['depth'], draw, dashed_draw, finger_draw, two_openings)
+            self.draw_back(self.tuckbox['depth'], back_draw, back_dashed_draw, finger_draw, two_openings)
 
-            draw.polyline([(self.tuckbox['depth'], 0),
+            back_draw.polyline([(self.tuckbox['depth'], 0),
                            (self.tuckbox['depth'] * 0.2, 0),
                            (self.tuckbox['depth'] * 0.2, self.tuckbox['height']),
                            (self.tuckbox['depth'], self.tuckbox['height'])])
@@ -242,7 +239,7 @@ class TuckBoxDrawing:
             self.draw_faces(image2, progress_tracker, only_back=True)
 
             # Draw all the lines over
-            draw.draw(image2)
+            back_draw.draw(image2)
 
             if progress_tracker is not None:
                 progress_tracker(90)
@@ -252,7 +249,7 @@ class TuckBoxDrawing:
             self.draw_watermark(image2)
 
             if "folds_dashed" in self.options:
-                dashed_draw.draw(image)
+                back_dashed_draw.draw(image2)
 
             if "folding_guides" in self.options:
                 vertical_folds = [margin_width + self.tuckbox['depth'],
@@ -265,9 +262,9 @@ class TuckBoxDrawing:
                     horizontal_folds = [margin_height + self.lip_size() +
                                         self.tuckbox['depth'] + self.tuckbox['height']]
 
-                self.draw_folds(folding_guides_draw, vertical_folds, horizontal_folds, margin_height, margin_width)
+                self.draw_folds(back_folding_guides_draw, vertical_folds, horizontal_folds, margin_height, margin_width)
 
-                folding_guides_draw.draw(image)
+                back_folding_guides_draw.draw(image2)
 
         else:
             image2 = None
@@ -314,7 +311,7 @@ class TuckBoxDrawing:
             face_positions["back"] = (math.floor((margin_width + self.tuckbox['depth']) * POINT_PER_MM),
                         math.floor((margin_height + self.lip_size() + self.tuckbox['depth']) * POINT_PER_MM))
         else:
-            faces = face_sizes.keys()
+            faces = list(face_sizes.keys())
             if not with_back:
                 faces.remove("back")
 

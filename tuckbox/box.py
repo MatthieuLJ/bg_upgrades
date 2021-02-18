@@ -40,7 +40,10 @@ class TuckBoxDrawing:
         return min(self.tuckbox['depth'], .3 * self.tuckbox['width'])
 
     def pattern_height(self):
-        return self.tuckbox['height'] + (2 * self.tuckbox['depth']) + self.lip_size()
+        if 'two_openings' in self.options and self.options['two_openings']:
+            return self.tuckbox['height'] + (2 * self.tuckbox['depth']) + (2 * self.lip_size())
+        else:
+            return self.tuckbox['height'] + (2 * self.tuckbox['depth']) + self.lip_size()
 
     def pattern_width(self):
         return (2.8*self.tuckbox['depth']) + (2*self.tuckbox['width'])
@@ -88,7 +91,7 @@ class TuckBoxDrawing:
         if progress_tracker is not None:
             progress_tracker(5)
 
-        two_openings = 'two_openings' in self.options
+        two_openings = 'two_openings' in self.options and self.options['two_openings']
 
         #        ---------
         #       /         \

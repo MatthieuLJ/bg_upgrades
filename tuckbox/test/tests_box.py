@@ -3,18 +3,23 @@ from django.test import TestCase
 from wand.image import Image
 from tuckbox import box
 
+box.RESOLUTION = 200 # reduce the resolution to run the tests faster
+
 comparison_metric = 'mean_absolute'
 comparison_threshold = 10
 
 class BoxTestCase(TestCase):
-    def compare_images(self, test_filename, my_box, save_image):
+    def compare_images(self, test_filename, my_box, save_image, num_images = 1):
         test_file = os.path.join(os.path.dirname(__file__), test_filename)
 
         if save_image:
             my_box.create_box_file(test_file)
             return
 
-        i = my_box.draw_box()
+        i, i2 = my_box.draw_box()
+
+        if num_images == 1:
+            self.assertIsNone(i2)
         ref_image = Image(filename=test_file)
         i.resize(ref_image.width, ref_image.height)
         i.fuzz = i.quantum_range * 0.20

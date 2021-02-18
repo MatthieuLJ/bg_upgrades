@@ -52,8 +52,9 @@ def check_fit(request):
     data = json.loads(request.body)
     paper = data['paper']
     tuckbox = data['tuckbox']
+    options = data['options']
 
-    my_box = box.TuckBoxDrawing(tuckbox, paper, {}, {})
+    my_box = box.TuckBoxDrawing(tuckbox, paper, {}, options)
 
     return HttpResponse(status=200 if my_box.will_it_fit() else 406)
 

@@ -157,6 +157,9 @@
                 "paper": {
                     "width": parseInt($("#id_paper_width").val()),
                     "height": parseInt($("#id_paper_height").val())
+                },
+                "options": {
+                    "two_openings": $("#id_two_openings").prop('checked')
                 }
             };
             //console.log("checking for fit:"+JSON.stringify(data));
@@ -198,7 +201,7 @@
                 window.open(data.info, "_blank", "location=no, menubar=no");
                 change_progress_display(false);
             } else if (data.state == 'FAILURE') {
-		alert("Something went wrong\n"+data.info);
+                alert("Something went wrong\n"+data.info);
                 // TODO: show/log some error
                 change_progress_display(false);
             } else if ((data.state == 'STARTED') || (data.state == 'SAVING')) {
@@ -297,10 +300,11 @@
                 });
             });
 
+            // Nothing is running to start
             change_progress_display(false);
 
             // For all the elements with the "tuck_input_num" class
-            // hook the check number function with the error label also
+            // hook the check number function
             $(".tuck_input_num").change(function () { check_number(this); });
 
             $("#id_paper_size").change(function () {
@@ -331,6 +335,11 @@
                 }
                 check_for_preview();
             }).trigger("change");
+
+            $("#id_two_openings").change(function() {
+                open_bottom($("#id_two_openings").prop('checked'));
+                check_pattern_fit();
+                });
 
             let color_buttons = [], color_pickers = [];
             

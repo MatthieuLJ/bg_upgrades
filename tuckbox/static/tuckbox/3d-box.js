@@ -1,5 +1,5 @@
 let materials = [
-    new THREE.MeshLambertMaterial({color: 0x000000, side: THREE.BackSide}),
+    new THREE.MeshLambertMaterial({color: 0xffffff, side: THREE.BackSide}),
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // front
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // back
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // left
@@ -12,9 +12,12 @@ let textures = Array(7)
 let colors = Array(7)
 let use_colors = Array(7).fill(false) // true if using colors, false if using pictures  (by default)
 let face_rotations = Array(7).fill(0);
+let bottom_geometry;
+let is_open = false;
+let tuckbox;
 
 function draw_3d_box(container, data) {
-    let tuckbox = data.tuckbox;
+    tuckbox = data.tuckbox;
 
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(45, 1, 0.1, 300);
@@ -58,14 +61,16 @@ function draw_3d_box(container, data) {
         let back_plane = new THREE.Mesh(planeGeom, materials[material_index]);
         group.add(front_plane);
         group.add(back_plane);
+
+        return planeGeom;
     }
 
     create_plane(tuckbox.width, tuckbox.height, 0, 0, 0, 0, tuckbox.depth/2, 1);
     create_plane(tuckbox.width, tuckbox.height, 0, Math.PI, 0, 0,-tuckbox.depth / 2, 2);
     create_plane(tuckbox.depth, tuckbox.height, 0, -Math.PI / 2, -tuckbox.width / 2, 0, 0, 3);
     create_plane(tuckbox.depth, tuckbox.height, 0, Math.PI / 2, tuckbox.width / 2, 0, 0, 4);
-    create_plane(tuckbox.width, tuckbox.depth, -Math.PI / 4, 0, 0, tuckbox.height / 2 + tuckbox.depth * Math.sin(Math.PI * 0.25) / 2, (1 - Math.cos(Math.PI * 0.25)) * tuckbox.depth / 2, 5);
-    create_plane(tuckbox.width, tuckbox.depth, Math.PI / 2, 0, 0, -tuckbox.height / 2, 0, 6);
+    create_plane(tuckbox.width, tuckbox.depth, -Math.PI / 4, 0, 0, tuckbox.height / 2 + tuckbox.depth * Math.sin(Math.PI / 4) / 2, (1 - Math.cos(Math.PI / 4)) * tuckbox.depth / 2, 5);
+    bottom_geometry = create_plane(tuckbox.width, tuckbox.depth, Math.PI / 2, 0, 0, -tuckbox.height / 2, 0, 6);
 
     let scaling = 3 / Math.max(tuckbox.depth, tuckbox.width, tuckbox.height)
     group.scale.set(scaling, scaling, scaling)
@@ -82,8 +87,24 @@ function draw_3d_box(container, data) {
         camera.getWorldPosition(v);
         spotlight.position.copy(v);
         renderer.render(scene, camera);
-
     }
+}
+
+function open_bottom(open) {
+    if (open == is_open) {
+        // nothing to do here
+        return;
+    }
+    if (open) {
+        bottom_geometry.translate(0, tuckbox.height / 2, 0);
+        bottom_geometry.rotateX(-Math.PI / 4);
+        bottom_geometry.translate(0, -tuckbox.height / 2 - tuckbox.depth * Math.sin(Math.PI / 4) / 2, (1 - Math.cos(Math.PI / 4)) * tuckbox.depth / 2);
+    } else {
+        bottom_geometry.translate(0, tuckbox.height / 2 + tuckbox.depth * Math.sin(Math.PI / 4) / 2, (Math.cos(Math.PI / 4) - 1) * tuckbox.depth / 2);
+        bottom_geometry.rotateX(Math.PI / 4);
+        bottom_geometry.translate(0, -tuckbox.height / 2, 0);
+    }
+    is_open = open;
 }
 
 // face is an index: 1=front, 2=back, 3=left, 4=right, 5=top, 6=bottom

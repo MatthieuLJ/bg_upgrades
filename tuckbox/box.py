@@ -63,7 +63,7 @@ class TuckBoxDrawing:
             return self.tuckbox['height'] + (2 * self.tuckbox['depth']) + self.lip_size()
 
     def pattern_width(self):
-        if 'two_pages' in self.options:
+        if 'two_pages' in self.options and self.options['two_pages']:
             return self.tuckbox['width'] + (2 * self.tuckbox['depth'])
         else:
             return (2.8*self.tuckbox['depth']) + (2*self.tuckbox['width'])
@@ -101,12 +101,14 @@ class TuckBoxDrawing:
         draw.fill_opacity = 0
         draw.translate(margin_width,
                        margin_height + self.lip_size() + self.tuckbox['depth'])
+        draw.push()
 
         # Finger holds draw
         finger_draw = Drawing(draw)
         finger_draw.fill_opacity = 1
         finger_draw.fill_color = Color('white')
-
+        finger_draw.push()
+        
         # Dashed draw
         dashed_draw = Drawing(draw)
         dash_array = [min(self.tuckbox['depth'], self.tuckbox['width'],
@@ -123,7 +125,7 @@ class TuckBoxDrawing:
         folding_guides_draw.stroke_color = Color('black')
         folding_guides_draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
 
-        if 'two_pages' in self.options:
+        if 'two_pages' in self.options and self.options["two_pages"]:
             back_draw = Drawing(draw)
             back_dashed_draw = Drawing(dashed_draw)
             back_folding_guides_draw = Drawing(folding_guides_draw)
@@ -141,7 +143,7 @@ class TuckBoxDrawing:
         #
         self.draw_front(draw, dashed_draw, two_openings)
 
-        if 'two_pages' not in self.options:
+        if 'two_pages' not in self.options and self.options["two_pages"]:
             self.draw_back(self.tuckbox['depth']*2 + self.tuckbox['width'], draw, dashed_draw, finger_draw, two_openings)
         else:
             draw.line((self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
@@ -158,7 +160,7 @@ class TuckBoxDrawing:
         image.unit = 'pixelsperinch'
 
         # Draw the faces
-        self.draw_faces(image, progress_tracker, with_back = 'two_pages' not in self.options)
+        self.draw_faces(image, progress_tracker, with_back = 'two_pages' not in self.options or not self.options["two_pages"])
 
         # Draw the lip(s)
         lip = self.draw_lip(top=True)
@@ -187,15 +189,15 @@ class TuckBoxDrawing:
 
         self.draw_watermark(image)
 
-        if "folds_dashed" in self.options:
+        if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.draw(image)
 
-        if "folding_guides" in self.options:
+        if "folding_guides" in self.options and self.options["folding_guides"]:
             vertical_folds = [margin_width + self.tuckbox['depth'],
                               margin_width +
                               self.tuckbox['depth'] + self.tuckbox['width']]
 
-            if not 'two_pages' in self.options:
+            if not 'two_pages' in self.options and self.options['two_pages']:
                 vertical_folds.extend([margin_width +
                                        self.tuckbox['depth']*2 + self.tuckbox['width'],
                                        margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']*2])
@@ -220,7 +222,7 @@ class TuckBoxDrawing:
         #
         # Possibly draw the second page
         #
-        if 'two_pages' in self.options:
+        if 'two_pages' in self.options and self.options['two_pages']:
             self.draw_back(self.tuckbox['depth'], back_draw, back_dashed_draw, finger_draw, two_openings)
 
             back_draw.polyline([(self.tuckbox['depth'], 0),
@@ -248,10 +250,10 @@ class TuckBoxDrawing:
 
             self.draw_watermark(image2)
 
-            if "folds_dashed" in self.options:
+            if "folds_dashed" in self.options and self.options["folds_dashed"]:
                 back_dashed_draw.draw(image2)
 
-            if "folding_guides" in self.options:
+            if "folding_guides" in self.options and self.options["folding_guides"]:
                 vertical_folds = [margin_width + self.tuckbox['depth'],
                                   margin_width +
                                   self.tuckbox['depth'] + self.tuckbox['width']]
@@ -390,7 +392,6 @@ class TuckBoxDrawing:
 
         tab_length = min(.9 *
                          self.tuckbox['depth'], .4 * self.tuckbox['width'])
-
         # Draw the solid lines (S)
         draw.polyline([(self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
                        (self.tuckbox['depth'], -self.tuckbox['depth']),
@@ -454,7 +455,6 @@ class TuckBoxDrawing:
                        (self.tuckbox['depth']*2 +
                         self.tuckbox['width'], self.tuckbox['height'])])
 
-
         # Restart higher (V)
         draw.polyline([(self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
                        (self.tuckbox['depth']*1.9 +
@@ -486,7 +486,7 @@ class TuckBoxDrawing:
                      (self.tuckbox['depth'] + .5 * self.tuckbox['width'],
                       -self.tuckbox['depth'] - self.lip_size())])
         # dashed lines
-        if "folds_dashed" in self.options:
+        if "folds_dashed" in self.options and self.options['folds_dashed']:
             dashed_draw.line((0, 0),
                              (self.tuckbox['depth']*2 + self.tuckbox['width'], 0))
             dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width']*.2, -self.tuckbox['depth']),
@@ -500,7 +500,6 @@ class TuckBoxDrawing:
                              (self.tuckbox['depth'], self.tuckbox['height']))
             dashed_draw.line((self.tuckbox['depth'] + self.tuckbox['width'], 0),
                              (self.tuckbox['depth'] + self.tuckbox['width'], self.tuckbox['height']))
-
     def draw_back(self, offset_left, draw, dashed_draw, finger_draw, two_openings):
         #  +----X +----+--+
         #  |    +-+    |  |
@@ -558,7 +557,6 @@ class TuckBoxDrawing:
                             self.tuckbox['height'] + self.tuckbox['depth']*.8),
                            (offset_left + self.tuckbox['width'],
                             self.tuckbox['height'])])
-
         finger_draw.arc((offset_left + self.tuckbox['width']*0.4, -self.tuckbox['width']*.1),
                         (offset_left + self.tuckbox['width']
                          * 0.6, self.tuckbox['width']*.1),
@@ -572,7 +570,7 @@ class TuckBoxDrawing:
                             (180, 0))
 
         # dashed lines
-        if "folds_dashed" in self.options:
+        if "folds_dashed" in self.options and self.options['folds_dashed']:
             if not two_openings:
                 dashed_draw.line((offset_left, self.tuckbox['height']),
                                  (offset_left + self.tuckbox['width'], self.tuckbox['height']))
@@ -633,10 +631,7 @@ class TuckBoxDrawing:
                             background = Color(self.faces['back']))
         else:
             # Prepare the front image
-            if "back_angle" in self.options:
-                angle = (self.options["back_angle"]+2)*90
-            else:
-                angle = 180
+            angle = 180 if "back_angle" not in self.options else (self.options["back_angle"]+2)*90
 
             if bottom:
                 angle = (angle + 180) % 360

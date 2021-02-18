@@ -92,6 +92,7 @@ def pattern(request):
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data
     options["two_openings"] = "two_openings" in form.data
+    options["two_pages"] = "two_pages" in form.data
 
     result_pdf = tempfile.NamedTemporaryFile(
         delete=False, dir=settings.TMP_ROOT, suffix=".pdf")

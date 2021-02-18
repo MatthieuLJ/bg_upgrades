@@ -104,8 +104,8 @@ class TuckBoxDrawing:
 
         # Finger holds draw
         finger_draw = Drawing(draw)
-        finger_draw.fill_color = Color('white')
         finger_draw.fill_opacity = 1
+        finger_draw.fill_color = Color('white')
         finger_draw.push()
         
         # Dashed draw
@@ -125,6 +125,7 @@ class TuckBoxDrawing:
         folding_guides_draw.stroke_color = Color('black')
         folding_guides_draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
         folding_guides_draw.push()
+
 
         if progress_tracker is not None:
             progress_tracker(5)
@@ -531,7 +532,7 @@ class TuckBoxDrawing:
         #  |    +-+    |  |
         #  V- - + + - -W--+
 
-        # Last bit after the notch (X)
+        # Last bit before the notch (X)
         draw.polyline([(offset_left, 0),
                        (offset_left + self.tuckbox['width']*0.4, 0)])
 
@@ -542,7 +543,6 @@ class TuckBoxDrawing:
                         self.tuckbox['height']),
                        (offset_left + self.tuckbox['depth']*0.8 +
                         self.tuckbox['width'], 0),
-                       (offset_left + self.tuckbox['width'], 0),
                        (offset_left + self.tuckbox['width']*0.6, 0),
                        ])
 

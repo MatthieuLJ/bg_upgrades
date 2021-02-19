@@ -78,6 +78,11 @@ class MySeleniumTests(StaticLiveServerTestCase):
         cls.selenium.quit()
         super().tearDownClass()
 
+    def set_text_field(self, field, text):
+        field.clear()
+        field.send_keys(text)
+        field.send_keys(Keys.TAB)
+
     def test_customPaperSizesHidden(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
         custom_paper_height_field = self.selenium.find_element_by_name("paper_height")
@@ -138,57 +143,81 @@ class MySeleniumTests(StaticLiveServerTestCase):
 
         height_field = self.selenium.find_element_by_id("id_height")
 
-        height_field.clear()
-        height_field.send_keys("abc")
-        height_field.send_keys(Keys.TAB)
+        self.set_text_field(height_field, "abc")
         self.assertEqual(height_field.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
 
-        height_field.clear()
-        height_field.send_keys("-2")
-        height_field.send_keys(Keys.TAB)
+        self.set_text_field(height_field, "-2")
         self.assertEqual(height_field.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
 
-        height_field.clear()
-        height_field.send_keys("10$1")
-        height_field.send_keys(Keys.TAB)
+        self.set_text_field(height_field, "10$1")
         self.assertEqual(height_field.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
 
-        height_field.clear()
-        height_field.send_keys("101")
-        height_field.send_keys(Keys.TAB)
+        self.set_text_field(height_field, "101")
         self.assertEqual(height_field.value_of_css_property("color"), "rgba(0, 0, 0, 1)")
 
         paper_select = Select(self.selenium.find_element_by_id('id_paper_size'))
         paper_select.select_by_visible_text('Custom')
         custom_paper_height = self.selenium.find_element_by_id("id_paper_height")
 
-        custom_paper_height.clear()
-        custom_paper_height.send_keys("abc")
-        custom_paper_height.send_keys(Keys.TAB)
+        self.set_text_field(custom_paper_height, "abc")
+        self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
+        
+        self.set_text_field(custom_paper_height, "-2")
         self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
 
-        custom_paper_height.clear()
-        custom_paper_height.send_keys("-2")
-        custom_paper_height.send_keys(Keys.TAB)
+        self.set_text_field(custom_paper_height, "10$1")
         self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
 
-        custom_paper_height.clear()
-        custom_paper_height.send_keys("10$1")
-        custom_paper_height.send_keys(Keys.TAB)
-        self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
-
-        custom_paper_height.clear()
-        custom_paper_height.send_keys("101")
-        custom_paper_height.send_keys(Keys.TAB)
+        self.set_text_field(custom_paper_height, "101")
         self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(0, 0, 0, 1)")
+
+    def test_fit(self):
+        self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
+
+        height_field = self.selenium.find_element_by_id("id_height")
+        width_field = self.selenium.find_element_by_id("id_width")
+        depth_field = self.selenium.find_element_by_id("id_depth")
+        paper_select = Select(self.selenium.find_element_by_id('id_paper_size'))
+        paper_select.select_by_visible_text('A4')
+        wont_fit_label = self.selenium.find_element_by_id("id_wont_fit")
+        two_openings = self.selenium.find_element_by_id("id_two_openings").find_element_by_xpath('..')
+
+        # initial conditions
+        self.assertEqual(wont_fit_label.value_of_css_property("display"), "none")
+        
+        # basic
+        self.set_text_field(height_field, "200")
+        self.set_text_field(width_field, "100")
+        self.set_text_field(depth_field, "100")
+        WebDriverWait(self.selenium, 5).until(EC.visibility_of(wont_fit_label))
+        self.assertNotEqual(wont_fit_label.value_of_css_property("display"), "none")
+
+        self.set_text_field(height_field, "40")
+        self.set_text_field(width_field, "30")
+        self.set_text_field(depth_field, "20")
+        WebDriverWait(self.selenium, 5).until_not(EC.visibility_of(wont_fit_label))
+        self.assertEqual(wont_fit_label.value_of_css_property("display"), "none")
+
+        # check with layout adjustments (this pattern would only fit in landscape mode)
+        self.set_text_field(height_field, "100")
+        self.set_text_field(width_field, "60")
+        self.set_text_field(depth_field, "40")
+        WebDriverWait(self.selenium, 5).until_not(EC.visibility_of(wont_fit_label))
+        self.assertEqual(wont_fit_label.value_of_css_property("display"), "none")
+
+        # check with two openings
+        self.set_text_field(height_field, "205")
+        self.set_text_field(width_field, "60")
+        self.set_text_field(depth_field, "30")
+        WebDriverWait(self.selenium, 5).until_not(EC.visibility_of(wont_fit_label))
+        self.assertEqual(wont_fit_label.value_of_css_property("display"), "none")
+
+        two_openings.click()
+        WebDriverWait(self.selenium, 5).until(EC.visibility_of(wont_fit_label))
+        self.assertNotEqual(wont_fit_label.value_of_css_property("display"), "none")
 
 
 # TODO:
-#  - Wont_fit is shown with some parameters
 #  - Check when the submit button is activated
 #  - Check the custom paper fields appear when that option is selected
 #  - Check the clear file fields
-        
-
-
-

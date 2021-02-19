@@ -5,6 +5,7 @@ coverage
 Django
 future
 pylint
+PyPDF2
 pyyaml
 redis
 selenium

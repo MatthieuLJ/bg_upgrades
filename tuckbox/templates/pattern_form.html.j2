@@ -157,6 +157,9 @@
                 "paper": {
                     "width": parseInt($("#id_paper_width").val()),
                     "height": parseInt($("#id_paper_height").val())
+                },
+                "options": {
+                    "two_openings": $("#id_two_openings").prop('checked')
                 }
             };
             //console.log("checking for fit:"+JSON.stringify(data));
@@ -198,7 +201,7 @@
                 window.open(data.info, "_blank", "location=no, menubar=no");
                 change_progress_display(false);
             } else if (data.state == 'FAILURE') {
-		alert("Something went wrong\n"+data.info);
+                alert("Something went wrong\n"+data.info);
                 // TODO: show/log some error
                 change_progress_display(false);
             } else if ((data.state == 'STARTED') || (data.state == 'SAVING')) {
@@ -297,10 +300,11 @@
                 });
             });
 
+            // Nothing is running to start
             change_progress_display(false);
 
             // For all the elements with the "tuck_input_num" class
-            // hook the check number function with the error label also
+            // hook the check number function
             $(".tuck_input_num").change(function () { check_number(this); });
 
             $("#id_paper_size").change(function () {
@@ -331,6 +335,11 @@
                 }
                 check_for_preview();
             }).trigger("change");
+
+            $("#id_two_openings").change(function() {
+                open_bottom($("#id_two_openings").prop('checked'));
+                check_pattern_fit();
+                });
 
             let color_buttons = [], color_pickers = [];
             
@@ -511,7 +520,7 @@
         {% endwith %}
 
         <div class="form-group row">
-            <label class="form-control-label col-md-2 offset-md-1 align-self-center"> Folding guides: </label>
+            <label class="form-control-label col-md-2 offset-md-2 align-self-center"> Folding guides: </label>
             <div class="col-md-1">
                 <input type="checkbox" name="folding_guides" id="id_folding_guides" data-toggle="toggle" data-on="On"
                     data-off="Off">
@@ -521,9 +530,16 @@
                 <input type="checkbox" name="folds_dashed" id="id_folds_dashed" data-toggle="toggle" data-on="On"
                     data-off="Off" />
             </div>
-            <label class="form-control-label col-md-2 align-self-center"> Openings on both sides: </label>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-md-2 offset-md-2 align-self-center"> Openings on both sides: </label>
             <div class="col-md-1">
                 <input type="checkbox" name="two_openings" id="id_two_openings" data-toggle="toggle" data-on="On"
+                    data-off="Off" />
+            </div>
+            <label class="form-control-label col-md-2 align-self-center"> Two pages: </label>
+            <div class="col-md-1">
+                <input type="checkbox" name="two_pages" id="id_two_pages" data-toggle="toggle" data-on="On"
                     data-off="Off" />
             </div>
         </div>

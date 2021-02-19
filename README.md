@@ -32,7 +32,7 @@ To setup an environment, use virtualenv and install the packages listed in requi
 
 To run the tests:
 
-    $ ./manage.py test
+    $ ./manage.py test --parallel
 
 To get coverage report on the tests:
 

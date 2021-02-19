@@ -52,8 +52,9 @@ def check_fit(request):
     data = json.loads(request.body)
     paper = data['paper']
     tuckbox = data['tuckbox']
+    options = data['options']
 
-    my_box = box.TuckBoxDrawing(tuckbox, paper, {}, {})
+    my_box = box.TuckBoxDrawing(tuckbox, paper, {}, options)
 
     return HttpResponse(status=200 if my_box.will_it_fit() else 406)
 
@@ -91,6 +92,7 @@ def pattern(request):
     options["folding_guides"] = "folding_guides" in form.data
     options["folds_dashed"] = "folds_dashed" in form.data
     options["two_openings"] = "two_openings" in form.data
+    options["two_pages"] = "two_pages" in form.data
 
     result_pdf = tempfile.NamedTemporaryFile(
         delete=False, dir=settings.TMP_ROOT, suffix=".pdf")

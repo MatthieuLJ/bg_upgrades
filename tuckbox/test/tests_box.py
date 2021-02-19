@@ -3,25 +3,37 @@ from django.test import TestCase
 from wand.image import Image
 from tuckbox import box
 
+box.RESOLUTION = 200 # reduce the resolution to run the tests faster
+
 comparison_metric = 'mean_absolute'
 comparison_threshold = 10
 
 class BoxTestCase(TestCase):
-    def compare_images(self, test_filename, my_box, save_image):
-        test_file = os.path.join(os.path.dirname(__file__), test_filename)
-
-        if save_image:
-            my_box.create_box_file(test_file)
-            return
-
-        i = my_box.draw_box()
-        ref_image = Image(filename=test_file)
-        i.resize(ref_image.width, ref_image.height)
-        i.fuzz = i.quantum_range * 0.20
-        _, compare_metric = i.compare(ref_image, metric=comparison_metric)
+    def compare_images(self, filename, image):
+        ref_image = Image(filename = filename)
+        image.resize(ref_image.width, ref_image.height)
+        image.fuzz = image.quantum_range * 0.20
+        _, compare_metric = image.compare(ref_image, metric=comparison_metric)
 
         #print("For file " + test_filename + ", got error "+str(compare_metric))
         self.assertLessEqual(compare_metric, comparison_threshold)
+
+    def compare_or_save_images(self, test_filename, my_box, save_image, num_images = 1):
+        test_filename_with_path = os.path.join(os.path.dirname(__file__), test_filename)
+        if save_image:
+            my_box.create_box_file(test_filename_with_path)
+            return
+
+        i, i2 = my_box.draw_box()
+        self.assertIsNotNone(i)
+        if num_images == 1:
+            self.assertIsNone(i2)  
+            self.compare_images(test_filename_with_path, i)
+        else:
+            self.assertIsNotNone(i2)
+            self.compare_images(test_filename_with_path[0:-4]+"_1"+test_filename_with_path[-4:], i)
+            self.compare_images(test_filename_with_path[0:-4]+"_2"+test_filename_with_path[-4:], i2)
+
 
     def test_DrawSimpleWhite(self, save_image = False):
         test_file = "test_simple_white.png"
@@ -29,7 +41,7 @@ class BoxTestCase(TestCase):
         tuckbox = {'height': 70, 'width': 50, 'depth': 20}
         my_box = box.TuckBoxDrawing(tuckbox, paper, None, None)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawSimpleWithDash(self, save_image = False):
         test_file = "test_simple_dashes.png"
@@ -38,7 +50,7 @@ class BoxTestCase(TestCase):
         options = {'folds_dashed': True}
         my_box = box.TuckBoxDrawing(tuckbox, paper, None, options)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawSimpleWithGuides(self, save_image = False):
         test_file = "test_simple_guides.png"
@@ -47,7 +59,35 @@ class BoxTestCase(TestCase):
         options = {'folding_guides': True}
         my_box = box.TuckBoxDrawing(tuckbox, paper, options = options)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
+
+    def test_DrawSimpleWhiteTwoPages(self, save_image = False):
+        test_file = "test_simple_white_two_pages.png"
+        paper = {'width': 200, 'height': 200}
+        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
+        options = {'two_pages': True}
+        my_box = box.TuckBoxDrawing(tuckbox, paper, None, options)
+
+        self.compare_or_save_images(test_file, my_box, save_image, num_images = 2)
+
+    def test_DrawSimpleWithDashTwoPages(self, save_image = False):
+        test_file = "test_simple_dashes_two_pages.png"
+        paper = {'width': 200, 'height': 200}
+        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
+        options = {'folds_dashed': True, 'two_pages': True}
+        my_box = box.TuckBoxDrawing(tuckbox, paper, None, options)
+
+        self.compare_or_save_images(test_file, my_box, save_image, num_images = 2)
+
+    def test_DrawSimpleWithGuidesTwoPages(self, save_image = False):
+        test_file = "test_simple_guides_two_pages.png"
+        paper = {'width': 200, 'height': 200}
+        tuckbox = {'height': 70, 'width': 50, 'depth': 20}
+        options = {'folding_guides': True, 'two_pages': True}
+        my_box = box.TuckBoxDrawing(tuckbox, paper, options = options)
+
+        self.compare_or_save_images(test_file, my_box, save_image, num_images = 2)
+
 
     def test_DrawAdjustLayout(self, save_image = False):
         test_file = "test_adjust_layout.png"
@@ -55,7 +95,7 @@ class BoxTestCase(TestCase):
         tuckbox = {'height': 100, 'width': 40, 'depth': 20}
         my_box = box.TuckBoxDrawing(tuckbox, paper)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawWithFaces(self, save_image=False):
         test_file = "test_faces.png"
@@ -69,7 +109,7 @@ class BoxTestCase(TestCase):
                     'bottom': os.path.join(os.path.dirname(__file__),"bottom.jpg") }
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawWithColors(self, save_image=False):
         test_file = "test_colors.png"
@@ -83,7 +123,7 @@ class BoxTestCase(TestCase):
                     'bottom': "#880088"}
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawWithRotations(self, save_image=False):
         test_file = "test_rotation.png"
@@ -99,7 +139,7 @@ class BoxTestCase(TestCase):
                     'right_angle': 1, 'top_angle': 2, 'bottom_angle': 3}
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawWithRotations2(self, save_image=False):
         # Force the back to be 90 or 270 degrees to exercise special case in drawing the lip
@@ -116,7 +156,7 @@ class BoxTestCase(TestCase):
                     'right_angle': 2, 'top_angle': 3, 'bottom_angle': 1}
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawWithTwoOpenings(self, save_image=False):
         test_file = "test_twoopenings.png"
@@ -131,7 +171,7 @@ class BoxTestCase(TestCase):
         options = {'two_openings': "two_openings"}
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_DrawWithTwoOpeningsRotation(self, save_image=False):
         test_file = "test_twoopeningsrotation.png"
@@ -147,7 +187,7 @@ class BoxTestCase(TestCase):
                     'left_angle': 1, 'right_angle': 2, 'top_angle': 3, 'bottom_angle': 1}
         my_box = box.TuckBoxDrawing(tuckbox, paper, faces = faces, options = options)
 
-        self.compare_images(test_file, my_box, save_image)
+        self.compare_or_save_images(test_file, my_box, save_image)
 
     def test_Fit(self):
         paper = {'width': 100, 'height': 100}

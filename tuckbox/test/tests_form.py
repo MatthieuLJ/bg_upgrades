@@ -221,7 +221,3 @@ class MySeleniumTests(StaticLiveServerTestCase):
 #  - Check when the submit button is activated
 #  - Check the custom paper fields appear when that option is selected
 #  - Check the clear file fields
-        
-
-
-

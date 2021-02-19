@@ -108,7 +108,7 @@ class TuckBoxDrawing:
         finger_draw.fill_opacity = 1
         finger_draw.fill_color = Color('white')
         finger_draw.push()
-        
+
         # Dashed draw
         dashed_draw = Drawing(draw)
         dash_array = [min(self.tuckbox['depth'], self.tuckbox['width'],
@@ -125,15 +125,15 @@ class TuckBoxDrawing:
         folding_guides_draw.stroke_color = Color('black')
         folding_guides_draw.stroke_width = RESOLUTION / (200 * POINT_PER_MM)
 
-        if 'two_pages' in self.options and self.options["two_pages"]:
-            back_draw = Drawing(draw)
-            back_dashed_draw = Drawing(dashed_draw)
-            back_folding_guides_draw = Drawing(folding_guides_draw)
+        back_draw = Drawing(draw)
+        back_dashed_draw = Drawing(dashed_draw)
+        back_folding_guides_draw = Drawing(folding_guides_draw)
 
         if progress_tracker is not None:
             progress_tracker(5)
 
         two_openings = 'two_openings' in self.options and self.options['two_openings']
+        two_pages = 'two_pages' in self.options and self.options['two_pages']
 
         dash_array = [min(self.tuckbox['depth'], self.tuckbox['width'],
                           self.tuckbox['height'])/13] * 2
@@ -143,9 +143,18 @@ class TuckBoxDrawing:
         #
         self.draw_front(draw, dashed_draw, two_openings)
 
-        if 'two_pages' not in self.options and self.options["two_pages"]:
-            self.draw_back(self.tuckbox['depth']*2 + self.tuckbox['width'], draw, dashed_draw, finger_draw, two_openings)
+        if two_pages:
+            offset_left_to_back = self.tuckbox['depth']
         else:
+            offset_left_to_back = self.tuckbox['depth']*2 + self.tuckbox['width']
+
+        self.draw_back(offset_left_to_back, back_draw, back_dashed_draw, finger_draw, two_openings)
+
+        if two_pages:
+            back_draw.polyline([(self.tuckbox['depth'], 0),
+                           (self.tuckbox['depth'] * 0.2, 0),
+                           (self.tuckbox['depth'] * 0.2, self.tuckbox['height']),
+                           (self.tuckbox['depth'], self.tuckbox['height'])])
             draw.line((self.tuckbox['depth']*2 + self.tuckbox['width'], 0),
                       (self.tuckbox['depth']*2 + self.tuckbox['width'], self.tuckbox['height']))
 
@@ -159,8 +168,19 @@ class TuckBoxDrawing:
         image.resolution = RESOLUTION
         image.unit = 'pixelsperinch'
 
+        if two_pages:
+            image2 = Image(width=math.ceil(self.paper['width'] * POINT_PER_MM),
+                        height=math.ceil(self.paper['height'] * POINT_PER_MM),
+                        background=Color('white'))
+            image2.resolution = RESOLUTION
+            image2.unit = 'pixelsperinch'
+        else:
+            image2 = image
+
         # Draw the faces
-        self.draw_faces(image, progress_tracker, with_back = 'two_pages' not in self.options or not self.options["two_pages"])
+        self.draw_faces(image, progress_tracker, with_back = not two_pages)
+        if two_pages:
+            self.draw_faces(image2, progress_tracker, only_back=True)
 
         # Draw the lip(s)
         lip = self.draw_lip(top=True)
@@ -181,94 +201,57 @@ class TuckBoxDrawing:
 
         # Draw all the lines over
         draw.draw(image)
+        back_draw.draw(image2)
+
+        finger_draw.draw(image2)
+        self.draw_watermark(image)
+        if two_pages:
+            self.draw_watermark(image2)
 
         if progress_tracker is not None:
             progress_tracker(90)
 
-        finger_draw.draw(image)
-
-        self.draw_watermark(image)
-
         if "folds_dashed" in self.options and self.options["folds_dashed"]:
             dashed_draw.draw(image)
+            back_dashed_draw.draw(image2)
 
         if "folding_guides" in self.options and self.options["folding_guides"]:
-            vertical_folds = [margin_width + self.tuckbox['depth'],
+            front_vertical_folds = [margin_width + self.tuckbox['depth'],
                               margin_width +
                               self.tuckbox['depth'] + self.tuckbox['width']]
-
-            if not 'two_pages' in self.options and self.options['two_pages']:
-                vertical_folds.extend([margin_width +
+            if not two_pages:
+                front_vertical_folds.extend([margin_width +
                                        self.tuckbox['depth']*2 + self.tuckbox['width'],
                                        margin_width + self.tuckbox['depth']*2 + self.tuckbox['width']*2])
 
-            horizontal_folds = [margin_height + self.lip_size(),
+            back_vertical_folds = [margin_width + self.tuckbox['depth'],
+                                  margin_width +
+                                  self.tuckbox['depth'] + self.tuckbox['width']]
+
+            front_horizontal_folds = [margin_height + self.lip_size(),
                                 margin_height + self.lip_size() +
                                 self.tuckbox['depth'],
                                 margin_height + self.lip_size() +
                                 self.tuckbox['depth'] + self.tuckbox['height']]
 
             if two_openings:
-                horizontal_folds.append(margin_height + self.lip_size() +
+                front_horizontal_folds.append(margin_height + self.lip_size() +
                                         self.tuckbox['depth'] * 2 + self.tuckbox['height'])
+                back_horizontal_folds = []
+            else:
+                back_horizontal_folds = [margin_height + self.lip_size() +
+                                        self.tuckbox['depth'] + self.tuckbox['height']]
 
-            self.draw_folds(folding_guides_draw, vertical_folds, horizontal_folds, margin_height, margin_width)
+            self.draw_folds(folding_guides_draw, front_vertical_folds, front_horizontal_folds, margin_height, margin_width)
+            self.draw_folds(back_folding_guides_draw, back_vertical_folds, back_horizontal_folds, margin_height, margin_width)
 
             folding_guides_draw.draw(image)
+            back_folding_guides_draw.draw(image2)
 
         if progress_tracker is not None:
             progress_tracker(100)
 
-        #
-        # Possibly draw the second page
-        #
-        if 'two_pages' in self.options and self.options['two_pages']:
-            self.draw_back(self.tuckbox['depth'], back_draw, back_dashed_draw, finger_draw, two_openings)
-
-            back_draw.polyline([(self.tuckbox['depth'], 0),
-                           (self.tuckbox['depth'] * 0.2, 0),
-                           (self.tuckbox['depth'] * 0.2, self.tuckbox['height']),
-                           (self.tuckbox['depth'], self.tuckbox['height'])])
-
-            # Create the image
-            image2 = Image(width=math.ceil(self.paper['width'] * POINT_PER_MM),
-                        height=math.ceil(self.paper['height'] * POINT_PER_MM),
-                        background=Color('white'))
-            image2.resolution = RESOLUTION
-            image2.unit = 'pixelsperinch'
-
-            # Draw the faces
-            self.draw_faces(image2, progress_tracker, only_back=True)
-
-            # Draw all the lines over
-            back_draw.draw(image2)
-
-            if progress_tracker is not None:
-                progress_tracker(90)
-
-            finger_draw.draw(image2)
-
-            self.draw_watermark(image2)
-
-            if "folds_dashed" in self.options and self.options["folds_dashed"]:
-                back_dashed_draw.draw(image2)
-
-            if "folding_guides" in self.options and self.options["folding_guides"]:
-                vertical_folds = [margin_width + self.tuckbox['depth'],
-                                  margin_width +
-                                  self.tuckbox['depth'] + self.tuckbox['width']]
-
-                if two_openings:
-                    horizontal_folds = []
-                else:
-                    horizontal_folds = [margin_height + self.lip_size() +
-                                        self.tuckbox['depth'] + self.tuckbox['height']]
-
-                self.draw_folds(back_folding_guides_draw, vertical_folds, horizontal_folds, margin_height, margin_width)
-
-                back_folding_guides_draw.draw(image2)
-
-        else:
+        if not two_pages:
             image2 = None
 
         return image, image2

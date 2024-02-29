@@ -1,3 +1,6 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 let materials = [
     new THREE.MeshLambertMaterial({color: 0xffffff, side: THREE.BackSide}),
     new THREE.MeshLambertMaterial({side: THREE.FrontSide}), // front
@@ -33,7 +36,7 @@ function draw_3d_box(container, data) {
     //var axesHelper = new THREE.AxesHelper(5);
     //scene.add(axesHelper);
 
-    var controls = new THREE.OrbitControls( camera, renderer.domElement );
+    var controls = new OrbitControls( camera, renderer.domElement );
 
     scene.background = new THREE.Color(0x808080)
 
@@ -163,3 +166,5 @@ function clear_face_image(face) {
     materials[face].map = null;
     materials[face].needsUpdate = true;
 }
+
+export { draw_3d_box, open_bottom, rotate_face_image, set_face_usage, load_face_color, load_face_image, clear_face_image };

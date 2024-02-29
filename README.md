@@ -115,7 +115,7 @@ Then update:
 
 Whenever the packages change, record the packages:
 
-    $ pip freeze > requirements.txt
+    $ pip-chill freeze > requirements.txt
 
 When the reference data needs to change for the graphics tests, run:
 

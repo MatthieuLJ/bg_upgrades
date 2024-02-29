@@ -14,7 +14,6 @@ Requirements
 ============
 
 * Python 3 (possibly also python3.X-dev on ubuntu)
-* pip packages listed in requirements.txt
 * `imagemagick`
 * `nginx` (for full deployment)
 * `redis`

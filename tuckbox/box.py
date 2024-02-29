@@ -4,7 +4,7 @@ import stat
 import subprocess
 import sys
 import tempfile
-from PyPDF2 import PdfFileMerger
+from pypdf import PdfWriter
 from wand.api import library
 from wand.color import Color
 from wand.drawing import Drawing
@@ -42,7 +42,7 @@ class TuckBoxDrawing:
             os.chmod(filename2, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
 
             if filename[-3:].lower() == 'pdf':
-                merger = PdfFileMerger()
+                merger = PdfWriter()
                 merger.append(filename1)
                 merger.append(filename2)
 

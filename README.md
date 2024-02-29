@@ -121,6 +121,7 @@ When the reference data needs to change for the graphics tests, run:
 
     $ python -m tuckbox.test.tests_box
 
+If running into permissions issues for using 'PDF' in ImageMagick, follow [those instructions](https://stackoverflow.com/a/59193253)
 
 Dependencies
 ============

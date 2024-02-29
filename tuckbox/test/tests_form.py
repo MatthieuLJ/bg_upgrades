@@ -85,63 +85,63 @@ class MySeleniumTests(StaticLiveServerTestCase):
 
     def test_customPaperSizesHidden(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
-        custom_paper_height_field = self.selenium.find_element_by_name("paper_height")
+        custom_paper_height_field = self.selenium.find_element(By.NAME, "paper_height")
         self.assertFalse(custom_paper_height_field.is_displayed())
-        custom_paper_width_field = self.selenium.find_element_by_name("paper_width")
+        custom_paper_width_field = self.selenium.find_element(By.NAME, "paper_width")
         self.assertFalse(custom_paper_width_field.is_displayed())
-        height_field = self.selenium.find_element_by_name("height")
+        height_field = self.selenium.find_element(By.NAME, "height")
         self.assertTrue(height_field.is_displayed())
 
     def test_show3Dmodel(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
         
-        model_container = self.selenium.find_element_by_id("image_preview")
-        children = model_container.find_elements_by_xpath(".//*")
+        model_container = self.selenium.find_element(By.ID, "image_preview")
+        children = model_container.find_elements(By.XPATH, ".//*")
         self.assertEqual(0, len(children))
 
-        height_field = self.selenium.find_element_by_name("height")
+        height_field = self.selenium.find_element(By.NAME, "height")
         height_field.send_keys("40")
-        width_field = self.selenium.find_element_by_name("width")
+        width_field = self.selenium.find_element(By.NAME, "width")
         width_field.send_keys("30")
-        depth_field = self.selenium.find_element_by_name("depth")
+        depth_field = self.selenium.find_element(By.NAME, "depth")
         depth_field.send_keys("20")
         height_field.send_keys("")
 
         WebDriverWait(self.selenium, 5).until(EC.presence_of_element_located((By.XPATH, "//div[@id='image_preview']/*")))
 
-        children = model_container.find_elements_by_xpath(".//*")
+        children = model_container.find_elements(By.XPATH, ".//*")
         self.assertEqual(1, len(children))
 
     def test_atLoadTime(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
 
         # Won't fit label should be hidden
-        wont_fit = self.selenium.find_element_by_id("id_wont_fit")
+        wont_fit = self.selenium.find_element(By.ID, "id_wont_fit")
         self.assertFalse(wont_fit.is_displayed())
 
         # Progress should be hidden
-        progress = self.selenium.find_element_by_id("id_progress_container")
+        progress = self.selenium.find_element(By.ID, "id_progress_container")
         self.assertFalse(progress.is_displayed())
 
         # Custom paper size fields should be hidden and values should be loaded with some default
-        custom_paper_height = self.selenium.find_element_by_id("id_paper_height")
+        custom_paper_height = self.selenium.find_element(By.ID, "id_paper_height")
         self.assertFalse(custom_paper_height.is_displayed())
         val = self.selenium.execute_script("return document.getElementById('id_paper_height').value;")
         self.assertNotEqual(val, "")
 
-        custom_paper_width = self.selenium.find_element_by_id("id_paper_width")
+        custom_paper_width = self.selenium.find_element(By.ID, "id_paper_width")
         self.assertFalse(custom_paper_width.is_displayed())
         val = self.selenium.execute_script("return document.getElementById('id_paper_width').value;")
         self.assertNotEqual(val, "")
 
         # Submit button should be disabled
-        submit_button = self.selenium.find_element_by_id("id_submit")
+        submit_button = self.selenium.find_element(By.ID, "id_submit")
         self.assertFalse(submit_button.is_enabled())
 
     def test_badEntriesInNumField(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
 
-        height_field = self.selenium.find_element_by_id("id_height")
+        height_field = self.selenium.find_element(By.ID, "id_height")
 
         self.set_text_field(height_field, "abc")
         self.assertEqual(height_field.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
@@ -155,9 +155,9 @@ class MySeleniumTests(StaticLiveServerTestCase):
         self.set_text_field(height_field, "101")
         self.assertEqual(height_field.value_of_css_property("color"), "rgba(0, 0, 0, 1)")
 
-        paper_select = Select(self.selenium.find_element_by_id('id_paper_size'))
+        paper_select = Select(self.selenium.find_element(By.ID, 'id_paper_size'))
         paper_select.select_by_visible_text('Custom')
-        custom_paper_height = self.selenium.find_element_by_id("id_paper_height")
+        custom_paper_height = self.selenium.find_element(By.ID, "id_paper_height")
 
         self.set_text_field(custom_paper_height, "abc")
         self.assertEqual(custom_paper_height.value_of_css_property("color"), "rgba(255, 0, 0, 1)")
@@ -174,13 +174,13 @@ class MySeleniumTests(StaticLiveServerTestCase):
     def test_fit(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/tuck/'))
 
-        height_field = self.selenium.find_element_by_id("id_height")
-        width_field = self.selenium.find_element_by_id("id_width")
-        depth_field = self.selenium.find_element_by_id("id_depth")
-        paper_select = Select(self.selenium.find_element_by_id('id_paper_size'))
+        height_field = self.selenium.find_element(By.ID, "id_height")
+        width_field = self.selenium.find_element(By.ID, "id_width")
+        depth_field = self.selenium.find_element(By.ID, "id_depth")
+        paper_select = Select(self.selenium.find_element(By.ID, 'id_paper_size'))
         paper_select.select_by_visible_text('A4')
-        wont_fit_label = self.selenium.find_element_by_id("id_wont_fit")
-        two_openings = self.selenium.find_element_by_id("id_two_openings").find_element_by_xpath('..')
+        wont_fit_label = self.selenium.find_element(By.ID, "id_wont_fit")
+        two_openings = self.selenium.find_element(By.ID, "id_two_openings").find_element(By.XPATH, '..')
 
         # initial conditions
         self.assertEqual(wont_fit_label.value_of_css_property("display"), "none")

@@ -38,14 +38,16 @@ function draw_3d_box(container, data) {
 
     var controls = new OrbitControls( camera, renderer.domElement );
 
-    scene.background = new THREE.Color(0x808080)
+    scene.background = new THREE.Color(0xFFFFFF)
 
-    var ambient_light = new THREE.AmbientLight(0x909090); // soft white light
+    var ambient_light = new THREE.AmbientLight(0xA0A0A0); // soft white light
     scene.add(ambient_light);
 
-    var spotlight = new THREE.PointLight(0xA0A0A0);
-    spotlight.position.set(5, 5, 0);
-    scene.add(spotlight);
+    var pointlight = new THREE.PointLight(0xFFFFFF);
+    pointlight.position.set(2, 2, 0);
+    pointlight.decay = 0.45;
+    pointlight.power = 80;
+    scene.add(pointlight);
 
     let group = new THREE.Group();
     group.scale.set(1, 1, 1);
@@ -88,7 +90,7 @@ function draw_3d_box(container, data) {
         requestAnimationFrame(animate);
         let v = new THREE.Vector3();
         camera.getWorldPosition(v);
-        spotlight.position.copy(v);
+        pointlight.position.copy(v);
         renderer.render(scene, camera);
     }
 }
@@ -148,7 +150,7 @@ function load_face_image(file, face) {
     reader.onload = function(e) {
         let loader = new THREE.TextureLoader();
         loader.load(e.target.result,
-            onLoad = function(tx) {
+            function(tx) {
                 textures[face] = tx;
                 materials[face].needsUpdate = true;
                 if (!use_colors[face]) {

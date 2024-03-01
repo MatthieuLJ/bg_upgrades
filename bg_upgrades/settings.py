@@ -126,7 +126,8 @@ STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'tuckbox/static'),
+    # Those files are collected automatically already
+    # os.path.join(BASE_DIR, 'tuckbox/static'),
 )
 
 # To store temporary files and the address that will be used to retrieve them

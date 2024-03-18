@@ -2,7 +2,7 @@ argh==0.31.2
 beautifulsoup4==4.12.3
 celery==5.3.6
 coverage==7.4.3
-django==5.0.2
+django==5.0.3
 future==1.0.0
 pip-chill==1.0.3
 pylint==3.1.0

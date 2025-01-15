@@ -12,7 +12,7 @@ dump.rdb
 venv/
 
 # Folder for static files
-staticfiles/*
+django_app/staticfiles/*
 
 # Temporary products
-tmp/tmp*
+django_app/tmp/tmp*

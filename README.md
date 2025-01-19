@@ -123,6 +123,14 @@ When the reference data needs to change for the graphics tests, run:
 
 If running into permissions issues for using 'PDF' in ImageMagick, follow [those instructions](https://stackoverflow.com/a/59193253)
 
+Docker
+======
+
+Start with `docker-compose up -d` (docker desktop needs to be running).
+
+For now, this will run the local webserver that can server requests but will not
+be able to access the resulting file.
+
 Dependencies
 ============
 

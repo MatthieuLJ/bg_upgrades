@@ -42,17 +42,19 @@ or
 
     $ coverage html
 
-Run only Django's test server:
+Test server
+-----------
 
     $ redis-server
     $ watchmedo auto-restart --directory=./ --pattern="*.py" --recursive -- celery -A bg_upgrades worker -l info
 
-    $ ./manage.py migrate
-    $ ./manage.py runserver
+then use Django's test server
 
-Run uwsgi with the CLI options
+    $ ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000
 
-    $ uwsgi -H venv --socket mysite.sock --module bg_upgrades.wsgi --chmod-socket=664
+or through uwsgi
+
+    $ uwsgi --http :8000 --module django_app/bg_upgrades.wsgi
 
 Startup / Deploy
 ================
@@ -115,7 +117,7 @@ Then update:
 
 Whenever the packages change, record the packages:
 
-    $ pip-chill freeze > requirements.txt
+    $ pip-chill > requirements.txt
 
 When the reference data needs to change for the graphics tests, run:
 

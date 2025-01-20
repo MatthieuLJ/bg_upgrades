@@ -14,8 +14,9 @@ RUN pip install -r requirements.txt
 
 COPY django_app/ /app
 
-WORKDIR /app
+COPY uwsgi/uwsgi.ini /app/
+COPY uwsgi/start_uwsgi.sh /app/
 
-RUN python3 ./manage.py migrate
+WORKDIR /app/
 
-EXPOSE 8000
+RUN chmod +x start_uwsgi.sh

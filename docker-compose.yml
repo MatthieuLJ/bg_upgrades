@@ -1,33 +1,61 @@
-version: '3.8'
-
 services:
-  web:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    image: django
-    command: python3 manage.py runserver 0.0.0.0:8000
-    ports:
-      - 8000:8000
-    # env_file is used to manage the env variables of our project
-    #env_file:
-      #- ./.env/.dev-sample
-    depends_on:
-      - redis
-
   redis:
     image: redis:7-alpine
 
   celery_worker:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./docker_env
+    command: celery -A bg_upgrades worker -l info
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./django_app
+          target: /app
+    volumes:
+      - tmp_storage:/tmp
+      - django_results:/app/tmp
+    depends_on:
+      - redis
+
+  uwsgi:
     build:
       context: .
       dockerfile: ./Dockerfile
-    image: celery
-    command: celery -A bg_upgrades worker -l info
-    #env_file:
-      #- ./.env/.dev-sample
+    env_file:
+      - ./docker_env
+    command: /bin/sh ./start_uwsgi.sh
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./django_app
+          target: /app
+    volumes:
+      - django_staticfiles:/app/staticfiles
+      - socket:/sock
+      - tmp_storage:/tmp
     depends_on:
       - redis
-      - web
 
-#volumes:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: ./Dockerfile
+    volumes:
+      - django_staticfiles:/staticfiles
+      - django_results:/result
+      - socket:/sock
+    depends_on:
+      - redis
+      - uwsgi
+      - celery_worker
+    ports:
+      - 80:80
+
+volumes:
+  socket:
+  django_staticfiles:
+  django_results:
+  tmp_storage:

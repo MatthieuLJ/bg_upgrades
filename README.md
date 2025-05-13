@@ -1,8 +1,7 @@
 
 ![Works on my machine](https://forthebadge.com/images/badges/works-on-my-machine.svg)
 
-Architecture
-============
+# Architecture
 
 BG upgrades is using the **django** framework at its core.
 
@@ -10,8 +9,7 @@ The overall architecture should be pretty standard with one central form generat
 
 It uses Redis and Celery to process the requests asynchronously (and report on progress).
 
-Requirements
-============
+# Requirements
 
 * Python 3 (possibly also python3.X-dev on ubuntu)
 * `imagemagick`
@@ -19,8 +17,7 @@ Requirements
 * `redis`
 * [`chromedriver`](https://chromedriver.chromium.org/)
 
-Development
-===========
+# Development
 
 To setup an environment, use virtualenv and install the packages listed in requirements.txt
 
@@ -42,8 +39,7 @@ or
 
     $ coverage html
 
-Test server
------------
+## Test server
 
     $ redis-server
     $ watchmedo auto-restart --directory=./ --pattern="*.py" --recursive -- celery -A bg_upgrades worker -l info
@@ -56,9 +52,11 @@ or through uwsgi
 
     $ uwsgi --http :8000 --module django_app/bg_upgrades.wsgi
 
-Startup / Deploy
-================
+### Generate a SSH certificate for local SSH testing:
 
+     openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout localhost.key -out localhost.crt -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+
+# Startup / Deploy
 
 To deploy, you need to setup those environment variables:
 
@@ -95,8 +93,7 @@ Optionally:
 
 The overall deployment framework is using nginx and uWSGI as documented (here)[https://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html].
 
-SSL / TLS
-=========
+# SSL / TLS
 
 Set the environment variables: `DOMAIN` to bg-upgrades.net and `WILDCARD` to `*.$DOMAIN`
 
@@ -106,8 +103,7 @@ Set the environment variables: `DOMAIN` to bg-upgrades.net and `WILDCARD` to `*.
 
 Instructions also (here)[https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/]
 
-Maintenance
-===========
+# Maintenance
 
 To find packages that need to be updated, you can check [this link](https://requires.io/github/MatthieuLJ/bg_upgrades/requirements/?branch=master) or run `$ pip list --outdated`
 
@@ -125,16 +121,14 @@ When the reference data needs to change for the graphics tests, run:
 
 If running into permissions issues for using 'PDF' in ImageMagick, follow [those instructions](https://stackoverflow.com/a/59193253)
 
-Docker
-======
+# Docker
 
 Start with `docker-compose up -d` (docker desktop needs to be running).
 
 For now, this will run the local webserver that can server requests but will not
 be able to access the resulting file.
 
-Dependencies
-============
+# Dependencies
 
 The libraries this web application uses:
 

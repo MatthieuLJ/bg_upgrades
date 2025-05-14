@@ -316,6 +316,15 @@ class TuckBoxDrawing:
                     color_face_draw.rectangle(left = face_positions[side][0], top = face_positions[side][1],
                                             width = face_sizes[side][0], height = face_sizes[side][1])
                     color_face_draw.draw(image)
+                # For some reason, the parameters of colors don't seem to be consistent
+                elif self.faces[side][0] == "#":
+                    # we are filling with color
+                    color_face_draw = Drawing()
+                    color_face_draw.stroke_width = 0
+                    color_face_draw.fill_color = Color(self.faces[side])
+                    color_face_draw.rectangle(left = face_positions[side][0], top = face_positions[side][1],
+                                            width = face_sizes[side][0], height = face_sizes[side][1])
+                    color_face_draw.draw(image)
                 else:
                     _, file_extension = os.path.splitext(os.path.basename(self.faces[side]))
                     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_extension)
@@ -612,6 +621,9 @@ class TuckBoxDrawing:
         if self.faces['back'][:2] == "0x":
             lip_image = Image(width = lip_full_mask_image.width, height = lip_full_mask_image.height,
                             background = Color("#"+self.faces['back'][2:]))
+        elif self.faces['back'][0] == "#":
+            lip_image = Image(width = lip_full_mask_image.width, height = lip_full_mask_image.height,
+                            background = Color(self.faces['back']))
         else:
             # Prepare the front image
             angle = 180 if "back_angle" not in self.options else (self.options["back_angle"]+2)*90
@@ -662,7 +674,7 @@ class TuckBoxDrawing:
 
     def resize_rotate_image(self, filename, destination_filename, angle=0, width=0, height=0):
         # convert filename [-rotate angle] [-resize widthxheight!] destination_filename
-        cmd = ["convert"]
+        cmd = ["magick"]
         cmd.append(filename)
         if angle == 0 and (width == 0 or height == 0):
             return

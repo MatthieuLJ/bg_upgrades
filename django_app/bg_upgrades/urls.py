@@ -17,13 +17,13 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, re_path, include
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('', RedirectView.as_view(url="tuck/", permanent=False) ),
     path('about', TemplateView.as_view(template_name="about.html"), name='about'),
-    path('tuck/', include('tuckbox.urls')),
+    re_path(r'^tuck/', include('tuckbox.urls')),
     path('admin/', admin.site.urls),
 ]  + static(settings.TMP_URL, document_root=settings.TMP_ROOT)

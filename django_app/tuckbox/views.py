@@ -6,7 +6,7 @@ import shutil
 from . import box, tasks
 from django.conf import settings
 from django.shortcuts import render, redirect
-from django.http import FileResponse, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django import forms
 
 
@@ -33,7 +33,6 @@ def index(request):
 
 def preview(request):
     tmp = tempfile.NamedTemporaryFile(delete=True, suffix=".png")
-    print(tmp.name)
 
     data = json.loads(request.body)
     paper = data['paper']
@@ -62,7 +61,7 @@ def check_fit(request):
 def pattern(request):
     if request.method != 'POST':
         return redirect('index')
-
+    
     form = PatternForm(request.POST)
     if not form.is_valid():
         return JsonResponse(data={'error_text': "Form has invalid data"}, status=400)
@@ -75,14 +74,13 @@ def pattern(request):
     faces = {}
     options = {}
 
-    # print(form.data)
-
     for face in ['front', 'back', 'top', 'bottom', 'left', 'right']:
         if face + "_plain_color" in form.data:
             #using color rather than image
             faces[face] = form.data[face + "_color"]
         elif face in request.FILES:
             # Need to copy the contents to a temporary file
+            
             _, file_extension = os.path.splitext(request.FILES[face].name)
             new_file = tempfile.NamedTemporaryFile(delete=False, prefix="_"+face, suffix=file_extension)
             shutil.copyfileobj(request.FILES[face], new_file)
@@ -106,23 +104,19 @@ def pattern(request):
     }
 
     async_result = tasks.build_box.delay(parameters)
-
+    
     return JsonResponse(data={'task_id': async_result.id, 'url': settings.TMP_URL + os.path.basename(result_pdf.name)}, status=202)
 
 
 def check_progress(request):
-    print(request.GET)
+    task_id = request.GET.get('task_id', 0)
     try:
-        task_id = request.GET['task_id']
         state, info = tasks.get_status(task_id)
         data = {'task_id': task_id,
                 'state': state,
                 'info': info}
-        print("Sending back: "+ str(data))
         return JsonResponse(data, status=200)
     except:
-        task_id = request.GET['task_id']
         data = {'task_id': task_id,
                 'state': 'FAILURE' }
-        print("Sending back: "+ str(data))
         return JsonResponse(data, status=200)

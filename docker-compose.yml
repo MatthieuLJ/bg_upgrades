@@ -47,6 +47,7 @@ services:
       - django_staticfiles:/staticfiles
       - django_results:/result
       - socket:/sock
+      - /etc/letsencrypt/live/:/etc/letsencrypt/live/
     depends_on:
       - redis
       - uwsgi

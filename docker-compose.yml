@@ -1,6 +1,8 @@
 services:
   redis:
-    image: redis:7-alpine
+    image: redis:8.0-alpine
+    ports:
+      - 6379:6379
 
   celery_worker:
     build: 
@@ -47,7 +49,7 @@ services:
       - django_staticfiles:/staticfiles
       - django_results:/result
       - socket:/sock
-      - /etc/letsencrypt/live/:/etc/letsencrypt/live/
+      - /etc/letsencrypt/:/etc/letsencrypt/
     depends_on:
       - redis
       - uwsgi

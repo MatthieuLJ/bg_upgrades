@@ -12,6 +12,8 @@ COPY requirements.txt /
 
 RUN pip install -r requirements.txt
 
+RUN addgroup --system app && adduser --system -s /bin/sh app
+
 COPY django_app/ /app
 
 COPY uwsgi/uwsgi.ini /app/

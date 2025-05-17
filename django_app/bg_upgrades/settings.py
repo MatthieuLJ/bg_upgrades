@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -25,8 +24,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'to2a5#&-dgyxi3x7))!oy+!vo7n)h7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ["52.40.238.231", ".bg-upgrades.net", "127.0.0.1", "localhost", "0.0.0.0", "*"]
-
+ALLOWED_HOSTS = ["52.40.238.231", ".bg-upgrades.net", "127.0.0.1", "localhost", "0.0.0.0", "*", '[::1]']
+CSRF_TRUSTED_ORIGINS = ['https://bg-upgrades.net', 'https://www.bg-upgrades.net']
 
 # Application definition
 

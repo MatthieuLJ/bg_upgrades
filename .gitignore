@@ -16,3 +16,6 @@ django_app/staticfiles/*
 
 # Temporary products
 django_app/tmp/tmp*
+
+# certbot volume
+certbot/

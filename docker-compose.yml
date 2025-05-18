@@ -27,6 +27,7 @@ services:
       context: .
       dockerfile: ./Dockerfile
     env_file:
+      # - ./docker_env.prod
       - ./docker_env
     command: /bin/sh ./start_uwsgi.sh
     develop:
@@ -44,19 +45,24 @@ services:
   nginx:
     build:
       context: ./nginx
+      # dockerfile: ./Dockerfile.prod
       dockerfile: ./Dockerfile
+    restart: always
     volumes:
       - django_staticfiles:/staticfiles
       - django_results:/result
       - socket:/sock
-      - /etc/letsencrypt/:/etc/letsencrypt/
-    depends_on:
-      - redis
-      - uwsgi
-      - celery_worker
+      - ./certbot/www/:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/letsencrypt/:ro
     ports:
       - 80:80
       - 443:443
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
 
 volumes:
   socket:

@@ -1,0 +1,8 @@
+FROM nginx:1.27.3-alpine
+
+COPY uwsgi_params /etc/nginx/
+COPY bg-upgrades.net-nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY options-ssl-nginx.conf /etc/nginx/
+
+CMD ["nginx","-g","daemon off;"]

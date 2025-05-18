@@ -125,8 +125,9 @@ If running into permissions issues for using 'PDF' in ImageMagick, follow [those
 
 Start with `docker-compose up -d` (docker desktop needs to be running).
 
-For now, this will run the local webserver that can server requests but will not
-be able to access the resulting file.
+To test locally, see the procedure to create an SSL certificate locally. Or use the nginx configuration file that does not use SSL.
+
+To run in production, change docker-compose to use Dockerfile.prod for the nginx service (the main change is to point to local SSL certificates) and the django environment variables (change the secret on the real site)
 
 # Dependencies
 

@@ -121,6 +121,16 @@ When the reference data needs to change for the graphics tests, run:
 
 If running into permissions issues for using 'PDF' in ImageMagick, follow [those instructions](https://stackoverflow.com/a/59193253)
 
+## SSL certificate
+
+Added
+
+```
+0 3 */3 * * cd <path to project> && perl -e 'sleep int(rand(43200))' && docker compose run --rm certbot renew
+```
+
+to `/etc/cron.d/certbot/` so that every 3 days at 3am it will check to renew the SSL certificate with certbot
+
 # Docker
 
 Start with `docker-compose up -d` (docker desktop needs to be running).

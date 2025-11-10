@@ -9,6 +9,8 @@ The overall architecture should be pretty standard with one central form generat
 
 It uses Redis and Celery to process the requests asynchronously (and report on progress).
 
+The server uses uWSGI and Nginx the same way it is documented [here](https://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html)
+
 # Requirements
 
 * Python 3 (possibly also python3.X-dev on ubuntu)
@@ -111,7 +113,7 @@ Then update:
 
     $ pip install <package_name> --upgrade
 
-Whenever the packages change, record the packages:
+Whenever the packages change, record the packages with versions:
 
     $ pip-chill > requirements.txt
 
@@ -138,6 +140,14 @@ Start with `docker-compose up -d` (docker desktop needs to be running).
 To test locally, see the procedure to create an SSL certificate locally. Or use the nginx configuration file that does not use SSL.
 
 To run in production, change docker-compose to use Dockerfile.prod for the nginx service (the main change is to point to local SSL certificates) and the django environment variables (change the secret on the real site)
+
+## Test server
+
+The test server is configure to run on a host called `mysite.test`. It is easy to add an entry in `/etc/hosts` or `C:\windows\system32\drivers\etc\hosts` on Windows with
+```
+127.0.0.1 mysite.test
+```
+to redirect queries to that host to localhost. Of course, nothing should be running using port 80.
 
 # Dependencies
 

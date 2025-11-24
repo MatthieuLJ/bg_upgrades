@@ -9,7 +9,7 @@ inflect==7.3.1
 jaraco.collections==5.1.0
 pip-chill==1.0.3
 pylint==4.0.2
-pypdf==6.2.0
+pypdf==6.4.0
 pysocks==1.7.1
 redis==7.0.1
 selenium==4.38.0

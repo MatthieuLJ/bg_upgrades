@@ -2,7 +2,7 @@ argh==0.31.3
 backports.tarfile==1.2.0
 celery==5.5.3
 coverage==7.11.3
-django==5.2.8
+django==5.2.11
 future==1.0.0
 importlib-metadata==8.7.0
 inflect==7.3.1

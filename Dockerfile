@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.12-alpine
 
 # Install Imagemagick package
 # gcc and more are required to build the uswgi wheel
@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1
 
 COPY requirements.txt /
 
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 RUN addgroup --system app && adduser --system -s /bin/sh app
 
